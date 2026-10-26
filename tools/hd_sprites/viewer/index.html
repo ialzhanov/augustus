@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Caesar III HD Sprites</title>
+<style>
+:root {
+  --bg: #15161a; --panel: #1d1f25; --panel2: #24272e; --line: #31343d; --text: #e6e6e6; --dim: #9aa0aa;
+  --ok: #4cc38a; --fail: #ef5f5f; --warn: #e8b33f; --info: #5aa9e6; --none: #5d6270; --accent: #d9a441;
+  --tile-dark: #1b1c20; --tile-grass: #4f6b22;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--text); font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; display: grid;
+       grid-template-columns: 260px 1fr; grid-template-rows: auto 1fr; grid-template-areas: "top top" "side main"; }
+header { grid-area: top; background: var(--panel); border-bottom: 1px solid var(--line); padding: 10px 16px; display: flex; gap: 18px;
+         align-items: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 5; }
+h1 { font-size: 15px; margin: 0; font-weight: 600; letter-spacing: .3px; }
+h1 small { color: var(--dim); font-weight: 400; margin-left: 8px; }
+.stats { display: flex; gap: 14px; align-items: center; }
+.stat b { font-size: 15px; } .stat span { color: var(--dim); margin-left: 4px; }
+.bar { height: 8px; width: 220px; background: var(--panel2); border-radius: 4px; overflow: hidden; display: flex; }
+.bar i { display: block; height: 100%; }
+.c-installed { background: var(--ok); } .c-pass { background: var(--info); } .c-fail { background: var(--fail); } .c-none { background: var(--none); }
+.controls { display: flex; gap: 8px; align-items: center; margin-left: auto; flex-wrap: wrap; }
+input[type=search], select { background: var(--panel2); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; font: inherit; }
+input[type=search] { width: 200px; }
+.chips { display: flex; gap: 4px; }
+.chip { border: 1px solid var(--line); background: var(--panel2); color: var(--dim); border-radius: 14px; padding: 4px 10px; cursor: pointer; user-select: none; }
+.chip.on { color: var(--text); border-color: var(--accent); background: #3a3020; }
+aside { grid-area: side; background: var(--panel); border-right: 1px solid var(--line); overflow: auto; padding: 8px 0; }
+.cat { padding: 10px 14px 4px; color: var(--dim); font-size: 11px; text-transform: uppercase; letter-spacing: .8px; display: flex; justify-content: space-between; }
+.grp { padding: 5px 14px; cursor: pointer; display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; border-left: 3px solid transparent; }
+.grp:hover { background: var(--panel2); }
+.grp.on { background: var(--panel2); border-left-color: var(--accent); }
+.grp .n { color: var(--dim); font-size: 11px; }
+.grp .mini { grid-column: 1 / -1; height: 3px; background: var(--panel2); border-radius: 2px; overflow: hidden; display: flex; }
+.grp .mini i { display: block; height: 100%; }
+.grp.empty { opacity: .55; }
+main { grid-area: main; overflow: auto; padding: 14px 16px 40px; }
+.section-title { display: flex; align-items: baseline; gap: 10px; margin: 6px 0 10px; }
+.section-title h2 { font-size: 14px; margin: 0; }
+.section-title span { color: var(--dim); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; cursor: pointer; content-visibility: auto;
+        contain-intrinsic-size: 150px 150px; transition: border-color .1s; }
+.card:hover { border-color: var(--accent); }
+.card .thumb { height: 104px; display: flex; align-items: center; justify-content: center; position: relative; background: var(--tile-dark); }
+.card .thumb img { max-width: 92%; max-height: 92%; image-rendering: auto; }
+.card .thumb img.px { image-rendering: pixelated; }
+.card .thumb .alt { position: absolute; inset: 0; margin: auto; opacity: 0; }
+.card:hover .thumb .alt { opacity: 1; } .card:hover .thumb .main { opacity: 0; }
+.card .meta { padding: 6px 8px; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.card .id { font-variant-numeric: tabular-nums; color: var(--dim); }
+.badge { font-size: 10px; padding: 1px 6px; border-radius: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; white-space: nowrap; }
+.b-installed { background: #1d3d2e; color: var(--ok); } .b-pass { background: #1b3247; color: var(--info); }
+.b-fail { background: #452224; color: var(--fail); } .b-none { background: #2a2c33; color: var(--dim); } .b-stale { background: #44391d; color: var(--warn); }
+.card .fails { padding: 0 8px 7px; display: flex; flex-wrap: wrap; gap: 3px; }
+.card .fails span { font-size: 10px; color: var(--fail); border: 1px solid #5b2a2c; border-radius: 4px; padding: 0 4px; }
+.more { margin: 16px auto; display: block; }
+button { background: var(--panel2); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; font: inherit; cursor: pointer; }
+button:hover { border-color: var(--accent); }
+/* detail drawer */
+#detail { position: fixed; inset: 0 0 0 auto; width: min(1100px, 96vw); background: var(--panel); border-left: 1px solid var(--line);
+          box-shadow: -10px 0 30px #0008; transform: translateX(105%); transition: transform .18s; z-index: 10; display: flex; flex-direction: column; }
+#detail.open { transform: none; }
+#shade { position: fixed; inset: 0; background: #0006; opacity: 0; pointer-events: none; transition: opacity .18s; z-index: 9; }
+#shade.open { opacity: 1; pointer-events: auto; }
+.dhead { padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.dhead h3 { margin: 0; font-size: 15px; }
+.dhead .sub { color: var(--dim); }
+.dhead .sp { flex: 1; }
+.dbody { overflow: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 16px; flex: 1; min-height: 0; }
+.dbody > * { flex: none; }
+.stage { position: relative; background: var(--tile-dark); border-radius: 8px; border: 1px solid var(--line); display: flex; align-items: center;
+         justify-content: flex-start; min-height: 260px; overflow: auto; padding: 24px; }
+.stage.bg-grass { background: var(--tile-grass); }
+.stage.bg-check { background: repeating-conic-gradient(#2c2e34 0 25%, #222428 0 50%) 0 0 / 16px 16px; }
+.wipe { position: relative; flex: none; margin: auto; }
+.wipe img { display: block; image-rendering: pixelated; }
+.wipe .newwrap { position: absolute; inset: 0; clip-path: inset(0 0 0 var(--cut, 50%)); }
+.wipe .new { display: block; image-rendering: auto; }
+.wipe .line { position: absolute; top: 0; bottom: 0; left: var(--cut, 50%); width: 2px; background: var(--accent); pointer-events: none; }
+.wipe .lab { position: absolute; top: -18px; font-size: 11px; color: var(--dim); }
+.row { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-start; }
+.panel { background: var(--panel2); border: 1px solid var(--line); border-radius: 8px; padding: 10px; }
+.panel h4 { margin: 0 0 8px; font-size: 12px; color: var(--dim); font-weight: 600; text-transform: uppercase; letter-spacing: .6px; }
+.views { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; }
+.views figure { margin: 0; text-align: center; }
+.views figcaption { color: var(--dim); font-size: 11px; margin-top: 4px; }
+.views img { display: block; background: var(--tile-dark); }
+table.checks { border-collapse: collapse; width: 100%; }
+table.checks td { padding: 4px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.checks td:first-child { width: 22px; } table.checks td:nth-child(2) { width: 90px; font-weight: 600; }
+.ok { color: var(--ok); } .bad { color: var(--fail); }
+.tiling { position: relative; }
+.tiling img { position: absolute; }
+.kbd { color: var(--dim); font-size: 11px; } .kbd b { border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; color: var(--text); font-weight: 500; }
+.overview { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin-bottom: 18px; }
+.ov { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+.ov h3 { margin: 0 0 6px; font-size: 13px; } .ov .bar { width: 100%; margin: 6px 0; }
+.ov .legend { color: var(--dim); font-size: 11px; display: flex; gap: 10px; flex-wrap: wrap; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+@media (max-width: 800px) { body { grid-template-columns: 1fr; grid-template-areas: "top" "main"; } aside { display: none; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Caesar III — HD sprites <small id="built"></small></h1>
+  <div class="stats" id="stats"></div>
+  <div class="controls">
+    <input type="search" id="q" placeholder="Search id or group (e.g. 2780, tent)">
+    <div class="chips" id="chips"></div>
+    <select id="bg" title="Thumbnail background"><option value="dark">Dark</option><option value="grass">Grass</option><option value="check">Checker</option></select>
+    <button id="reload" title="Reload data after a build (R)">Reload</button>
+  </div>
+</header>
+<aside id="side"></aside>
+<main id="main"></main>
+<div id="shade"></div>
+<section id="detail" aria-hidden="true"></section>
+<script src="data.js"></script>
+<script>
+const D = window.C3DATA;
+const groups = new Map(D.groups.map(g => [g.id, g]));
+const STATUS = [
+  ['installed', 'Installed'], ['pass', 'Passing'], ['fail', 'Failing'], ['none', 'Not started']];
+const st = load();
+function load() { try { return Object.assign({ status: 'all', group: 'overview', bg: 'dark', q: '' }, JSON.parse(localStorage.getItem('c3viewer') || '{}')); } catch (e) { return { status: 'all', group: 'overview', bg: 'dark', q: '' }; } }
+function save() { try { localStorage.setItem('c3viewer', JSON.stringify(st)); } catch (e) {} }
+
+function status(s) {
+  if (!s.hd) return 'none';
+  const fails = s.checks ? Object.entries(s.checks).filter(([, v]) => !v[0]).map(([k]) => k) : [];
+  if (s.installed && s.installed_current && !fails.length) return 'installed';
+  return fails.length ? 'fail' : 'pass';
+}
+D.sprites.forEach(s => { s.status = status(s); s.fails = s.checks ? Object.entries(s.checks).filter(([, v]) => !v[0]).map(([k]) => k) : []; });
+
+function counts(list) {
+  const c = { installed: 0, pass: 0, fail: 0, none: 0 };
+  list.forEach(s => c[s.status]++); c.total = list.length; return c;
+}
+function barHTML(c, width) {
+  const t = Math.max(c.total, 1);
+  return `<div class="bar" ${width ? `style="width:${width}"` : ''}>${['installed', 'pass', 'fail'].map(k =>
+    `<i class="c-${k}" style="width:${100 * c[k] / t}%"></i>`).join('')}</div>`;
+}
+
+// header
+document.getElementById('built').textContent = 'data built ' + D.built;
+function renderStats() {
+  const c = counts(D.sprites);
+  document.getElementById('stats').innerHTML = barHTML(c) +
+    `<div class="stat"><b class="ok">${c.installed}</b><span>installed</span></div>` +
+    `<div class="stat"><b style="color:var(--info)">${c.pass}</b><span>passing</span></div>` +
+    `<div class="stat"><b class="bad">${c.fail}</b><span>failing</span></div>` +
+    `<div class="stat"><b>${c.total}</b><span>sprites</span></div>`;
+}
+const chips = document.getElementById('chips');
+chips.innerHTML = [['all', 'All'], ...STATUS].map(([k, l]) => `<span class="chip" data-k="${k}">${l}</span>`).join('');
+chips.onclick = e => { const k = e.target.dataset.k; if (!k) return; st.status = k; save(); renderChips(); renderMain(); };
+function renderChips() { chips.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c.dataset.k === st.status)); }
+const q = document.getElementById('q'); q.value = st.q;
+q.oninput = () => { st.q = q.value.trim().toLowerCase(); save(); renderMain(); };
+const bg = document.getElementById('bg'); bg.value = st.bg;
+bg.onchange = () => { st.bg = bg.value; save(); applyBg(); };
+function applyBg() { document.documentElement.style.setProperty('--tile-dark', st.bg === 'grass' ? '#4f6b22' : '#1b1c20');
+  document.querySelectorAll('.card .thumb').forEach(t => t.style.background = st.bg === 'check' ? 'repeating-conic-gradient(#2c2e34 0 25%, #222428 0 50%) 0 0 / 12px 12px' : ''); }
+document.getElementById('reload').onclick = () => location.reload();
+
+// sidebar: overview + groups by category, groups with work first
+function renderSide() {
+  const byGroup = new Map();
+  D.sprites.forEach(s => { if (!byGroup.has(s.g)) byGroup.set(s.g, []); byGroup.get(s.g).push(s); });
+  const cats = {};
+  D.groups.forEach(g => { if (byGroup.has(g.id)) (cats[g.category] = cats[g.category] || []).push(g); });
+  let html = `<div class="grp ${st.group === 'overview' ? 'on' : ''}" data-g="overview"><span>Overview</span><span class="n"></span></div>`;
+  for (const cat of ['Terrain', 'Housing', 'Buildings', 'Walkers', 'Interface & other']) {
+    const gs = cats[cat] || []; if (!gs.length) continue;
+    const all = gs.flatMap(g => byGroup.get(g.id)); const c = counts(all);
+    html += `<div class="cat"><span>${cat}</span><span>${c.installed}/${c.total}</span></div>`;
+    gs.sort((a, b) => (counts(byGroup.get(b.id)).total - counts(byGroup.get(b.id)).none > 0) - (counts(byGroup.get(a.id)).total - counts(byGroup.get(a.id)).none > 0) || a.start - b.start);
+    for (const g of gs) {
+      const gc = counts(byGroup.get(g.id)); const t = Math.max(gc.total, 1);
+      html += `<div class="grp ${st.group == g.id ? 'on' : ''} ${gc.none === gc.total ? 'empty' : ''}" data-g="${g.id}">
+        <span>${g.name.toLowerCase().replace(/_/g, ' ')}</span><span class="n">${gc.installed}/${gc.total}</span>
+        <div class="mini">${['installed', 'pass', 'fail'].map(k => `<i class="c-${k}" style="width:${100 * gc[k] / t}%"></i>`).join('')}</div></div>`;
+    }
+  }
+  const side = document.getElementById('side'); side.innerHTML = html;
+  side.onclick = e => { const el = e.target.closest('.grp'); if (!el) return; st.group = el.dataset.g; save(); renderSide(); renderMain(); document.getElementById('main').scrollTop = 0; };
+}
+
+// main: overview or a filtered grid
+let current = [], shown = 0;
+function filtered() {
+  let list = D.sprites;
+  if (st.group !== 'overview' || st.q) {
+    if (st.q) {
+      const n = parseInt(st.q, 10);
+      list = list.filter(s => (!isNaN(n) && String(s.id).startsWith(st.q)) || (groups.get(s.g)?.name || '').toLowerCase().includes(st.q.replace(/ /g, '_')));
+    } else list = list.filter(s => s.g == st.group);
+  } else list = list.filter(s => s.status !== 'none');
+  if (st.status !== 'all') list = list.filter(s => s.status === st.status);
+  return list;
+}
+function badge(s) {
+  if (s.status === 'none') return '<span class="badge b-none">original</span>';
+  if (s.status === 'installed') return '<span class="badge b-installed">installed</span>';
+  if (s.installed && !s.installed_current) return `<span class="badge b-stale" title="the game has an older version of this sprite">old in game</span>`;
+  return s.status === 'fail' ? '<span class="badge b-fail">failing</span>' : '<span class="badge b-pass">passing</span>';
+}
+function card(s) {
+  const orig = `../originals/${s.id}.png`;
+  const main = s.hd ? `<img class="main" loading="lazy" src="${s.hd}?${s.rendered}"><img class="alt px" loading="lazy" src="${orig}">`
+                    : `<img class="main px" loading="lazy" src="${orig}">`;
+  return `<div class="card" data-id="${s.id}" title="${s.hd ? 'hover: original' : 'original sprite'}">
+    <div class="thumb">${main}</div>
+    <div class="meta"><span class="id">#${s.id} <span style="opacity:.6">${s.w}×${s.h}</span></span>${badge(s)}</div>
+    ${s.fails.length ? `<div class="fails">${s.fails.map(f => `<span>${f}</span>`).join('')}</div>` : ''}</div>`;
+}
+function renderMain() {
+  const main = document.getElementById('main');
+  current = filtered(); shown = 0;
+  let head = '';
+  if (st.group === 'overview' && !st.q) {
+    const byCat = {};
+    D.sprites.forEach(s => { const c = groups.get(s.g)?.category || 'Interface & other'; (byCat[c] = byCat[c] || []).push(s); });
+    head = `<div class="overview">${['Terrain', 'Housing', 'Buildings', 'Walkers', 'Interface & other'].filter(c => byCat[c]).map(c => {
+      const k = counts(byCat[c]);
+      return `<div class="ov"><h3>${c}</h3>${barHTML(k)}<div class="legend">
+        <span><i class="dot c-installed"></i>${k.installed} installed</span><span><i class="dot c-pass"></i>${k.pass} passing</span>
+        <span><i class="dot c-fail"></i>${k.fail} failing</span><span><i class="dot c-none"></i>${k.none} original</span></div></div>`; }).join('')}</div>
+      <div class="section-title"><h2>Work in progress</h2><span>${current.length} sprites with a new version · newest first</span></div>`;
+    current = current.slice().sort((a, b) => (b.rendered || 0) - (a.rendered || 0));
+  } else {
+    const g = groups.get(+st.group);
+    head = `<div class="section-title"><h2>${st.q ? `Search “${st.q}”` : (g ? g.name.toLowerCase().replace(/_/g, ' ') : '')}</h2>
+      <span>${current.length} sprites${g && !st.q ? ` · ids ${g.start}–${g.end - 1}` : ''}</span></div>`;
+  }
+  main.innerHTML = head + '<div class="grid" id="grid"></div><button class="more" id="more">Show more</button>';
+  more(); applyBg();
+}
+function more() {
+  const grid = document.getElementById('grid'); const next = current.slice(shown, shown + 300);
+  grid.insertAdjacentHTML('beforeend', next.map(card).join('')); shown += next.length;
+  document.getElementById('more').style.display = shown < current.length ? '' : 'none';
+}
+document.getElementById('main').addEventListener('click', e => {
+  if (e.target.id === 'more') return more();
+  const c = e.target.closest('.card'); if (c) openDetail(+c.dataset.id);
+});
+document.getElementById('main').addEventListener('scroll', e => {
+  const m = e.target; if (m.scrollTop + m.clientHeight > m.scrollHeight - 600 && shown < current.length) more();
+});
+
+// detail drawer
+let openId = null, zoom = 0, cut = 50, dbg = st.bg;   // zoom 0 = fit the stage
+function openDetail(id) {
+  openId = id; const s = D.sprites.find(x => x.id === id); const g = groups.get(s.g);
+  const det = document.getElementById('detail');
+  const z = zoom || Math.max(1, Math.min(10, Math.floor(620 / s.w), Math.floor(420 / s.h)));
+  const W = s.w * z, H = s.h * z;
+  const hdFile = s.hd ? `${s.hd}?${s.rendered}` : null;
+  const checks = s.checks ? Object.entries(s.checks).map(([k, [ok, msg]]) =>
+    `<tr><td class="${ok ? 'ok' : 'bad'}">${ok ? '✔' : '✖'}</td><td>${k}</td><td>${msg}</td></tr>`).join('') : '<tr><td></td><td colspan="2">No new version yet.</td></tr>';
+  const isTile = s.w === 58 && s.h === 30;
+  det.innerHTML = `
+    <div class="dhead"><h3>#${s.id}</h3><span class="sub">${g ? g.name.toLowerCase().replace(/_/g, ' ') : ''} · ${s.w}×${s.h} px${s.top ? ' · has top part' : ''}</span>${badge(s)}
+      <span class="sp"></span>
+      <label class="kbd">Zoom <select id="dz"><option value="0" ${zoom === 0 ? 'selected' : ''}>Fit (${z * 100}%)</option>${[1, 2, 4, 6, 8].map(v => `<option value="${v}" ${v === zoom ? 'selected' : ''}>${v * 100}%</option>`).join('')}</select></label>
+      <label class="kbd">Background <select id="dbg"><option value="dark">Dark</option><option value="grass">Grass</option><option value="check">Checker</option></select></label>
+      <span class="kbd"><b>←</b> <b>→</b> next · <b>Esc</b> close</span><button id="dclose">Close</button></div>
+    <div class="dbody">
+      <div class="stage bg-${dbg}" id="stage">
+        ${hdFile ? `<div class="wipe" id="wipe" style="--cut:${cut}%;width:${W}px;height:${H}px">
+            <span class="lab" style="left:0">original</span><span class="lab" style="right:0">new</span>
+            <img src="../originals/${s.id}.png" width="${W}" height="${H}">
+            <div class="newwrap"><img class="new" src="${hdFile}" width="${W}" height="${H}" style="${footClip(s, z)}"></div><div class="line"></div></div>`
+          : `<img src="../originals/${s.id}.png" width="${W}" height="${H}" style="image-rendering:pixelated">`}
+      </div>
+      ${hdFile ? `<input type="range" id="cut" min="0" max="100" value="${cut}" style="width:100%" title="drag to compare (or move the mouse over the image)">` : ''}
+      <div class="row">
+        <div class="panel"><h4>Views</h4><div class="views">
+          <figure><img src="../originals/${s.id}.png" width="${s.w * 2}" style="image-rendering:pixelated"><figcaption>original · 200%</figcaption></figure>
+          ${hdFile ? `<figure><img src="${hdFile}" width="${s.w}" style="${footClip(s, 1)}"><figcaption>new · 100% (game)</figcaption></figure>
+          <figure><img src="${hdFile}" width="${s.w * 2}" style="${footClip(s, 2)}"><figcaption>new · 200% (game max)</figcaption></figure>` : ''}
+          ${s.hd8 ? `<figure><img src="${s.hd8}?${s.rendered}" width="${Math.min(s.w * 6, 460)}"><figcaption>8× render</figcaption></figure>` : ''}
+          ${s.hdtop ? `<figure><img src="${s.hdtop}?${s.rendered}" width="${s.w * 2}"><figcaption>top part (_top.png)</figcaption></figure>` : ''}
+        </div></div>
+        ${isTile ? `<div class="panel"><h4>Tiling 3×3 (seams)</h4>${tiling(s, hdFile)}</div>` : ''}
+      </div>
+      <div class="panel"><h4>Checks</h4><table class="checks">${checks}</table></div>
+      <div class="kbd">Files: <code>originals/${s.id}.png</code>${s.hd ? ` · <code>blender/out/${s.id}.png</code>` : ''}${s.installed ? ` · <code>~/caesar3/hd/c3/${s.id}.png</code>${s.installed_current ? '' : ' <span class="bad">(older than out/)</span>'}` : ''}</div>
+    </div>`;
+  det.classList.add('open'); document.getElementById('shade').classList.add('open');
+  det.querySelector('#dbg').value = dbg;
+  det.querySelector('#dclose').onclick = closeDetail;
+  det.querySelector('#dz').onchange = e => { zoom = +e.target.value; openDetail(id); };
+  det.querySelector('#dbg').onchange = e => { dbg = e.target.value; det.querySelector('#stage').className = 'stage bg-' + dbg; };
+  const r = det.querySelector('#cut'), w = det.querySelector('#wipe');
+  if (r) {
+    r.oninput = () => { cut = +r.value; w.style.setProperty('--cut', cut + '%'); };
+    w.onmousemove = e => { const b = w.getBoundingClientRect(); cut = Math.round(100 * (e.clientX - b.left) / b.width); r.value = cut; w.style.setProperty('--cut', cut + '%'); };
+  }
+}
+function tiling(s, hdFile) {
+  // 3x3 tiles of this sprite (and its group's other new tiles) in the game's diamond layout, at 200%
+  const z = 2, tw = 60 * z, th = 30 * z; const same = D.sprites.filter(x => x.g === s.g && x.hd && x.w === 58 && x.h === 30);
+  let html = `<div class="tiling" style="width:${tw * 3}px;height:${th * 3 + th}px">`;
+  for (let y = 0; y < 3; y++) for (let x = 0; x < 3; x++) {
+    const t = (x === 1 && y === 1) || same.length < 2 ? s : same[(x * 7 + y * 3 + s.id) % same.length];
+    const src = t.hd ? `${t.hd}?${t.rendered}` : `../originals/${t.id}.png`;
+    html += `<img src="${src}" width="${58 * z}" height="${th}" style="left:${(x - y) * 30 * z + tw}px;top:${(x + y) * 15 * z}px;${t.hd ? footClip(t, z) : ''}${t.hd ? '' : 'image-rendering:pixelated;'}">`;
+  }
+  return html + '</div>';
+}
+function footClip(s, z) {
+  // diamond of the footprint (n tiles), 1 px larger on each side like the engine's stepped outline (no gaps when tiled)
+  const n = Math.round((s.w + 2) / 60); if (s.h !== 30 * n) return '';
+  const cx = s.w / 2, cy = s.h / 2, hw = 30 * n, hh = 15 * n + 0.5;
+  const P = (x, y) => `${x * z}px ${y * z}px`;
+  return `clip-path:polygon(${P(cx, cy - hh)},${P(cx + hw, cy)},${P(cx, cy + hh)},${P(cx - hw, cy)});`;
+}
+function closeDetail() { openId = null; document.getElementById('detail').classList.remove('open'); document.getElementById('shade').classList.remove('open'); }
+document.getElementById('shade').onclick = closeDetail;
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' && e.target.type === 'search') return;
+  if (e.key === 'Escape') closeDetail();
+  if (e.key === 'r' || e.key === 'R') location.reload();
+  if (openId !== null && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+    const i = current.findIndex(s => s.id === openId); const n = current[i + (e.key === 'ArrowRight' ? 1 : -1)];
+    if (n) openDetail(n.id);
+  }
+});
+
+renderStats(); renderChips(); renderSide(); renderMain();
+</script>
+</body>
+</html>
