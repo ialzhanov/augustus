@@ -218,7 +218,7 @@ const LIVE = location.protocol.startsWith('http');
 let D = window.C3DATA || { built: '-', groups: [], sprites: [] };
 const CLIMATE = { c3: 'Central', c3_north: 'North', c3_south: 'South' };
 const STATUS = { rendering: 'Rendering', installed: 'Installed', pass: 'Passing', fail: 'Failing', stale: 'Old in game', none: 'Not started' };
-const CATS = ['Terrain', 'Housing', 'Buildings', 'Walkers', 'Empire map', 'Minimap', 'Interface', 'Ungrouped'];
+const CATS = ['Buildings', 'Empire map', 'Housing', 'Interface', 'Minimap', 'Terrain', 'Ungrouped', 'Walkers'];   // alphabetical
 const HAS = { top: 'Top part', script: 'Build script', attempts: 'Attempts', variant: 'Own climate image', shared: 'Same in all climates' };
 const PREFIX = /^(BUILDING_|TERRAIN_|FIGURE_|EMPIRE_|MINIMAP_)/;
 const $ = id => document.getElementById(id);
@@ -347,7 +347,7 @@ function catProgress(cat) {
 let catBars = {};
 function renderRail() {
   const fps = [...new Set(D.sprites.map(s => String(s.tiles)))].sort((a, b) => (+a || 9) - (+b || 9));
-  const gs = D.groups.slice().sort((a, b) => a.start - b.start);
+  const gs = D.groups.slice().sort((a, b) => prettyGroup(a).localeCompare(prettyGroup(b), undefined, { numeric: true }) || a.start - b.start);
   const gf = groupFind.toLowerCase();
   const glist = [{ id: 0, name: '', category: 'Ungrouped' }, ...gs].filter(g => (counts.g[g.id] || st.f.g.has(String(g.id))) && (!gf || prettyGroup(g.id ? g : null).includes(gf)));
   // under category headings: the same short name exists in several categories (water, barber)
