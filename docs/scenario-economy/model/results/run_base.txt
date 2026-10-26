@@ -1,0 +1,812 @@
+## Aquileia
+goals pop 12000 culture 85 prosperity 100 peace 85 favor 100
+max house level 19 (prosperity value 100); next level blocked by: None
+caps: {'food_types': 3, 'wine_types': 2, 'gods': 5, 'entertainment': 115, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion', 'school', 'library'], 75.16666666666667, 0)
+tax 8%, Rome wage 33.5, event money 0/yr, event favor 0/yr
+LP: surplus 67411/yr | tax 36259 exports 62087 imports 12194 fixed 920
+    pop 12600 plebs 8734 workers 3930/3930 land 3980/15661 prosperity cap 100
+    houses {'1x1': np.float64(186.6), '1x2': np.float64(88.3), '4x2': np.float64(95.3), '19x4': np.float64(19.3)}
+    prod {'bricks': np.float64(123.0), 'fruit': np.float64(77.3), 'furniture': np.float64(49.6), 'iron': np.float64(223.8), 'meat': np.float64(645.3), 'oil': np.float64(4.6), 'pottery': np.float64(69.6), 'sand': np.float64(131.5), 'vines': np.float64(86.9), 'weapons': np.float64(82.0), 'wheat': np.float64(77.3), 'wine': np.float64(50.6)}
+    exports {'Spalatum:meat': np.float64(65.0), 'Spalatum:sand': np.float64(70.0), 'Spalatum:wine': np.float64(10.0), 'Spalatum:weapons': np.float64(10.0), 'Sirmium:iron': np.float64(40.0), 'Sirmium:weapons': np.float64(20.0), 'Sirmium:bricks': np.float64(18.0), 'Naissus:meat': np.float64(40.0), 'Naissus:weapons': np.float64(30.0), 'Naissus:bricks': np.float64(15.0), 'Tarentum:iron': np.float64(21.8), 'Tarentum:furniture': np.float64(25.0), 'Tarentum:bricks': np.float64(30.0), 'Mediolanum:vines': np.float64(35.0), 'Mediolanum:iron': np.float64(40.0), 'Mediolanum:wine': np.float64(10.0), 'Mediolanum:weapons': np.float64(10.0), 'Barium:meat': np.float64(36.8), 'Barium:iron': np.float64(40.0), 'Roma:pottery': np.float64(35.0), 'Roma:furniture': np.float64(20.0), 'Roma:wine': np.float64(20.0), 'Roma:bricks': np.float64(30.0), 'Athenae:meat': np.float64(16.8), 'Athenae:pottery': np.float64(30.0), 'Athenae:bricks': np.float64(30.0)}
+    imports {'Mediolanum:clay': np.float64(30.0), 'Mediolanum:timber': np.float64(49.6), 'Barium:clay': np.float64(46.1), 'Roma:clay': np.float64(25.0), 'Roma:olives': np.float64(4.6), 'Athenae:clay': np.float64(30.0)}
+    routes opened ['Spalatum', 'Sirmium', 'Naissus', 'Tarentum', 'Mediolanum', 'Barium', 'Roma', 'Athenae']
+    build cost 58540 vs start funds 11000 -> payback 0.9 yr; lowest tax that balances: 0%
+    food types used (in order): ['meat', 'fruit', 'wheat']
+    sites (packed): {'farm': 554, 'rock': 206, 'timber': 3467, 'clay': 1584, 'sand': 2711, 'wharf': 606}; Rome wheat 0; start stock {}
+forts assumed 3; surplus with no trade: None; surplus with the tent mix: 68439.91451887603
+favor: {'salary_year': 96.0, 'savings_income': 96.0, 'gift_gain': 5, 'yearly_net': 6.25}; caps [('E2', 79, ['OR(variable_check variable_uid=Meat Shipments check=lte value=49 | variable_check variable_uid=Wheat Shipments check=lte value=49)'])]
+years (lower bound): {'peace': 19, 'prosperity': 10, 'favor': 10}
+flows with quest conditions (not applied): [('E0', 'favor_add', 192, ['resource_stored_count resource=wheat check=gte value=320 storage_type=granaries']), ('E1', 'favor_add', 192, ['resource_stored_count resource=meat check=gte value=320 storage_type=granaries']), ('E46', 'money_add', 0, ['variable_check variable_uid=barrac check=gte value=2'])]
+REQUIREMENT: favor capped at 79 by E2 while OR(variable_check variable_uid=Meat Shipments check=lte value=49 | variable_check variable_uid=Wheat Shipments check=lte value=49)
+PROBLEMS: none
+build-up: 25% y2.0 lvl15 budget 15000 surplus 14175 capex 8040 treasury 17135 | 50% y4.0 lvl15 budget 29175 surplus 20573 capex 12540 treasury 47382 | 75% y6.0 lvl15 budget 63922 surplus 25367 capex 16805 treasury 89057 | 100% y8.0 lvl19 budget 109862 surplus 64884 capex 58540 treasury 137572 | lowest treasury 2960 at year 0
+
+## CN_01_Igilgili___The_City_to_Mercury
+goals pop 8000 culture 30 prosperity 75 peace 100 favor 100
+max house level 11 (prosperity value 80); next level blocked by: ['no wine']
+caps: {'food_types': 3, 'wine_types': 0, 'gods': 5, 'entertainment': 45, 'water': 3, 'education': 2, 'health': 1, 'barber': True, 'bathhouse': True}
+culture max 77, plan (['religion'], 13.333333333333334, 0)
+tax 5%, Rome wage 45.0, event money 0/yr, event favor 0/yr
+LP: surplus 23288/yr | tax 9420 exports 58492 imports 28362 fixed 1997
+    pop 8000 plebs 8000 workers 2553/3600 land 1965/5169 prosperity cap 75
+    houses {'1x2': np.float64(7.1), '11x2': np.float64(92.9)}
+    prod {'bricks': np.float64(50.5), 'furniture': np.float64(106.3), 'oil': np.float64(106.0), 'olives': np.float64(237.1), 'pottery': np.float64(71.5), 'sand': np.float64(164.9), 'stone': np.float64(280.8), 'weapons': np.float64(56.0)}
+    exports {'Roma:stone': np.float64(20.0), 'Siga:olives': np.float64(24.0), 'Siga:stone': np.float64(32.0), 'Siga:oil': np.float64(8.0), 'Quiza:olives': np.float64(24.0), 'Quiza:stone': np.float64(32.0), 'Quiza:furniture': np.float64(16.0), 'Tigava:olives': np.float64(24.0), 'Tigava:sand': np.float64(24.0), 'Tigava:stone': np.float64(32.0), 'Tigava:bricks': np.float64(16.0), 'Auzia:sand': np.float64(32.0), 'Auzia:stone': np.float64(24.0), 'Auzia:furniture': np.float64(20.0), 'Auzia:weapons': np.float64(16.0), 'Zdif:pottery': np.float64(16.0), 'Zdif:furniture': np.float64(32.0), 'Zdif:oil': np.float64(16.0), 'Hippo Regius:stone': np.float64(32.0), 'Hippo Regius:pottery': np.float64(16.0), 'Hippo Regius:oil': np.float64(8.0), 'Theveste:olives': np.float64(24.0), 'Theveste:stone': np.float64(32.0), 'Theveste:pottery': np.float64(16.0), 'Theveste:furniture': np.float64(16.0), 'Meninx:olives': np.float64(32.0), 'Meninx:sand': np.float64(48.0), 'Meninx:stone': np.float64(32.0), 'Sabratha:sand': np.float64(32.0), 'Sabratha:oil': np.float64(16.0), 'Sabratha:bricks': np.float64(32.0), 'Tacapae:stone': np.float64(32.0), 'Tacapae:oil': np.float64(32.0), 'Tacapae:weapons': np.float64(32.0)}
+    imports {'Siga:iron': np.float64(8.0), 'Quiza:clay': np.float64(59.7), 'Tigava:timber': np.float64(10.3), 'Auzia:wheat': np.float64(234.0), 'Zdif:iron': np.float64(8.0), 'Hippo Regius:timber': np.float64(32.0), 'Hippo Regius:iron': np.float64(40.0), 'Theveste:fruit': np.float64(234.0), 'Meninx:clay': np.float64(5.0), 'Sabratha:timber': np.float64(64.0), 'Tacapae:clay': np.float64(32.0)}
+    routes opened ['Roma', 'Siga', 'Quiza', 'Tigava', 'Auzia', 'Zdif', 'Hippo Regius', 'Theveste', 'Meninx', 'Sabratha', 'Tacapae']
+    build cost 35240 vs start funds 5000 -> payback 1.5 yr; lowest tax that balances: 0%
+    food types used (in order): ['wheat', 'fruit']
+    monuments needed: [{'monument': 'grand_temple_mercury', 'materials': {'stone': 20, 'timber': 32, 'concrete': 20, 'marble': 28, 'bricks': 28}, 'import_cost': 29920, 'missing': []}]
+    sites (packed): {'farm': 40, 'rock': 74, 'timber': 1041, 'clay': 79, 'sand': 273, 'wharf': 40}; Rome wheat 0; start stock {}
+forts assumed 2; surplus with no trade: None; surplus with the tent mix: 23288.492874236905
+favor: {'salary_year': 60.0, 'savings_income': 360.0, 'gift_gain': 10, 'yearly_net': 13.23076923076923}; caps [('E2', 70, ['building_count_active check=eq value=0 building=grand_temple_mercury'])]
+years (lower bound): {'peace': 22, 'prosperity': 9, 'favor': 5}
+flows with quest conditions (not applied): [('E37', 'savings_add', 300, ['variable_check variable_uid=GTDone check=eq value=1'])]
+REQUIREMENT: favor capped at 70 by E2 while building_count_active check=eq value=0 building=grand_temple_mercury
+PROBLEMS: none
+build-up: 25% y1.3 lvl11 budget 5800 surplus None capex 0 treasury 5000 BLOCKED by ['balance', 'budget', 'food', 'population', 'quota', 'tents<=30%'] | 50% y2.7 lvl11 budget 5800 surplus None capex 0 treasury 5000 BLOCKED by ['population', 'quota'] | 75% y4.0 lvl11 budget 5800 surplus None capex 0 treasury 5000 BLOCKED by ['population'] | 100% y5.3 lvl11 budget 5800 surplus None capex 0 treasury 5000 BLOCKED by ['budget', 'population'] | lowest treasury 5000 at year 0
+
+## CN_02_Quiza___The_City_to_Neptune
+goals pop 10000 culture 10 prosperity 100 peace 80 favor 90
+max house level 18 (prosperity value 100); next level blocked by: ['entertainment 80>70']
+caps: {'food_types': 4, 'wine_types': 2, 'gods': 5, 'entertainment': 70, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['religion'], 13.333333333333334, 0)
+tax 8%, Rome wage 45.0, event money 0/yr, event favor 0/yr
+LP: surplus 49158/yr | tax 40405 exports 47576 imports 22909 fixed 1944
+    pop 10500 plebs 5398 workers 2429/2429 land 2761/6320 prosperity cap 100
+    houses {'1x1': np.float64(214.8), '1x2': np.float64(58.8), '4x1': np.float64(172.9), '18x4': np.float64(26.9)}
+    prod {'bricks': np.float64(96.0), 'clay': np.float64(295.5), 'fish': np.float64(288.0), 'furniture': np.float64(54.8), 'pottery': np.float64(69.8), 'weapons': np.float64(76.8), 'wine': np.float64(30.0)}
+    exports {'Igilgili:fish': np.float64(24.0), 'Igilgili:clay': np.float64(32.0), 'Igilgili:bricks': np.float64(16.0), 'Siga:fish': np.float64(22.3), 'Siga:clay': np.float64(32.0), 'Siga:furniture': np.float64(8.0), 'Tigava:fish': np.float64(48.0), 'Tigava:clay': np.float64(24.0), 'Tigava:bricks': np.float64(11.5), 'Iol:fish': np.float64(32.0), 'Iol:wine': np.float64(8.0), 'Iol:weapons': np.float64(24.0), 'Auzia:fish': np.float64(32.0), 'Auzia:clay': np.float64(24.0), 'Auzia:furniture': np.float64(8.0), 'Zdif:pottery': np.float64(16.0), 'Zdif:furniture': np.float64(16.0), 'Zdif:weapons': np.float64(20.8), 'Zdif:bricks': np.float64(24.0), 'Hippo Regius:clay': np.float64(24.0), 'Hippo Regius:pottery': np.float64(16.0), 'Hippo Regius:bricks': np.float64(16.0), 'Theveste:clay': np.float64(32.0), 'Theveste:pottery': np.float64(16.0), 'Theveste:furniture': np.float64(16.0), 'Meninx:fish': np.float64(27.7), 'Meninx:wine': np.float64(9.1), 'Meninx:weapons': np.float64(24.0), 'Meninx:bricks': np.float64(16.0)}
+    imports {'Igilgili:sand': np.float64(24.0), 'Igilgili:oil': np.float64(0.8), 'Ostia:iron': np.float64(76.8), 'Siga:sand': np.float64(24.0), 'Tigava:timber': np.float64(32.0), 'Iol:timber': np.float64(6.8), 'Auzia:wheat': np.float64(236.9), 'Auzia:oil': np.float64(5.6), 'Zdif:timber': np.float64(16.0), 'Theveste:fruit': np.float64(102.0), 'Theveste:vines': np.float64(30.0)}
+    routes opened ['Igilgili', 'Ostia', 'Siga', 'Tigava', 'Iol', 'Auzia', 'Zdif', 'Hippo Regius', 'Theveste', 'Meninx']
+    build cost 39670 vs start funds 9000 -> payback 0.8 yr; lowest tax that balances: 0%
+    food types used (in order): ['wheat', 'fruit', 'fish']
+    monuments needed: [{'monument': 'grand_temple_neptune', 'materials': {'stone': 20, 'timber': 32, 'concrete': 20, 'marble': 28, 'bricks': 28}, 'import_cost': 18780, 'missing': []}]
+    sites (packed): {'farm': 0, 'rock': 0, 'timber': 1258, 'clay': 306, 'sand': 673, 'wharf': 211}; Rome wheat 0; start stock {}
+forts assumed 2; surplus with no trade: None; surplus with the tent mix: 51716.71022449345
+favor: {'salary_year': 0.0, 'savings_income': 120.0, 'gift_gain': 10, 'yearly_net': 10.181818181818182}; caps [('E2', 70, ['building_count_active check=eq value=0 building=grand_temple_neptune'])]
+years (lower bound): {'peace': 18, 'prosperity': 12, 'favor': 5}
+flows with quest conditions (not applied): [('E27', 'favor_add', 24, ['variable_check variable_uid=Status check=neq value=6', 'resource_stored_count resource=fish check=gte value=32 storage_type=warehouses', 'variable_check variable_uid=FavorMonthCounter check=eq value=12']), ('E37', 'favor_add', -5, ['variable_check variable_uid=Status check=eq value=6', 'resource_stored_count resource=fish check=lt value=48 storage_type=warehouses']), ('E38', 'favor_add', 2, ['variable_check variable_uid=Status check=eq value=6', 'resource_stored_count resource=fish check=gte value=48 storage_type=warehouses'])]
+REQUIREMENT: favor capped at 70 by E2 while building_count_active check=eq value=0 building=grand_temple_neptune
+PROBLEMS: none
+build-up: 25% y1.7 lvl6 budget 9000 surplus 15278 capex 9142 treasury 12589 | 50% y3.3 lvl6 budget 21732 surplus 23544 capex 21435 treasury 32648 | 75% y5.0 lvl6 budget 54083 surplus 24132 capex 29880 treasury 63933 | 100% y6.7 lvl18 budget 93813 surplus 51954 capex 42150 treasury 115068 | lowest treasury -142 at year 0
+
+## Castra_Regina
+goals pop 16000 culture 50 prosperity 75 peace 100 favor 70
+max house level 16 (prosperity value 100); next level blocked by: ['entertainment 60>55']
+caps: {'food_types': 3, 'wine_types': 2, 'gods': 5, 'entertainment': 55, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion'], 29.333333333333336, 0)
+tax 4%, Rome wage 32, event money 0/yr, event favor 0/yr
+LP: surplus 56900/yr | tax 13030 exports 71592 imports 7915 fixed 1724
+    pop 16000 plebs 13523 workers 4635/6085 land 5017/15704 prosperity cap 75
+    houses {'4x2': np.float64(260.1), '15x3': np.float64(24.8)}
+    prod {'clay': np.float64(158.5), 'fish': np.float64(50.0), 'gold': np.float64(16.7), 'iron': np.float64(254.2), 'marble': np.float64(311.2), 'meat': np.float64(49.5), 'sand': np.float64(279.5), 'stone': np.float64(409.9), 'timber': np.float64(242.8), 'vegetables': np.float64(860.9), 'vines': np.float64(35.1)}
+    exports {'Vindobona:iron': np.float64(132.5), 'Vindobona:marble': np.float64(110.0), 'Vindonissa:clay': np.float64(134.5), 'Vindonissa:gold': np.float64(8.0), 'Vindonissa:stone': np.float64(100.0), 'Aquileia:gold': np.float64(4.0), 'Aquileia:sand': np.float64(58.5), 'Aquileia:stone': np.float64(180.0), 'Verona:timber': np.float64(120.0), 'Verona:vines': np.float64(2.5), 'Verona:sand': np.float64(120.0), 'Singidunum:vines': np.float64(32.5), 'Singidunum:sand': np.float64(100.0), 'Singidunum:stone': np.float64(110.0), 'Avaricum:clay': np.float64(22.5), 'Avaricum:timber': np.float64(120.0), 'Avaricum:marble': np.float64(100.0), 'Roma:iron': np.float64(120.0), 'Roma:marble': np.float64(100.0), 'Roma:gold': np.float64(4.0), 'Roma:stone': np.float64(18.5)}
+    imports {'Vindobona:pottery': np.float64(5.9), 'Vindonissa:oil': np.float64(5.9), 'Vindonissa:wine': np.float64(5.9), 'Aquileia:weapons': np.float64(20.0), 'Avaricum:furniture': np.float64(5.9)}
+    routes opened ['Vindobona', 'Vindonissa', 'Aquileia', 'Verona', 'Singidunum', 'Avaricum', 'Roma']
+    build cost 47850 vs start funds 11000 -> payback 0.8 yr; lowest tax that balances: 0%
+    food types used (in order): ['vegetables', 'meat', 'fish']
+    sites (packed): {'farm': 232, 'rock': 1080, 'timber': 3633, 'clay': 569, 'sand': 1333, 'wharf': 266}; Rome wheat 0; start stock {}
+forts assumed 5; surplus with no trade: None; surplus with the tent mix: 56899.81247422477
+favor: {'salary_year': 76.8, 'savings_income': 76.8, 'gift_gain': 5, 'yearly_net': 4.9411764705882355}; caps [('E45', 64, ['building_count_any check=lte value=59 building=tower'])]
+years (lower bound): {'peace': 22, 'prosperity': 9, 'favor': 7}
+flows with quest conditions (not applied): [('E7', 'money_add', 0, ['variable_check variable_uid=rack check=gte value=2'])]
+REQUIREMENT: favor capped at 64 by E45 while building_count_any check=lte value=59 building=tower
+PROBLEMS: none
+build-up: 25% y2.7 lvl9 budget 15000 surplus 36301 capex 15330 treasury 44072 | 50% y5.3 lvl9 budget 63402 surplus 57891 capex 32375 treasury 152616 | 75% y8.0 lvl9 budget 188991 surplus 57493 capex 36865 treasury 301972 | 100% y10.7 lvl16 budget 342837 surplus 56324 capex 47595 treasury 442999 | lowest treasury -4330 at year 0
+
+## Cyrene
+goals pop 10000 culture 100 prosperity 100 peace 85 favor 85
+max house level 15 (prosperity value 100); next level blocked by: ['second wine missing']
+caps: {'food_types': 3, 'wine_types': 1, 'gods': 5, 'entertainment': 115, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion', 'school', 'academy', 'library'], 135.375, 0)
+tax 8%, Rome wage 33.5, event money 0/yr, event favor 0/yr
+LP: surplus 18251/yr | tax 23009 exports 26794 imports 14546 fixed 1233
+    pop 10500 plebs 8472 workers 3812/3812 land 2588/8091 prosperity cap 100
+    houses {'1x2': np.float64(96.1), '4x2': np.float64(1.8), '11x2': np.float64(67.7), '15x3': np.float64(20.3)}
+    prod {'fish': np.float64(216.0), 'furniture': np.float64(21.5), 'gold': np.float64(0.9), 'iron': np.float64(236.6), 'oil': np.float64(125.3), 'olives': np.float64(135.9), 'pottery': np.float64(35.3), 'weapons': np.float64(134.5)}
+    exports {'Berenice:olives': np.float64(2.5), 'Berenice:iron': np.float64(30.0), 'Berenice:oil': np.float64(20.0), 'Alexandrea ad Aegyptum:oil': np.float64(15.0), 'Leiptis Magna:iron': np.float64(20.0), 'Leiptis Magna:oil': np.float64(15.0), 'Carthago:iron': np.float64(25.0), 'Carthago:weapons': np.float64(30.0), 'Roma:oil': np.float64(31.8), 'Roma:weapons': np.float64(45.0), 'Syracusae:iron': np.float64(25.0), 'Antiochia:oil': np.float64(20.0), 'Antiochia:weapons': np.float64(40.0)}
+    imports {'Alexandrea ad Aegyptum:wheat': np.float64(140.0), 'Leiptis Magna:fruit': np.float64(40.6), 'Leiptis Magna:timber': np.float64(1.5), 'Carthago:timber': np.float64(20.0), 'Roma:clay': np.float64(15.3), 'Roma:wine': np.float64(4.9), 'Syracusae:clay': np.float64(20.0), 'Antiochia:wheat': np.float64(76.8)}
+    routes opened ['Berenice', 'Alexandrea ad Aegyptum', 'Leiptis Magna', 'Carthago', 'Roma', 'Syracusae', 'Antiochia']
+    build cost 38900 vs start funds 10500 -> payback 2.1 yr; lowest tax that balances: 2%
+    food types used (in order): ['wheat', 'fish', 'fruit']
+    sites (packed): {'farm': 90, 'rock': 157, 'timber': 1246, 'clay': 337, 'sand': 792, 'wharf': 143}; Rome wheat 0; start stock {}
+forts assumed 4; surplus with no trade: None; surplus with the tent mix: 18251.082344176677
+favor: {'salary_year': 96.0, 'savings_income': 96.0, 'gift_gain': 5, 'yearly_net': 7.260869565217392}; caps [('E24', 74, ['variable_check variable_uid=limit check=lte value=1'])]
+years (lower bound): {'peace': 19, 'prosperity': 10, 'favor': 7}
+REQUIREMENT: favor capped at 74 by E24 while variable_check variable_uid=limit check=lte value=1
+PROBLEMS: none
+build-up: 25% y1.7 lvl15 budget 14500 surplus 17318 capex 15562 treasury 9369 | 50% y3.3 lvl15 budget 28931 surplus 31852 capex 30070 treasury 35837 | 75% y5.0 lvl15 budget 69907 surplus 34491 capex 33428 treasury 87765 | 100% y6.7 lvl15 budget 125192 surplus 23162 capex 38920 treasury 130316 | lowest treasury -5139 at year 1.7
+
+## Marcianopolis
+goals pop 20000 culture 100 prosperity 100 peace 0 favor 100
+max house level 19 (prosperity value 100); next level blocked by: None
+caps: {'food_types': 5, 'wine_types': 2, 'gods': 5, 'entertainment': 100, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion', 'school', 'academy', 'library'], 122.04166666666667, 0)
+tax 8%, Rome wage 34.5, event money 0/yr, event favor 0/yr
+LP: surplus 182855/yr | tax 41160 exports 318601 imports 130645 fixed 1543
+    pop 21000 plebs 17875 workers 8044/8044 land 6639/15703 prosperity cap 100
+    houses {'4x2': np.float64(343.8), '19x4': np.float64(15.6)}
+    prod {'bricks': np.float64(953.8), 'fish': np.float64(252.0), 'furniture': np.float64(10.6), 'gold': np.float64(0.2), 'marble': np.float64(658.2), 'oil': np.float64(6.1), 'pottery': np.float64(8.9), 'timber': np.float64(11.5), 'vegetables': np.float64(1135.0), 'wine': np.float64(86.3)}
+    exports {'Ockzakow:bricks': np.float64(76.8), 'Byzantium:marble': np.float64(140.0), 'Byzantium:bricks': np.float64(100.0), 'Philippopoli:bricks': np.float64(85.0), 'Thessalonica:marble': np.float64(100.0), 'Thessalonica:bricks': np.float64(100.0), 'Athenae:bricks': np.float64(76.8), 'Roma:bricks': np.float64(76.8), 'Alexandrea ad Aegyptum:bricks': np.float64(76.8), 'Mapopa:marble': np.float64(76.8), 'Bialigrod:bricks': np.float64(80.0), 'Sarmizegetusa:fish': np.float64(200.0), 'Dyrrachium:marble': np.float64(100.0), 'Dyrrachium:bricks': np.float64(100.0), 'Drobeta:fish': np.float64(200.0), 'Vindobona:fish': np.float64(200.0), 'Caesarean Sardis:bricks': np.float64(80.0), 'Naissus:marble': np.float64(120.0), 'Naissus:bricks': np.float64(100.0), 'Spalatum:marble': np.float64(120.0), 'Spalatum:wine': np.float64(78.8)}
+    imports {'Ockzakow:vines': np.float64(76.8), 'Byzantium:clay': np.float64(100.0), 'Byzantium:sand': np.float64(5.5), 'Philippopoli:fruit': np.float64(62.5), 'Thessalonica:wheat': np.float64(93.7), 'Thessalonica:sand': np.float64(148.8), 'Athenae:sand': np.float64(76.8), 'Roma:clay': np.float64(67.3), 'Roma:vines': np.float64(9.5), 'Alexandrea ad Aegyptum:clay': np.float64(73.5), 'Alexandrea ad Aegyptum:sand': np.float64(3.3), 'Mapopa:wheat': np.float64(76.8), 'Bialigrod:clay': np.float64(242.5), 'Sarmizegetusa:sand': np.float64(242.5), 'Dyrrachium:wheat': np.float64(240.0), 'Dyrrachium:clay': np.float64(2.5), 'Naissus:olives': np.float64(6.1)}
+    routes opened ['Ockzakow', 'Byzantium', 'Philippopoli', 'Thessalonica', 'Athenae', 'Roma', 'Alexandrea ad Aegyptum', 'Mapopa', 'Bialigrod', 'Sarmizegetusa', 'Dyrrachium', 'Drobeta', 'Vindobona', 'Caesarean Sardis', 'Naissus', 'Spalatum']
+    build cost 194350 vs start funds 12500 -> payback 1.1 yr; lowest tax that balances: 0%
+    food types used (in order): ['vegetables', 'wheat', 'fruit']
+    sites (packed): {'farm': 245, 'rock': 535, 'timber': 3684, 'clay': 552, 'sand': 1538, 'wharf': 227}; Rome wheat 0; start stock {}
+forts assumed 0; surplus with no trade: None; surplus with the tent mix: 182854.50088357241
+favor: {'salary_year': 57.6, 'savings_income': 57.6, 'gift_gain': 5, 'yearly_net': 5.794117647058823}; caps []
+rating set by events: [('E2', 'prosperity', 80, ['variable_check variable_uid=win check=lt value=5', 'stats_prosperity check=gt value=80'])]
+years (lower bound): {'prosperity': 10, 'favor': 11}
+PROBLEMS: none
+build-up: 25% y3.3 lvl10 budget 17000 surplus 55953 capex 17555 treasury 88199 | 50% y6.7 lvl10 budget 110254 surplus 205259 capex 109955 treasury 431151 | 75% y10.0 lvl10 budget 545606 surplus 245857 capex 197205 treasury 1095760 | 100% y13.3 lvl19 budget 1297465 surplus 184016 capex 188005 treasury 1812215 | lowest treasury -5055 at year 0
+
+## Narbo_Martius
+goals pop 12000 culture 70 prosperity 100 peace 90 favor 90
+max house level 19 (prosperity value 100); next level blocked by: None
+caps: {'food_types': 3, 'wine_types': 2, 'gods': 5, 'entertainment': 115, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion', 'school'], 50.16666666666667, 0)
+tax 8%, Rome wage 32.5, event money 0/yr, event favor 0/yr
+LP: surplus 88528/yr | tax 25721 exports 89049 imports 5560 fixed 1091
+    pop 12600 plebs 10475 workers 4714/4714 land 4942/7783 prosperity cap 100
+    houses {'1x2': np.float64(48.9), '4x2': np.float64(175.1), '19x4': np.float64(10.6)}
+    prod {'bricks': np.float64(120.8), 'clay': np.float64(219.5), 'fish': np.float64(42.5), 'furniture': np.float64(27.6), 'gold': np.float64(0.3), 'oil': np.float64(251.4), 'olives': np.float64(513.8), 'pottery': np.float64(159.1), 'sand': np.float64(120.4), 'timber': np.float64(27.6), 'vegetables': np.float64(588.8), 'vines': np.float64(231.1), 'weapons': np.float64(6.0), 'wine': np.float64(231.1)}
+    exports {'Emporiae:olives': np.float64(70.0), 'Emporiae:pottery': np.float64(40.0), 'Massilia:pottery': np.float64(45.0), 'Massilia:furniture': np.float64(25.0), 'Massilia:bricks': np.float64(35.0), 'Regium Lepidi:oil': np.float64(65.0), 'Regium Lepidi:wine': np.float64(65.0), 'Augusta Taurinorum:olives': np.float64(80.0), 'Augusta Taurinorum:oil': np.float64(50.0), 'Augusta Taurinorum:wine': np.float64(40.0), 'Aiacium:olives': np.float64(21.8), 'Aiacium:oil': np.float64(55.0), 'Tolosa:olives': np.float64(45.0), 'Tolosa:sand': np.float64(60.0), 'Tolosa:bricks': np.float64(40.0), 'Olbia:olives': np.float64(45.0), 'Olbia:pottery': np.float64(25.0), 'Roma:pottery': np.float64(45.0), 'Roma:oil': np.float64(65.0), 'Roma:wine': np.float64(55.0), 'Roma:bricks': np.float64(45.0), 'Ostia:oil': np.float64(11.8), 'Ostia:wine': np.float64(65.0)}
+    imports {'Regium Lepidi:iron': np.float64(6.0), 'Tolosa:weapons': np.float64(14.0), 'Ostia:wheat': np.float64(42.5)}
+    routes opened ['Emporiae', 'Massilia', 'Regium Lepidi', 'Augusta Taurinorum', 'Aiacium', 'Tolosa', 'Olbia', 'Roma', 'Ostia']
+    build cost 56885 vs start funds 10500 -> payback 0.6 yr; lowest tax that balances: 0%
+    food types used (in order): ['vegetables', 'wheat', 'fish']
+    sites (packed): {'farm': 197, 'rock': 67, 'timber': 1745, 'clay': 281, 'sand': 633, 'wharf': 104}; Rome wheat 0; start stock {}
+forts assumed 5; surplus with no trade: None; surplus with the tent mix: 88730.80527129136
+favor: {'salary_year': 76.8, 'savings_income': 76.8, 'gift_gain': 5, 'yearly_net': 4.809523809523809}; caps []
+rating set by events: [('E1', 'prosperity', 90, ['variable_check variable_uid=pant check=lte value=1', 'stats_prosperity check=gte value=91'])]
+years (lower bound): {'peace': 20, 'prosperity': 10, 'favor': 11}
+flows with quest conditions (not applied): [('E6', 'favor_add', 4, ['variable_check variable_uid=palace check=gte value=1']), ('E10', 'favor_add', 2, ['variable_check variable_uid=vila check=gte value=1']), ('E24', 'favor_add', 4, ['variable_check variable_uid=bestow check=gte value=1']), ('E28', 'money_add', 0, ['variable_check variable_uid=rack check=gte value=2']), ('E30', 'favor_add', -24, ['OR(variable_check variable_uid=vila check=gte value=1 | variable_check variable_uid=house check=gte value=1)', 'OR(variable_check variable_uid=vila check=gte value=1 | variable_check variable_uid=palace check=gte value=1)', 'OR(variable_check variable_uid=house check=gte value=1 | variable_check variable_uid=palace check=gte value=1)'])]
+PROBLEMS: none
+build-up: 25% y2.0 lvl14 budget 14500 surplus 34472 capex 15035 treasury 29937 | 50% y4.0 lvl14 budget 48972 surplus 68525 capex 38260 treasury 109709 | 75% y6.0 lvl14 budget 151969 surplus 78330 capex 43210 treasury 251613 | 100% y8.0 lvl19 budget 298823 surplus 85298 capex 55710 treasury 402741 | lowest treasury -4535 at year 0
+
+## Noviomagus
+goals pop 18000 culture 70 prosperity 90 peace 90 favor 70
+max house level 16 (prosperity value 100); next level blocked by: ['entertainment 60>55']
+caps: {'food_types': 3, 'wine_types': 2, 'gods': 5, 'entertainment': 55, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['religion', 'school', 'academy', 'library'], 106.04166666666667, 0)
+tax 8%, Rome wage 30, event money 0/yr, event favor 0/yr
+LP: surplus 46622/yr | tax 42323 exports 30075 imports 4002 fixed 1146
+    pop 18900 plebs 13032 workers 5864/5864 land 5441/12792 prosperity cap 90
+    houses {'1x2': np.float64(87.2), '4x2': np.float64(203.7), '14x3': np.float64(65.2)}
+    prod {'bricks': np.float64(35.3), 'clay': np.float64(156.5), 'fish': np.float64(180.8), 'furniture': np.float64(102.2), 'iron': np.float64(131.1), 'meat': np.float64(811.5), 'oil': np.float64(15.6), 'pottery': np.float64(92.5), 'sand': np.float64(73.4), 'stone': np.float64(120.8), 'timber': np.float64(168.0), 'weapons': np.float64(91.1), 'wine': np.float64(10.0)}
+    exports {'Lutetia:weapons': np.float64(30.0), 'Lutetia:bricks': np.float64(35.0), 'Avaricum:pottery': np.float64(30.0), 'Avaricum:furniture': np.float64(25.0), 'Argentoratum:clay': np.float64(45.0), 'Argentoratum:stone': np.float64(55.0), 'Argentoratum:pottery': np.float64(45.0), 'Gesoriacum:timber': np.float64(65.0), 'Gesoriacum:iron': np.float64(40.0), 'Gesoriacum:furniture': np.float64(60.0), 'Divodurum:sand': np.float64(55.0), 'Divodurum:stone': np.float64(65.0), 'Divodurum:weapons': np.float64(40.0)}
+    imports {'Lutetia:olives': np.float64(15.6), 'Argentoratum:vines': np.float64(10.0), 'Argentoratum:wine': np.float64(5.6)}
+    routes opened ['Lutetia', 'Avaricum', 'Argentoratum', 'Gesoriacum', 'Divodurum']
+    build cost 44405 vs start funds 8500 -> payback 1.0 yr; lowest tax that balances: 0%
+    food types used (in order): ['meat', 'fish', 'wheat']
+    sites (packed): {'farm': 146, 'rock': 459, 'timber': 2349, 'clay': 2068, 'sand': 2398, 'wharf': 1281}; Rome wheat 0; start stock {}
+forts assumed 5; surplus with no trade: None; surplus with the tent mix: 46622.48498425404
+favor: {'salary_year': 134.4, 'savings_income': 134.4, 'gift_gain': 5, 'yearly_net': 5.9}; caps []
+rating set by events: [('E12', 'peace', 80, ['variable_check variable_uid=peace check=lte value=1', 'stats_peace check=gte value=80'])]
+years (lower bound): {'peace': 20, 'prosperity': 10, 'favor': 6}
+PROBLEMS: none
+build-up: 25% y3.0 lvl6 budget 12250 surplus 19445 capex 11528 treasury 26140 | 50% y6.0 lvl6 budget 41417 surplus 22010 capex 17050 treasury 82800 | 75% y9.0 lvl6 budget 103600 surplus 24142 capex 22728 treasury 146352 | 100% y12.0 lvl15 budget 172829 surplus 42692 capex 45885 treasury 223446 | lowest treasury -3028 at year 0
+
+## Nuceria
+goals pop 16000 culture 85 prosperity 100 peace 100 favor 100
+max house level 19 (prosperity value 100); next level blocked by: None
+caps: {'food_types': 4, 'wine_types': 2, 'gods': 5, 'entertainment': 115, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion', 'school', 'library'], 75.16666666666667, 0)
+tax 8%, Rome wage 13.5, event money 0/yr, event favor 0/yr
+LP: surplus 107708/yr | tax 41863 exports 89412 imports 3212 fixed 804
+    pop 16800 plebs 12610 workers 5675/5675 land 6884/15204 prosperity cap 100
+    houses {'0x2': np.float64(242.4), '1x2': np.float64(6.8), '4x2': np.float64(145.6), '19x4': np.float64(20.9)}
+    prod {'fish': np.float64(180.0), 'fruit': np.float64(1026.4), 'furniture': np.float64(5.0), 'oil': np.float64(125.8), 'olives': np.float64(382.2), 'pottery': np.float64(5.0), 'stone': np.float64(30.0), 'vegetables': np.float64(603.1), 'vines': np.float64(284.9), 'weapons': np.float64(8.0), 'wine': np.float64(207.5)}
+    exports {'Capua:olives': np.float64(60.0), 'Capua:stone': np.float64(30.0), 'Sibari:vegetables': np.float64(80.0), 'Sibari:vines': np.float64(20.0), 'Roma:vegetables': np.float64(77.5), 'Roma:fruit': np.float64(120.0), 'Roma:oil': np.float64(35.0), 'Roma:wine': np.float64(10.0), 'Tarentum:fruit': np.float64(130.0), 'Tarentum:wine': np.float64(20.0), 'Carailis:vegetables': np.float64(46.8), 'Carailis:wine': np.float64(30.0), 'Carthago:fruit': np.float64(36.8), 'Carthago:wine': np.float64(40.0), 'Massilia:oil': np.float64(13.4), 'Massilia:wine': np.float64(25.0), 'Syracusae:olives': np.float64(61.8), 'Syracusae:wine': np.float64(15.0), 'Barium:vegetables': np.float64(75.0), 'Barium:olives': np.float64(60.0), 'Barium:wine': np.float64(10.0), 'Athenae:olives': np.float64(31.8), 'Athenae:wine': np.float64(45.0), 'Helvia Recina:vegetables': np.float64(100.0), 'Helvia Recina:fish': np.float64(100.0), 'Helvia Recina:oil': np.float64(20.0), 'Volsinii:fish': np.float64(60.0), 'Volsinii:oil': np.float64(15.0), 'Volsinii:olives': np.float64(40.0), 'Verona:vegetables': np.float64(80.0), 'Verona:oil': np.float64(20.0), 'Verona:vines': np.float64(55.0), 'Tarraco:fruit': np.float64(76.8), 'Lutetia:vegetables': np.float64(60.0), 'Lutetia:fruit': np.float64(60.0), 'Lutetia:fish': np.float64(60.0), 'Lutetia:oil': np.float64(15.0)}
+    imports {'Tarentum:clay': np.float64(5.0), 'Carthago:iron': np.float64(8.0), 'Carthago:wheat': np.float64(68.8), 'Barium:wheat': np.float64(15.0), 'Athenae:timber': np.float64(5.0)}
+    routes opened ['Capua', 'Sibari', 'Roma', 'Tarentum', 'Carailis', 'Carthago', 'Massilia', 'Syracusae', 'Barium', 'Athenae', 'Helvia Recina', 'Volsinii', 'Verona', 'Tarraco', 'Lutetia']
+    build cost 135450 vs start funds 11500 -> payback 1.3 yr; lowest tax that balances: 0%
+    food types used (in order): ['fruit', 'wheat', 'vegetables']
+    sites (packed): {'farm': 546, 'rock': 803, 'timber': 3422, 'clay': 975, 'sand': 2102, 'wharf': 298}; Rome wheat 0; start stock {}
+forts assumed 2; surplus with no trade: None; surplus with the tent mix: 108898.53408967181
+favor: {'salary_year': 96.0, 'savings_income': 96.0, 'gift_gain': 5, 'yearly_net': 7.1}; caps [('E8', 79, ['money check=lte value=500000'])]
+years (lower bound): {'peace': 22, 'prosperity': 10, 'favor': 9}
+REQUIREMENT: favor capped at 79 by E8 while money check=lte value=500000 -> treasury above 500000 needs about 4.6 years of surplus
+PROBLEMS: none
+build-up: 25% y2.7 lvl15 budget 15000 surplus 28167 capex 15950 treasury 33107 | 50% y5.3 lvl15 budget 52557 surplus 48001 capex 42375 treasury 108240 | 75% y8.0 lvl15 budget 154115 surplus 65894 capex 79305 treasury 223170 | 100% y10.7 lvl19 budget 305975 surplus 111680 capex 135870 treasury 403371 | lowest treasury -4450 at year 0
+
+## RC01_Ostia
+goals pop 1250 culture 10 prosperity 35 peace 5 favor 50
+max house level 9 (prosperity value 58); next level blocked by: ['education 2>1', 'no oil']
+caps: {'food_types': 2, 'wine_types': 0, 'gods': 5, 'entertainment': 25, 'water': 3, 'education': 1, 'health': 1, 'barber': True, 'bathhouse': True}
+culture max 76, plan (['religion'], 13.333333333333334, 0)
+tax 8%, Rome wage 32.0, event money 1200/yr, event favor 0/yr
+LP: surplus 7911/yr | tax 1260 exports 8772 imports 0 fixed 683
+    pop 1312 plebs 1312 workers 375/591 land 381/1061 prosperity cap 35
+    houses {'6x1': np.float64(77.2)}
+    prod {'clay': np.float64(61.6), 'timber': np.float64(107.7), 'wheat': np.float64(161.4)}
+    exports {'Rome:wheat': np.float64(80.0), 'Rome:clay': np.float64(60.0), 'Rome:timber': np.float64(30.0), 'Croton:timber': np.float64(76.8)}
+    imports {}
+    routes opened ['Rome', 'Croton']
+    build cost 3476 vs start funds 6600 -> payback 0.4 yr; lowest tax that balances: 0%
+    sites (packed): {'farm': 26, 'rock': 81, 'timber': 243, 'clay': 96, 'sand': 240, 'wharf': 30}; Rome wheat 0; start stock {}
+forts assumed 0; surplus with no trade: None; surplus with the tent mix: 7910.580072138049
+favor: {'salary_year': 960.0, 'savings_income': 960.0, 'gift_gain': 5, 'yearly_net': 8.277777777777779}; caps []
+rating set by events: [('E0', 'prosperity', 35, ['city_population check=gte value=1250 class=all', 'building_count_active check=gte value=1 building=theater', 'building_count_active check=gte value=1 building=school'])]
+years (lower bound): {'peace': 3, 'prosperity': 4, 'favor': 2}
+flows with quest conditions (not applied): [('E2', 'favor_add', -6, ['variable_check variable_uid=drought check=gte value=1'])]
+PROBLEMS: none
+build-up: 25% y0.2 lvl4 budget 8600 surplus 883 capex 910 treasury 5782 | 50% y0.4 lvl4 budget 8692 surplus 1113 capex 1246 treasury 5654 | 75% y0.6 lvl4 budget 8900 surplus 1342 capex 1580 treasury 5575 | 100% y0.8 lvl9 budget 9155 surplus 6353 capex 3376 treasury 4581 | lowest treasury 3779 at year 0.6
+
+## RC02_Brundisium
+goals pop 2400 culture 25 prosperity 50 peace 20 favor 50
+max house level 19 (prosperity value 100); next level blocked by: None
+caps: {'food_types': 3, 'wine_types': 2, 'gods': 5, 'entertainment': 80, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['religion'], 13.333333333333334, 0)
+tax 8%, Rome wage 30, event money 0/yr, event favor 0/yr
+LP: surplus 20883/yr | tax 5563 exports 21883 imports 1677 fixed 1360
+    pop 2520 plebs 2052 workers 923/923 land 871/2329 prosperity cap 50
+    houses {'4x1': np.float64(157.9), '19x4': np.float64(2.3)}
+    prod {'bricks': np.float64(51.1), 'clay': np.float64(202.8), 'furniture': np.float64(24.3), 'marble': np.float64(15.0), 'oil': np.float64(0.6), 'pottery': np.float64(64.6), 'sand': np.float64(131.1), 'stone': np.float64(40.5), 'vegetables': np.float64(9.4), 'wheat': np.float64(155.4), 'wine': np.float64(1.1)}
+    exports {'Apulia:clay': np.float64(70.0), 'Apulia:sand': np.float64(60.0), 'Sena Gallica:marble': np.float64(15.0), 'Sena Gallica:stone': np.float64(40.0), 'Corcyra:clay': np.float64(30.0), 'Corcyra:sand': np.float64(18.8), 'Corcyra:pottery': np.float64(28.0), 'Rome:wheat': np.float64(21.8), 'Rome:pottery': np.float64(35.0), 'Rome:furniture': np.float64(20.0), 'Epidamnos:sand': np.float64(26.8), 'Epidamnos:bricks': np.float64(50.0)}
+    imports {'Sena Gallica:fish': np.float64(9.4), 'Rome:olives': np.float64(0.6), 'Rome:vines': np.float64(1.1), 'Epidamnos:timber': np.float64(24.3)}
+    routes opened ['Apulia', 'Sena Gallica', 'Corcyra', 'Rome', 'Epidamnos']
+    build cost 10508 vs start funds 8500 -> payback 0.5 yr; lowest tax that balances: 0%
+    food types used (in order): ['wheat', 'vegetables', 'fish']
+    sites (packed): {'farm': 46, 'rock': 210, 'timber': 522, 'clay': 144, 'sand': 322, 'wharf': 56}; Rome wheat 0; start stock {}
+forts assumed 0; surplus with no trade: None; surplus with the tent mix: 21344.21693286834
+favor: {'salary_year': 960.0, 'savings_income': 1260.0, 'gift_gain': 10, 'yearly_net': 11.666666666666666}; caps []
+years (lower bound): {'peace': 6, 'prosperity': 6, 'favor': 1}
+flows with quest conditions (not applied): [('E5', 'savings_add', 300, ['variable_check variable_uid=elections check=gte value=1']), ('E13', 'favor_add', -2, ['variable_check variable_uid=favor check=gte value=1'])]
+PROBLEMS: none
+build-up: 25% y0.4 lvl6 budget 10000 surplus 13828 capex 5922 treasury 5344 | 50% y0.8 lvl6 budget 12766 surplus 14276 capex 6569 treasury 10317 | 75% y1.2 lvl6 budget 18386 surplus 15004 capex 7216 treasury 15526 | 100% y1.6 lvl19 budget 24242 surplus 20352 capex 10328 treasury 19485 | lowest treasury 2578 at year 0
+
+## RC03_Capua
+goals pop 4500 culture 30 prosperity 60 peace 35 favor 65
+max house level 16 (prosperity value 100); next level blocked by: ['entertainment 60>55']
+caps: {'food_types': 3, 'wine_types': 4, 'gods': 5, 'entertainment': 55, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['religion'], 13.333333333333334, 0)
+tax 8%, Rome wage 30, event money 0/yr, event favor 0/yr
+LP: surplus 26875/yr | tax 12557 exports 23325 imports 1708 fixed 2335
+    pop 4725 plebs 2868 workers 1291/1291 land 1497/3931 prosperity cap 100
+    houses {'4x2': np.float64(55.2), '14x3': np.float64(20.6)}
+    prod {'bricks': np.float64(35.6), 'clay': np.float64(72.8), 'fruit': np.float64(55.7), 'furniture': np.float64(5.0), 'oil': np.float64(15.8), 'olives': np.float64(73.1), 'pottery': np.float64(25.0), 'sand': np.float64(47.8), 'vines': np.float64(86.6), 'weapons': np.float64(46.9), 'wheat': np.float64(248.0), 'wine': np.float64(25.8)}
+    exports {'Terracena:olives': np.float64(30.0), 'Terracena:vines': np.float64(30.0), 'Terracena:bricks': np.float64(10.0), 'Regium:clay': np.float64(30.0), 'Regium:sand': np.float64(30.0), 'Regium:pottery': np.float64(10.0), 'Olbia:olives': np.float64(26.8), 'Olbia:vines': np.float64(30.0), 'Olbia:oil': np.float64(10.0), 'Olbia:wine': np.float64(10.0), 'Rome:wine': np.float64(10.0), 'Rome:weapons': np.float64(40.0), 'Brention:pottery': np.float64(10.0), 'Brention:bricks': np.float64(24.0)}
+    imports {'Terracena:iron': np.float64(20.0), 'Regium:timber': np.float64(5.0), 'Brention:iron': np.float64(26.9)}
+    routes opened ['Terracena', 'Regium', 'Olbia', 'Rome', 'Brention']
+    build cost 14352 vs start funds 9500 -> payback 0.5 yr; lowest tax that balances: 0%
+    food types used (in order): ['wheat', 'fruit', 'meat']
+    sites (packed): {'farm': 116, 'rock': 332, 'timber': 917, 'clay': 373, 'sand': 790, 'wharf': 156}; Rome wheat 0; start stock {}
+forts assumed 0; surplus with no trade: None; surplus with the tent mix: 26875.44675772401
+favor: {'salary_year': 960.0, 'savings_income': 960.0, 'gift_gain': 5, 'yearly_net': 5.25}; caps []
+years (lower bound): {'peace': 9, 'prosperity': 7, 'favor': 5}
+PROBLEMS: none
+build-up: 25% y0.8 lvl6 budget 11000 surplus 14594 capex 7478 treasury 7495 | 50% y1.5 lvl6 budget 16473 surplus 15434 capex 8776 treasury 17457 | 75% y2.2 lvl6 budget 27733 surplus 16424 capex 9999 treasury 28181 | 100% y3.0 lvl16 budget 39680 surplus 28207 capex 14312 treasury 40604 | lowest treasury 2022 at year 0
+
+## RC04_Tarentum
+goals pop 4500 culture 30 prosperity 60 peace 50 favor 60
+max house level 15 (prosperity value 100); next level blocked by: ['second wine missing']
+caps: {'food_types': 5, 'wine_types': 1, 'gods': 5, 'entertainment': 80, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['religion'], 13.333333333333334, 0)
+tax 8%, Rome wage 30, event money 0/yr, event favor 0/yr
+LP: surplus 32046/yr | tax 10133 exports 30366 imports 824 fixed 1615
+    pop 4725 plebs 3429 workers 1543/1543 land 1547/4123 prosperity cap 60
+    houses {'4x1': np.float64(178.6), '4x2': np.float64(21.3), '15x3': np.float64(13.0)}
+    prod {'bricks': np.float64(23.6), 'clay': np.float64(38.9), 'furniture': np.float64(27.1), 'iron': np.float64(246.9), 'meat': np.float64(25.9), 'pottery': np.float64(27.1), 'sand': np.float64(11.8), 'stone': np.float64(81.0), 'timber': np.float64(67.1), 'vegetables': np.float64(25.9), 'vines': np.float64(38.6), 'weapons': np.float64(95.4), 'wheat': np.float64(231.7), 'wine': np.float64(38.6)}
+    exports {'Asculum:iron': np.float64(60.0), 'Asculum:stone': np.float64(30.0), 'Asculum:weapons': np.float64(15.0), 'Beneventum:iron': np.float64(90.0), 'Beneventum:weapons': np.float64(30.0), 'Sipontum:timber': np.float64(40.0), 'Sipontum:furniture': np.float64(24.0), 'Ariminium:stone': np.float64(50.0), 'Ariminium:weapons': np.float64(20.0), 'Rome:pottery': np.float64(24.0), 'Rome:wine': np.float64(35.0), 'Rome:bricks': np.float64(17.8)}
+    imports {'Sipontum:oil': np.float64(3.1)}
+    routes opened ['Asculum', 'Beneventum', 'Sipontum', 'Ariminium', 'Rome']
+    build cost 18802 vs start funds 10000 -> payback 0.6 yr; lowest tax that balances: 0%
+    food types used (in order): ['wheat', 'meat', 'vegetables']
+    sites (packed): {'farm': 94, 'rock': 285, 'timber': 853, 'clay': 287, 'sand': 648, 'wharf': 115}; Rome wheat 0; start stock {}
+forts assumed 2; surplus with no trade: None; surplus with the tent mix: 32046.229629216883
+favor: {'salary_year': 960.0, 'savings_income': 960.0, 'gift_gain': 5, 'yearly_net': 5.5}; caps []
+years (lower bound): {'peace': 12, 'prosperity': 7, 'favor': 4}
+PROBLEMS: none
+build-up: 25% y0.8 lvl6 budget 11500 surplus 13794 capex 5298 treasury 9874 | 50% y1.5 lvl6 budget 16673 surplus 14815 capex 6716 treasury 19185 | 75% y2.2 lvl6 budget 27401 surplus 15537 capex 8099 treasury 29184 | 100% y3.0 lvl15 budget 38783 surplus 33970 capex 18802 treasury 37046 | lowest treasury 4702 at year 0
+
+## RC05_Tarraco
+goals pop 5000 culture 40 prosperity 65 peace 55 favor 70
+max house level 19 (prosperity value 100); next level blocked by: None
+caps: {'food_types': 3, 'wine_types': 2, 'gods': 5, 'entertainment': 80, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion'], 29.333333333333336, 0)
+tax 8%, Rome wage 20.0, event money 0/yr, event favor 0/yr
+LP: surplus 31543/yr | tax 16902 exports 23350 imports 2146 fixed 2016
+    pop 5250 plebs 3485 workers 1568/1568 land 1515/3607 prosperity cap 100
+    houses {'4x2': np.float64(67.0), '19x4': np.float64(8.8)}
+    prod {'bricks': np.float64(24.0), 'clay': np.float64(84.7), 'fruit': np.float64(35.3), 'furniture': np.float64(27.0), 'iron': np.float64(80.0), 'marble': np.float64(46.4), 'oil': np.float64(2.1), 'pottery': np.float64(31.5), 'sand': np.float64(52.0), 'stone': np.float64(30.0), 'timber': np.float64(97.8), 'weapons': np.float64(80.0), 'wheat': np.float64(266.0), 'wine': np.float64(4.2)}
+    exports {'Emporiae:timber': np.float64(30.0), 'Emporiae:marble': np.float64(10.0), 'Emporiae:stone': np.float64(30.0), 'Massilia:marble': np.float64(20.0), 'Massilia:weapons': np.float64(50.0), 'Capua:marble': np.float64(15.0), 'Capua:weapons': np.float64(30.0), 'Rome:pottery': np.float64(24.0), 'Rome:furniture': np.float64(24.0), 'Rome:bricks': np.float64(24.0), 'Otobesa:clay': np.float64(40.0), 'Otobesa:timber': np.float64(40.0), 'Otobesa:sand': np.float64(40.0)}
+    imports {'Emporiae:fish': np.float64(35.3), 'Massilia:olives': np.float64(2.1), 'Capua:vines': np.float64(4.2)}
+    routes opened ['Emporiae', 'Massilia', 'Capua', 'Rome', 'Otobesa']
+    build cost 18480 vs start funds 9000 -> payback 0.6 yr; lowest tax that balances: 0%
+    food types used (in order): ['wheat', 'fruit', 'fish']
+    sites (packed): {'farm': 99, 'rock': 61, 'timber': 727, 'clay': 491, 'sand': 828, 'wharf': 168}; Rome wheat 0; start stock {}
+forts assumed 0; surplus with no trade: None; surplus with the tent mix: 31543.280169686182
+favor: {'salary_year': 960.0, 'savings_income': 960.0, 'gift_gain': 5, 'yearly_net': 6.214285714285714}; caps []
+years (lower bound): {'peace': 13, 'prosperity': 8, 'favor': 5}
+flows with quest conditions (not applied): [('E8', 'money_add', -500, ['variable_check variable_uid=deposits check=gte value=1', 'resource_stored_count resource=timber check=lt value=1 storage_type=all', 'building_count_active check=gte value=1 building=iron_mine'])]
+PROBLEMS: none
+build-up: 25% y0.8 lvl6 budget 10500 surplus 8798 capex 9036 treasury 3630 | 50% y1.7 lvl6 budget 14166 surplus 12575 capex 11892 treasury 9679 | 75% y2.5 lvl6 budget 23071 surplus 13584 capex 13284 treasury 19187 | 100% y3.3 lvl19 budget 33971 surplus 32608 capex 18480 treasury 33238 | lowest treasury -36 at year 0
+
+## RC06_Syracusae
+goals pop 7000 culture 40 prosperity 75 peace 60 favor 65
+max house level 15 (prosperity value 100); next level blocked by: ['second wine missing']
+caps: {'food_types': 3, 'wine_types': 1, 'gods': 5, 'entertainment': 100, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion'], 29.333333333333336, 0)
+tax 8%, Rome wage 38.0, event money 0/yr, event favor 0/yr
+LP: surplus 36622/yr | tax 18532 exports 33572 imports 3944 fixed 1810
+    pop 7350 plebs 4693 workers 2112/2112 land 2297/6112 prosperity cap 100
+    houses {'4x2': np.float64(90.3), '14x3': np.float64(29.5)}
+    prod {'bricks': np.float64(44.1), 'clay': np.float64(130.1), 'furniture': np.float64(37.1), 'oil': np.float64(69.4), 'olives': np.float64(182.2), 'pottery': np.float64(57.6), 'sand': np.float64(22.1), 'vegetables': np.float64(79.7), 'vines': np.float64(34.1), 'weapons': np.float64(38.0), 'wheat': np.float64(361.3), 'wine': np.float64(34.1)}
+    exports {'Rhegium:clay': np.float64(50.0), 'Rhegium:olives': np.float64(30.0), 'Rhegium:pottery': np.float64(10.0), 'Brundisium:olives': np.float64(52.8), 'Brundisium:oil': np.float64(24.0), 'Capua:pottery': np.float64(40.0), 'Capua:bricks': np.float64(36.8), 'Rome:olives': np.float64(28.8), 'Rome:oil': np.float64(24.0), 'Rome:wine': np.float64(24.0), 'Himera:furniture': np.float64(30.0), 'Himera:weapons': np.float64(30.0)}
+    imports {'Brundisium:timber': np.float64(37.1), 'Capua:iron': np.float64(38.0)}
+    routes opened ['Rhegium', 'Brundisium', 'Capua', 'Rome', 'Himera']
+    build cost 22815 vs start funds 10000 -> payback 0.6 yr; lowest tax that balances: 0%
+    food types used (in order): ['wheat', 'vegetables', 'fish']
+    sites (packed): {'farm': 101, 'rock': 528, 'timber': 1205, 'clay': 324, 'sand': 737, 'wharf': 97}; Rome wheat 0; start stock {}
+forts assumed 2; surplus with no trade: None; surplus with the tent mix: 36622.061564557
+favor: {'salary_year': 960.0, 'savings_income': 960.0, 'gift_gain': 5, 'yearly_net': 5.9411764705882355}; caps []
+years (lower bound): {'peace': 14, 'prosperity': 8, 'favor': 5}
+flows with quest conditions (not applied): [('E6', 'money_add', 750, ['variable_check variable_uid=wreck check=gte value=1'])]
+PROBLEMS: none
+build-up: 25% y1.2 lvl6 budget 11500 surplus 23064 capex 8789 treasury 14665 | 50% y2.3 lvl6 budget 24954 surplus 24285 capex 10758 treasury 40317 | 75% y3.5 lvl6 budget 52574 surplus 25507 capex 12726 treasury 67393 | 100% y4.7 lvl15 budget 81619 surplus 36622 capex 22815 treasury 93546 | lowest treasury 1211 at year 0
+
+## RC07_Miletus
+goals pop 6500 culture 40 prosperity 85 peace 65 favor 65
+max house level 19 (prosperity value 100); next level blocked by: None
+caps: {'food_types': 4, 'wine_types': 3, 'gods': 5, 'entertainment': 115, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion'], 29.333333333333336, 0)
+tax 8%, Rome wage 30, event money -6900/yr, event favor 0/yr
+LP: surplus 38007/yr | tax 23643 exports 33600 imports 3154 fixed 8945
+    pop 6825 plebs 4168 workers 1876/1876 land 2075/5162 prosperity cap 85
+    houses {'1x1': np.float64(106.0), '1x2': np.float64(30.3), '4x1': np.float64(198.2), '19x4': np.float64(13.3)}
+    prod {'fish': np.float64(288.0), 'fruit': np.float64(53.1), 'furniture': np.float64(3.2), 'marble': np.float64(61.0), 'oil': np.float64(73.6), 'olives': np.float64(104.6), 'pottery': np.float64(3.2), 'stone': np.float64(51.7), 'vines': np.float64(92.9), 'weapons': np.float64(57.6), 'wine': np.float64(61.9)}
+    exports {'Lydia:fish': np.float64(80.0), 'Lydia:olives': np.float64(30.0), 'Lydia:vines': np.float64(30.0), 'Rhodes:oil': np.float64(30.0), 'Rhodes:wine': np.float64(18.0), 'Athenae:marble': np.float64(30.0), 'Athenae:stone': np.float64(46.8), 'Corinthus:oil': np.float64(35.0), 'Corinthus:wine': np.float64(35.0), 'Herculaneum:marble': np.float64(30.0), 'Herculaneum:weapons': np.float64(46.8)}
+    imports {'Lydia:wheat': np.float64(53.1), 'Lydia:iron': np.float64(57.6), 'Rhodes:clay': np.float64(3.2), 'Athenae:timber': np.float64(3.2)}
+    routes opened ['Lydia', 'Rhodes', 'Athenae', 'Corinthus', 'Herculaneum']
+    build cost 22162 vs start funds 9500 -> payback 0.6 yr; lowest tax that balances: 0%
+    food types used (in order): ['fish', 'fruit', 'wheat']
+    sites (packed): {'farm': 50, 'rock': 425, 'timber': 1033, 'clay': 287, 'sand': 530, 'wharf': 163}; Rome wheat 0; start stock {}
+forts assumed 2; surplus with no trade: None; surplus with the tent mix: 38006.62200482747
+favor: {'salary_year': 960.0, 'savings_income': 960.0, 'gift_gain': 5, 'yearly_net': 6.125}; caps []
+years (lower bound): {'peace': 15, 'prosperity': 9, 'favor': 5}
+PROBLEMS: none
+build-up: 25% y1.1 lvl9 budget 11000 surplus 20648 capex 8326 treasury 12358 | 50% y2.2 lvl9 budget 22184 surplus 21868 capex 10416 treasury 33297 | 75% y3.2 lvl9 budget 45213 surplus 23009 capex 12467 treasury 55555 | 100% y4.3 lvl19 budget 69521 surplus 36656 capex 21702 treasury 78637 | lowest treasury 1174 at year 0
+
+## RC08_Mediolanum_SAVE
+goals pop 8000 culture 45 prosperity 85 peace 90 favor 75
+max house level 19 (prosperity value 100); next level blocked by: None
+caps: {'food_types': 5, 'wine_types': 2, 'gods': 5, 'entertainment': 115, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion'], 29.333333333333336, 0)
+tax 8%, Rome wage 30, event money 0/yr, event favor 0/yr
+LP: surplus 58695/yr | tax 26389 exports 48390 imports 4347 fixed 2533
+    pop 8400 plebs 5493 workers 2472/2472 land 2690/14646 prosperity cap 85
+    houses {'1x1': np.float64(249.2), '1x2': np.float64(27.7), '4x2': np.float64(57.2), '19x4': np.float64(14.5)}
+    prod {'bricks': np.float64(58.1), 'clay': np.float64(93.4), 'furniture': np.float64(40.1), 'marble': np.float64(70.4), 'meat': np.float64(58.1), 'oil': np.float64(3.5), 'pottery': np.float64(34.1), 'sand': np.float64(89.0), 'stone': np.float64(45.0), 'timber': np.float64(160.4), 'vegetables': np.float64(58.1), 'vines': np.float64(112.4), 'weapons': np.float64(120.0), 'wheat': np.float64(237.1), 'wine': np.float64(42.4)}
+    exports {'Genua:clay': np.float64(30.0), 'Genua:timber': np.float64(50.0), 'Genua:sand': np.float64(60.0), 'Arretium:vines': np.float64(70.0), 'Arretium:marble': np.float64(30.0), 'Arretium:stone': np.float64(45.0), 'Patavium:timber': np.float64(70.0), 'Patavium:weapons': np.float64(40.0), 'Aquileia:marble': np.float64(30.0), 'Aquileia:weapons': np.float64(40.0), 'Massilia:pottery': np.float64(30.0), 'Massilia:furniture': np.float64(30.0), 'Massilia:wine': np.float64(30.0), 'Bonoria:weapons': np.float64(21.3), 'Bonoria:bricks': np.float64(50.0)}
+    imports {'Arretium:iron': np.float64(60.0), 'Aquileia:olives': np.float64(3.5), 'Massilia:iron': np.float64(60.0)}
+    routes opened ['Genua', 'Arretium', 'Patavium', 'Aquileia', 'Massilia', 'Bonoria']
+    build cost 26510 vs start funds 12500 -> payback 0.5 yr; lowest tax that balances: 0%
+    food types used (in order): ['wheat', 'meat', 'vegetables']
+    sites (packed): {'farm': 190, 'rock': 604, 'timber': 2904, 'clay': 930, 'sand': 1774, 'wharf': 365}; Rome wheat 0; start stock {'marble': 32, 'sand': 32, 'stone': 32}
+forts assumed 4; surplus with no trade: None; surplus with the tent mix: 58727.132338296324
+favor: {'salary_year': 960.0, 'savings_income': 960.0, 'gift_gain': 5, 'yearly_net': 5.777777777777778}; caps []
+years (lower bound): {'peace': 20, 'prosperity': 9, 'favor': 7}
+flows with quest conditions (not applied): [('E3', 'favor_add', -20, ['variable_check variable_uid=military check=lt value=1', 'count_own_troops check=gte value=33 in_city_only=false']), ('E16', 'favor_add', -1, ['variable_check variable_uid=gifts check=gte value=1'])]
+PROBLEMS: none
+build-up: 25% y1.3 lvl6 budget 14000 surplus None capex 0 treasury 12500 BLOCKED by ['balance', 'budget', 'quota'] | 50% y2.7 lvl6 budget 14000 surplus None capex 0 treasury 12500 BLOCKED by ['balance', 'budget', 'quota'] | 75% y4.0 lvl6 budget 14000 surplus None capex 0 treasury 12500 BLOCKED by ['balance', 'budget', 'quota'] | 100% y5.3 lvl19 budget 14000 surplus 37111 capex 17182 treasury 20059 | lowest treasury -4682 at year 4.0
+
+## RC09_Lugdunum
+goals pop 8000 culture 45 prosperity 90 peace 60 favor 70
+max house level 15 (prosperity value 100); next level blocked by: ['second wine missing']
+caps: {'food_types': 4, 'wine_types': 1, 'gods': 5, 'entertainment': 115, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion'], 29.333333333333336, 0)
+tax 8%, Rome wage 42.0, event money 0/yr, event favor 0/yr
+LP: surplus 45337/yr | tax 20419 exports 44385 imports 4164 fixed 2444
+    pop 8400 plebs 5540 workers 2493/2493 land 2471/5665 prosperity cap 90
+    houses {'4x1': np.float64(60.0), '4x2': np.float64(91.5), '14x3': np.float64(31.8)}
+    prod {'bricks': np.float64(25.0), 'clay': np.float64(71.1), 'furniture': np.float64(97.6), 'gold': np.float64(17.6), 'iron': np.float64(200.5), 'oil': np.float64(14.4), 'pottery': np.float64(23.6), 'sand': np.float64(47.5), 'vegetables': np.float64(85.8), 'vines': np.float64(43.6), 'weapons': np.float64(90.3), 'wheat': np.float64(433.5), 'wine': np.float64(43.6)}
+    exports {'Narbo:iron': np.float64(50.0), 'Narbo:gold': np.float64(8.0), 'Burdigala:clay': np.float64(35.0), 'Burdigala:sand': np.float64(35.0), 'Burdigala:pottery': np.float64(16.0), 'Burdigala:bricks': np.float64(25.0), 'Portus Namnetum:furniture': np.float64(40.0), 'Portus Namnetum:oil': np.float64(6.8), 'Portus Namnetum:weapons': np.float64(30.0), 'Massilia:furniture': np.float64(50.0), 'Massilia:weapons': np.float64(26.8), 'Lutetia:gold': np.float64(8.0), 'Lutetia:wine': np.float64(16.0), 'Lutetia:weapons': np.float64(16.0), 'Genua:iron': np.float64(60.0), 'Genua:wine': np.float64(20.0)}
+    imports {'Narbo:timber': np.float64(97.6), 'Genua:olives': np.float64(14.4)}
+    routes opened ['Narbo', 'Burdigala', 'Portus Namnetum', 'Massilia', 'Lutetia', 'Genua']
+    build cost 30180 vs start funds 9500 -> payback 0.7 yr; lowest tax that balances: 0%
+    food types used (in order): ['wheat', 'vegetables', 'fish']
+    sites (packed): {'farm': 118, 'rock': 537, 'timber': 1165, 'clay': 297, 'sand': 749, 'wharf': 104}; Rome wheat 0; start stock {}
+forts assumed 0; surplus with no trade: None; surplus with the tent mix: 45337.141648003446
+favor: {'salary_year': 960.0, 'savings_income': 960.0, 'gift_gain': 5, 'yearly_net': 7.0625}; caps []
+years (lower bound): {'peace': 14, 'prosperity': 9, 'favor': 5}
+flows with quest conditions (not applied): [('E5', 'money_add', 1200, ['variable_check variable_uid=mint check=gte value=1', 'resource_stored_count resource=gold check=gte value=1 storage_type=all'])]
+PROBLEMS: none
+build-up: 25% y1.3 lvl6 budget 11000 surplus 10780 capex 8865 treasury 7822 | 50% y2.7 lvl6 budget 18187 surplus 14793 capex 15870 treasury 17865 | 75% y4.0 lvl6 budget 35235 surplus 17598 capex 22015 treasury 33315 | 100% y5.3 lvl15 budget 56830 surplus 43850 capex 29920 treasury 66375 | lowest treasury 635 at year 0
+
+## RC10_Carthago_SAVE
+goals pop 8000 culture 45 prosperity 90 peace 75 favor 80
+max house level 15 (prosperity value 100); next level blocked by: ['second wine missing']
+caps: {'food_types': 4, 'wine_types': 1, 'gods': 5, 'entertainment': 115, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion'], 29.333333333333336, 0)
+tax 8%, Rome wage 30, event money 0/yr, event favor 0/yr
+LP: surplus 46427/yr | tax 21362 exports 39371 imports 2077 fixed 2585
+    pop 8400 plebs 5322 workers 2395/2395 land 2585/8607 prosperity cap 90
+    houses {'4x1': np.float64(81.0), '4x2': np.float64(82.1), '14x3': np.float64(34.2)}
+    prod {'fish': np.float64(225.9), 'furniture': np.float64(8.2), 'iron': np.float64(72.3), 'marble': np.float64(96.0), 'oil': np.float64(104.7), 'olives': np.float64(140.0), 'pottery': np.float64(8.2), 'stone': np.float64(21.8), 'vines': np.float64(99.6), 'weapons': np.float64(40.5), 'wheat': np.float64(411.7), 'wine': np.float64(64.6)}
+    exports {'Thapsus:fish': np.float64(110.0), 'Thapsus:olives': np.float64(35.0), 'Thapsus:oil': np.float64(15.0), 'Munda:fruit': np.float64(21.8), 'Munda:vines': np.float64(35.0), 'Munda:wine': np.float64(20.0), 'Cyrene:iron': np.float64(31.8), 'Cyrene:marble': np.float64(30.0), 'Cyrene:weapons': np.float64(15.0), 'Syracusae:marble': np.float64(35.0), 'Syracusae:stone': np.float64(21.8), 'Syracusae:oil': np.float64(20.0), 'Massilia:marble': np.float64(15.0), 'Massilia:oil': np.float64(35.0), 'Massilia:weapons': np.float64(10.0), 'Alexandria:marble': np.float64(15.0), 'Alexandria:oil': np.float64(20.0), 'Alexandria:wine': np.float64(35.0)}
+    imports {'Munda:clay': np.float64(8.2), 'Cyrene:timber': np.float64(8.2)}
+    routes opened ['Thapsus', 'Munda', 'Cyrene', 'Syracusae', 'Massilia', 'Alexandria']
+    build cost 31715 vs start funds 12500 -> payback 0.7 yr; lowest tax that balances: 0%
+    food types used (in order): ['wheat', 'fish', 'vegetables']
+    sites (packed): {'farm': 83, 'rock': 429, 'timber': 1317, 'clay': 348, 'sand': 930, 'wharf': 145}; Rome wheat 0; start stock {'wine': 16, 'weapons': 32}
+forts assumed 3; surplus with no trade: None; surplus with the tent mix: 46427.32793171004
+favor: {'salary_year': 960.0, 'savings_income': 960.0, 'gift_gain': 5, 'yearly_net': 5.434782608695652}; caps []
+years (lower bound): {'peace': 17, 'prosperity': 9, 'favor': 8}
+flows with quest conditions (not applied): [('E11', 'favor_add', 1, ['time check=gte value={48,48}', 'variable_check variable_uid=attacks check=lt value=1'])]
+PROBLEMS: none
+build-up: 25% y1.3 lvl9 budget 14000 surplus 20146 capex 7010 treasury 18921 | 50% y2.7 lvl9 budget 27431 surplus 22838 capex 9655 treasury 44931 | 75% y4.0 lvl9 budget 56086 surplus 24770 capex 12140 treasury 74185 | 100% y5.3 lvl15 budget 87825 surplus 42497 capex 31355 treasury 99814 | lowest treasury 5490 at year 0
+
+## RC11_Tarsus_SAVE
+goals pop 8250 culture 45 prosperity 90 peace 65 favor 75
+max house level 15 (prosperity value 100); next level blocked by: ['second wine missing']
+caps: {'food_types': 3, 'wine_types': 1, 'gods': 5, 'entertainment': 115, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion'], 29.333333333333336, 0)
+tax 8%, Rome wage 44.0, event money 0/yr, event favor 0/yr
+LP: surplus 39180/yr | tax 17961 exports 51347 imports 14089 fixed 1698
+    pop 8250 plebs 5651 workers 2509/2543 land 2342/7781 prosperity cap 100
+    houses {'1x2': np.float64(88.4), '4x2': np.float64(61.1), '15x3': np.float64(26.0)}
+    prod {'fish': np.float64(288.0), 'furniture': np.float64(6.2), 'gold': np.float64(50.8), 'iron': np.float64(117.4), 'marble': np.float64(130.6), 'pottery': np.float64(6.2), 'sand': np.float64(120.0), 'stone': np.float64(32.5), 'weapons': np.float64(116.6)}
+    exports {'Miletus:gold': np.float64(16.0), 'Pergamum:fish': np.float64(160.0), 'Pergamum:marble': np.float64(20.0), 'Pergamum:weapons': np.float64(20.0), 'Palmyra:marble': np.float64(35.0), 'Palmyra:stone': np.float64(25.7), 'Palmyra:weapons': np.float64(20.0), 'Cyrene:marble': np.float64(31.8), 'Cyrene:gold': np.float64(10.0), 'Cyrene:weapons': np.float64(35.0), 'Corinthus:fish': np.float64(56.8), 'Corinthus:marble': np.float64(20.0), 'Leptis Magna:marble': np.float64(20.0), 'Leptis Magna:gold': np.float64(10.0), 'Leptis Magna:weapons': np.float64(30.0), 'Alexandria:fish': np.float64(0.6), 'Alexandria:gold': np.float64(10.0), 'Alexandria:sand': np.float64(120.0)}
+    imports {'Palmyra:oil': np.float64(6.2), 'Cyrene:vegetables': np.float64(52.0), 'Cyrene:wine': np.float64(6.2), 'Corinthus:clay': np.float64(6.2), 'Leptis Magna:timber': np.float64(6.2), 'Alexandria:wheat': np.float64(242.5)}
+    routes opened ['Miletus', 'Pergamum', 'Palmyra', 'Cyrene', 'Corinthus', 'Leptis Magna', 'Alexandria']
+    build cost 44050 vs start funds 14500 -> payback 1.1 yr; lowest tax that balances: 0%
+    food types used (in order): ['wheat', 'vegetables', 'fish']
+    sites (packed): {'farm': 0, 'rock': 64, 'timber': 1263, 'clay': 568, 'sand': 1024, 'wharf': 252}; Rome wheat 0; start stock {}
+forts assumed 2; surplus with no trade: None; surplus with the tent mix: 42737.66497368107
+favor: {'salary_year': 960.0, 'savings_income': 960.0, 'gift_gain': 5, 'yearly_net': 5.944444444444445}; caps []
+years (lower bound): {'peace': 15, 'prosperity': 9, 'favor': 6}
+flows with quest conditions (not applied): [('E10', 'favor_add', 0, ['variable_check variable_uid=favor count check=gte value=1'])]
+PROBLEMS: none
+build-up: 25% y1.4 lvl14 budget 16000 surplus 27793 capex 12569 treasury 21039 | 50% y2.8 lvl14 budget 35108 surplus 39207 capex 26238 treasury 53433 | 75% y4.1 lvl14 budget 81170 surplus 37164 capex 28168 treasury 104007 | 100% y5.5 lvl15 budget 133675 surplus 37793 capex 43880 treasury 139828 | lowest treasury 1931 at year 0
+
+## RC12_Tingis
+goals pop 11000 culture 50 prosperity 95 peace 80 favor 90
+max house level 19 (prosperity value 100); next level blocked by: None
+caps: {'food_types': 3, 'wine_types': 2, 'gods': 5, 'entertainment': 115, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion'], 29.333333333333336, 0)
+tax 8%, Rome wage 30, event money 0/yr, event favor 0/yr
+LP: surplus 54694/yr | tax 41633 exports 41348 imports 14157 fixed 2901
+    pop 11550 plebs 6613 workers 2976/2976 land 3019/9000 prosperity cap 100
+    houses {'4x2': np.float64(127.2), '14x3': np.float64(12.2), '19x4': np.float64(19.2)}
+    prod {'bricks': np.float64(76.7), 'clay': np.float64(268.1), 'furniture': np.float64(37.5), 'oil': np.float64(37.5), 'pottery': np.float64(98.5), 'sand': np.float64(208.6), 'vegetables': np.float64(109.7), 'weapons': np.float64(30.0), 'wheat': np.float64(510.5), 'wine': np.float64(38.9)}
+    exports {'Emporiae:clay': np.float64(70.0), 'Emporiae:sand': np.float64(80.0), 'Emporiae:bricks': np.float64(25.0), 'Massilia:oil': np.float64(30.0), 'Massilia:weapons': np.float64(12.3), 'Caralis:pottery': np.float64(50.0), 'Caralis:wine': np.float64(26.8), 'Carthago Nova:clay': np.float64(60.0), 'Carthago Nova:sand': np.float64(90.0), 'Carthago Nova:bricks': np.float64(50.0), 'Lixus:pottery': np.float64(40.0), 'Lixus:furniture': np.float64(30.0)}
+    imports {'Emporiae:iron': np.float64(10.0), 'Massilia:vines': np.float64(38.9), 'Caralis:olives': np.float64(37.5), 'Carthago Nova:timber': np.float64(37.5), 'Carthago Nova:iron': np.float64(20.0), 'Lixus:meat': np.float64(76.8)}
+    routes opened ['Emporiae', 'Massilia', 'Caralis', 'Carthago Nova', 'Lixus']
+    build cost 30395 vs start funds 10000 -> payback 0.6 yr; lowest tax that balances: 0%
+    food types used (in order): ['wheat', 'vegetables', 'meat']
+    sites (packed): {'farm': 163, 'rock': 320, 'timber': 1691, 'clay': 480, 'sand': 1157, 'wharf': 162}; Rome wheat 0; start stock {}
+forts assumed 3; surplus with no trade: None; surplus with the tent mix: 54693.52231013512
+favor: {'salary_year': 960.0, 'savings_income': 960.0, 'gift_gain': 5, 'yearly_net': 4.777777777777778}; caps []
+years (lower bound): {'peace': 18, 'prosperity': 10, 'favor': 11}
+PROBLEMS: none
+build-up: 25% y1.8 lvl6 budget 11500 surplus 29786 capex 11439 treasury 25865 | 50% y3.7 lvl6 budget 38803 surplus 36961 capex 17222 treasury 81265 | 75% y5.5 lvl6 budget 99988 surplus 30253 capex 20331 treasury 139770 | 100% y7.3 lvl15 budget 161601 surplus 47336 capex 30640 treasury 200584 | lowest treasury -1439 at year 0
+
+## RC13_Valencia
+goals pop 12000 culture 55 prosperity 100 peace 75 favor 70
+max house level 19 (prosperity value 100); next level blocked by: None
+caps: {'food_types': 3, 'wine_types': 2, 'gods': 5, 'entertainment': 110, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion'], 29.333333333333336, 0)
+tax 8%, Rome wage 30, event money -562/yr, event favor -6.0/yr
+LP: surplus 79743/yr | tax 42234 exports 57932 imports 3408 fixed 2528
+    pop 12600 plebs 8115 workers 3652/3652 land 3460/12776 prosperity cap 100
+    houses {'4x2': np.float64(156.1), '19x4': np.float64(22.4)}
+    prod {'clay': np.float64(359.6), 'fish': np.float64(202.5), 'furniture': np.float64(5.4), 'gold': np.float64(24.3), 'iron': np.float64(216.5), 'marble': np.float64(99.8), 'oil': np.float64(5.4), 'olives': np.float64(5.4), 'pottery': np.float64(5.7), 'sand': np.float64(145.6), 'stone': np.float64(251.8), 'timber': np.float64(49.1), 'vines': np.float64(87.6), 'weapons': np.float64(8.0), 'wheat': np.float64(576.6), 'wine': np.float64(10.8)}
+    exports {'Emporiae:clay': np.float64(200.0), 'Emporiae:timber': np.float64(42.5), 'Massilia:gold': np.float64(8.0), 'Massilia:sand': np.float64(68.8), 'Rome:marble': np.float64(30.0), 'Rome:gold': np.float64(8.0), 'Rome:stone': np.float64(38.8), 'Tarraco:iron': np.float64(207.5), 'Tarraco:marble': np.float64(35.0), 'Genua:vines': np.float64(76.8), 'Arminium:fish': np.float64(76.8), 'Alalia:clay': np.float64(76.8), 'Narbo Martius:marble': np.float64(24.0), 'Narbo Martius:gold': np.float64(8.0), 'Narbo Martius:stone': np.float64(210.5), 'Capua:sand': np.float64(76.8), 'Caralis:clay': np.float64(76.8)}
+    imports {'Emporiae:fruit': np.float64(89.7)}
+    routes opened ['Emporiae', 'Massilia', 'Rome', 'Tarraco', 'Genua', 'Arminium', 'Alalia', 'Narbo Martius', 'Capua', 'Caralis']
+    build cost 45490 vs start funds 10000 -> payback 0.6 yr; lowest tax that balances: 0%
+    drains avoided by: ['build city_mint (>= 1)']
+    food types used (in order): ['wheat', 'fruit', 'fish']
+    sites (packed): {'farm': 186, 'rock': 936, 'timber': 2812, 'clay': 895, 'sand': 1797, 'wharf': 377}; Rome wheat 0; start stock {}
+forts assumed 2; surplus with no trade: 29663.20044318588; surplus with the tent mix: 79742.67052925559
+favor: {'salary_year': 960.0, 'savings_income': 1560.0, 'gift_gain': 10, 'yearly_net': 5.030303030303031}; caps []
+years (lower bound): {'peace': 17, 'prosperity': 10, 'favor': 6}
+flows with quest conditions (not applied): [('E4', 'savings_add', 600, ['variable_check variable_uid=corruption check=gte value=2'])]
+PROBLEMS: none
+build-up: 25% y2.0 lvl6 budget 11500 surplus 34582 capex 11830 treasury 32752 | 50% y4.0 lvl6 budget 46082 surplus 55534 capex 35700 treasury 98999 | 75% y6.0 lvl6 budget 136199 surplus 58012 capex 39010 treasury 209235 | 100% y8.0 lvl19 budget 249745 surplus 81600 capex 45490 treasury 342367 | lowest treasury -1830 at year 0
+
+## RC14_Lutetia_SAVE
+goals pop 12000 culture 50 prosperity 95 peace 80 favor 75
+max house level 15 (prosperity value 100); next level blocked by: ['second wine missing']
+caps: {'food_types': 4, 'wine_types': 1, 'gods': 5, 'entertainment': 115, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion'], 29.333333333333336, 0)
+tax 5%, Rome wage 30, event money 0/yr, event favor 0/yr
+LP: surplus 59558/yr | tax 15838 exports 69387 imports 4530 fixed 3006
+    pop 12600 plebs 10726 workers 4616/4827 land 3833/15167 prosperity cap 95
+    houses {'8x2': np.float64(141.1), '14x3': np.float64(20.8)}
+    prod {'bricks': np.float64(95.4), 'clay': np.float64(254.2), 'furniture': np.float64(92.6), 'iron': np.float64(288.3), 'meat': np.float64(56.2), 'pottery': np.float64(114.4), 'sand': np.float64(206.5), 'stone': np.float64(225.9), 'timber': np.float64(303.2), 'vegetables': np.float64(699.8), 'weapons': np.float64(108.3)}
+    exports {'Agendincum:clay': np.float64(70.0), 'Agendincum:timber': np.float64(70.0), 'Agendincum:bricks': np.float64(40.0), 'Juliobona:stone': np.float64(48.8), 'Juliobona:weapons': np.float64(28.0), 'Avaricum:sand': np.float64(80.0), 'Avaricum:pottery': np.float64(45.0), 'Avaricum:furniture': np.float64(20.0), 'Portus Namnetum:iron': np.float64(80.0), 'Portus Namnetum:stone': np.float64(100.0), 'Portus Namnetum:weapons': np.float64(28.0), 'Augustodurum:clay': np.float64(21.8), 'Augustodurum:pottery': np.float64(20.0), 'Augustodurum:furniture': np.float64(35.0), 'Narbo Martius:iron': np.float64(100.0), 'Narbo Martius:stone': np.float64(75.0), 'Narbo Martius:weapons': np.float64(14.0), 'Rome:weapons': np.float64(24.0), 'Rome:bricks': np.float64(52.8), 'Burdigala:timber': np.float64(140.0), 'Burdigala:sand': np.float64(78.5), 'Burdigala:furniture': np.float64(24.0)}
+    imports {'Agendincum:marble': np.float64(0.3), 'Avaricum:oil': np.float64(5.0), 'Rome:wine': np.float64(5.0)}
+    routes opened ['Agendincum', 'Juliobona', 'Avaricum', 'Portus Namnetum', 'Augustodurum', 'Narbo Martius', 'Rome', 'Burdigala']
+    build cost 54030 vs start funds 12000 -> payback 0.9 yr; lowest tax that balances: 0%
+    food types used (in order): ['vegetables', 'meat', 'fruit']
+    sites (packed): {'farm': 213, 'rock': 986, 'timber': 3035, 'clay': 914, 'sand': 1858, 'wharf': 378}; Rome wheat 0; start stock {}
+forts assumed 3; surplus with no trade: None; surplus with the tent mix: 59558.29727386109
+favor: {'salary_year': 960.0, 'savings_income': 960.0, 'gift_gain': 5, 'yearly_net': 6.571428571428571}; caps []
+years (lower bound): {'peace': 18, 'prosperity': 10, 'favor': 6}
+PROBLEMS: none
+build-up: 25% y2.0 lvl6 budget 13500 surplus 32621 capex 13715 treasury 30906 | 50% y4.0 lvl6 budget 46121 surplus 40991 capex 24980 treasury 93254 | 75% y6.0 lvl6 budget 119734 surplus 43019 capex 28810 treasury 173435 | 100% y8.0 lvl15 budget 203745 surplus 56415 capex 53845 treasury 247834 | lowest treasury -1715 at year 0
+
+## RC15_Caesarea
+goals pop 8500 culture 50 prosperity 95 peace 70 favor 75
+max house level 15 (prosperity value 100); next level blocked by: ['second wine missing']
+caps: {'food_types': 4, 'wine_types': 1, 'gods': 5, 'entertainment': 115, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion'], 29.333333333333336, 0)
+tax 8%, Rome wage 30, event money 0/yr, event favor 0/yr
+LP: surplus 52570/yr | tax 18671 exports 60394 imports 12704 fixed 1905
+    pop 8925 plebs 6572 workers 2957/2957 land 2823/9037 prosperity cap 95
+    houses {'1x2': np.float64(95.6), '4x2': np.float64(50.4), '11x2': np.float64(15.2), '15x3': np.float64(23.5)}
+    prod {'furniture': np.float64(29.3), 'gold': np.float64(42.1), 'oil': np.float64(137.1), 'olives': np.float64(217.5), 'pottery': np.float64(9.3), 'sand': np.float64(120.0), 'stone': np.float64(201.1), 'vines': np.float64(151.4), 'weapons': np.float64(48.4), 'wine': np.float64(101.0)}
+    exports {'Hippo Regius:vines': np.float64(50.0), 'Hippo Regius:sand': np.float64(120.0), 'Hippo Regius:oil': np.float64(20.0), 'Caralis:gold': np.float64(11.6), 'Caralis:stone': np.float64(41.2), 'Caralis:wine': np.float64(24.0), 'Calama:olives': np.float64(80.0), 'Calama:gold': np.float64(10.0), 'Calama:furniture': np.float64(20.0), 'Calama:wine': np.float64(12.0), 'Carthago Nova:gold': np.float64(10.0), 'Carthago Nova:stone': np.float64(46.8), 'Carthago Nova:oil': np.float64(20.0), 'Capsa:stone': np.float64(80.0), 'Capsa:oil': np.float64(20.0), 'Capsa:weapons': np.float64(36.0), 'Palma:stone': np.float64(20.8), 'Palma:oil': np.float64(28.0), 'Palma:wine': np.float64(28.0), 'Tingis:gold': np.float64(10.0), 'Tingis:oil': np.float64(30.0), 'Tingis:wine': np.float64(30.0)}
+    imports {'Hippo Regius:fish': np.float64(85.3), 'Caralis:fruit': np.float64(47.1), 'Carthago Nova:clay': np.float64(9.3), 'Capsa:timber': np.float64(29.3), 'Palma:iron': np.float64(48.4), 'Tingis:wheat': np.float64(242.5)}
+    routes opened ['Hippo Regius', 'Caralis', 'Calama', 'Carthago Nova', 'Capsa', 'Palma', 'Tingis']
+    build cost 39362 vs start funds 16000 -> payback 0.7 yr; lowest tax that balances: 0%
+    food types used (in order): ['wheat', 'fish', 'fruit']
+    sites (packed): {'farm': 105, 'rock': 535, 'timber': 1643, 'clay': 419, 'sand': 1104, 'wharf': 168}; Rome wheat 0; start stock {}
+forts assumed 3; surplus with no trade: None; surplus with the tent mix: 52702.90406726334
+favor: {'salary_year': 960.0, 'savings_income': 960.0, 'gift_gain': 5, 'yearly_net': 7.611111111111111}; caps []
+years (lower bound): {'peace': 16, 'prosperity': 10, 'favor': 5}
+flows with quest conditions (not applied): [('E2', 'money_add', -581, ['city_population check=gte value=2300 class=all', 'money check=gte value=1500', 'variable_check variable_uid=pirates check=lt value=1'])]
+PROBLEMS: none
+build-up: 25% y1.4 lvl6 budget 17500 surplus 45197 capex 17732 treasury 30282 | 50% y2.8 lvl6 budget 49515 surplus 43937 capex 19720 treasury 91431 | 75% y4.2 lvl6 budget 112651 surplus 43524 capex 21708 treasury 151396 | 100% y5.7 lvl15 budget 174603 surplus 54747 capex 39362 treasury 203350 | lowest treasury -1732 at year 0
+
+## RC16_Damascus
+goals pop 12500 culture 60 prosperity 95 peace 80 favor 85
+max house level 15 (prosperity value 100); next level blocked by: ['second wine missing']
+caps: {'food_types': 4, 'wine_types': 1, 'gods': 5, 'entertainment': 115, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion', 'school'], 50.16666666666667, 0)
+tax 8%, Rome wage 40.0, event money 0/yr, event favor 0/yr
+LP: surplus 47350/yr | tax 23365 exports 63451 imports 3315 fixed 2139
+    pop 12500 plebs 9869 workers 4196/4441 land 4257/9415 prosperity cap 95
+    houses {'4x2': np.float64(189.8), '15x3': np.float64(26.3)}
+    prod {'fruit': np.float64(644.8), 'furniture': np.float64(41.0), 'iron': np.float64(554.6), 'oil': np.float64(60.2), 'olives': np.float64(180.2), 'pottery': np.float64(6.3), 'stone': np.float64(440.0), 'timber': np.float64(181.6), 'vegetables': np.float64(52.6), 'vines': np.float64(84.9), 'weapons': np.float64(80.6), 'wine': np.float64(44.9)}
+    exports {'Miletus:iron': np.float64(120.0), 'Miletus:stone': np.float64(60.0), 'Miletus:wine': np.float64(10.0), 'Pergamum:olives': np.float64(60.0), 'Pergamum:iron': np.float64(100.0), 'Pergamum:weapons': np.float64(14.0), 'Tarsus:timber': np.float64(140.0), 'Tarsus:furniture': np.float64(20.0), 'Tarsus:oil': np.float64(10.0), 'Cyrene:iron': np.float64(58.5), 'Cyrene:stone': np.float64(160.0), 'Cyrene:weapons': np.float64(24.0), 'Melitene:olives': np.float64(60.0), 'Melitene:vines': np.float64(40.0), 'Melitene:iron': np.float64(60.0), 'Laodicea:stone': np.float64(140.0), 'Laodicea:oil': np.float64(15.0), 'Laodicea:wine': np.float64(28.0), 'Alexandria:iron': np.float64(134.5), 'Alexandria:stone': np.float64(80.0), 'Alexandria:weapons': np.float64(28.0)}
+    imports {'Cyrene:clay': np.float64(6.3), 'Alexandria:wheat': np.float64(52.6)}
+    routes opened ['Miletus', 'Pergamum', 'Tarsus', 'Cyrene', 'Melitene', 'Laodicea', 'Alexandria']
+    build cost 55890 vs start funds 10000 -> payback 1.2 yr; lowest tax that balances: 0%
+    food types used (in order): ['fruit', 'wheat', 'vegetables']
+    sites (packed): {'farm': 170, 'rock': 820, 'timber': 1890, 'clay': 145, 'sand': 595, 'wharf': 26}; Rome wheat 0; start stock {}
+forts assumed 3; surplus with no trade: None; surplus with the tent mix: 47350.192891292594
+favor: {'salary_year': 960.0, 'savings_income': 960.0, 'gift_gain': 5, 'yearly_net': 4.842105263157895}; caps []
+years (lower bound): {'peace': 18, 'prosperity': 10, 'favor': 10}
+forums limited to 1 by a penalty event (tax only within their reach)
+PROBLEMS: none
+build-up: 25% y2.1 lvl6 budget 11500 surplus 23905 capex 11158 treasury 23743 | 50% y4.2 lvl6 budget 36401 surplus 45752 capex 33301 treasury 74159 | 75% y6.2 lvl6 budget 108960 surplus None capex 33301 treasury 74159 BLOCKED by ['balance', 'quota'] | 100% y8.3 lvl15 budget 108960 surplus 63229 capex 56208 treasury 117116 | lowest treasury -1158 at year 0
+
+## RC17_Londinium_SAVE
+goals pop 17500 culture 50 prosperity 95 peace 85 favor 85
+max house level 13 (prosperity value 100); next level blocked by: ['education 3>2']
+caps: {'food_types': 5, 'wine_types': 1, 'gods': 5, 'entertainment': 115, 'water': 3, 'education': 2, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion'], 29.333333333333336, 0)
+tax 4%, Rome wage 30, event money 0/yr, event favor 0/yr
+LP: surplus 29555/yr | tax 18069 exports 77471 imports 40148 fixed 3762
+    pop 17500 plebs 14245 workers 5803/6410 land 4988/16372 prosperity cap 95
+    houses {'9x2': np.float64(178.1), '13x2': np.float64(77.5)}
+    prod {'bricks': np.float64(136.5), 'clay': np.float64(293.8), 'fish': np.float64(208.6), 'furniture': np.float64(239.3), 'pottery': np.float64(165.3), 'sand': np.float64(158.2), 'timber': np.float64(469.9), 'vegetables': np.float64(952.3), 'weapons': np.float64(105.0), 'wine': np.float64(76.8)}
+    exports {'Camelodunum:fish': np.float64(100.0), 'Camelodunum:clay': np.float64(60.0), 'Camelodunum:timber': np.float64(60.0), 'Mamucium:timber': np.float64(80.0), 'Mamucium:wine': np.float64(25.0), 'Mamucium:weapons': np.float64(40.5), 'Isca:sand': np.float64(90.0), 'Isca:pottery': np.float64(38.0), 'Isca:bricks': np.float64(65.0), 'Lindum:timber': np.float64(90.0), 'Lindum:furniture': np.float64(40.0), 'Lindum:bricks': np.float64(40.0), 'Pontum Namnetum:pottery': np.float64(46.8), 'Pontum Namnetum:bricks': np.float64(30.0), 'Juliobonna:pottery': np.float64(16.8), 'Juliobonna:furniture': np.float64(60.0), 'Crociatonum:furniture': np.float64(76.8), 'Burdigala:wine': np.float64(33.0), 'Burdigala:weapons': np.float64(43.8)}
+    imports {'Camelodunum:iron': np.float64(50.0), 'Isca:iron': np.float64(55.0), 'Pontum Namnetum:oil': np.float64(18.8), 'Juliobonna:marble': np.float64(0.1), 'Crociatonum:vines': np.float64(76.8)}
+    routes opened ['Camelodunum', 'Mamucium', 'Isca', 'Lindum', 'Pontum Namnetum', 'Juliobonna', 'Crociatonum', 'Burdigala']
+    build cost 60080 vs start funds 12500 -> payback 2.0 yr; lowest tax that balances: 0%
+    food types used (in order): ['vegetables', 'fish']
+    sites (packed): {'farm': 183, 'rock': 802, 'timber': 3257, 'clay': 883, 'sand': 1958, 'wharf': 326}; Rome wheat 0; start stock {}
+forts assumed 5; surplus with no trade: None; surplus with the tent mix: 29554.94212641638
+favor: {'salary_year': 960.0, 'savings_income': 960.0, 'gift_gain': 5, 'yearly_net': 6.703703703703704}; caps []
+years (lower bound): {'peace': 19, 'prosperity': 10, 'favor': 7}
+PROBLEMS: none
+build-up: 25% y2.9 lvl6 budget 14000 surplus 41569 capex 14318 treasury 58803 | 50% y5.8 lvl6 budget 74621 surplus 62962 capex 30839 treasury 194722 | 75% y8.8 lvl6 budget 227061 surplus 65506 capex 35923 treasury 376986 | 100% y11.7 lvl13 budget 414409 surplus 31304 capex 59520 treasury 494571 | lowest treasury -1818 at year 0
+
+## RC18_Sarmizegetusa
+goals pop 11000 culture 60 prosperity 95 peace 75 favor 85
+max house level 19 (prosperity value 100); next level blocked by: None
+caps: {'food_types': 3, 'wine_types': 2, 'gods': 5, 'entertainment': 80, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion', 'school'], 50.16666666666667, 0)
+tax 8%, Rome wage 39.0, event money 0/yr, event favor 0/yr
+LP: surplus 48265/yr | tax 43007 exports 39130 imports 13686 fixed 5297
+    pop 11550 plebs 6800 workers 3060/3060 land 2894/9013 prosperity cap 100
+    houses {'4x1': np.float64(523.1), '19x4': np.float64(23.7)}
+    prod {'bricks': np.float64(30.8), 'clay': np.float64(77.4), 'fish': np.float64(95.5), 'furniture': np.float64(36.5), 'iron': np.float64(87.9), 'marble': np.float64(10.6), 'oil': np.float64(26.3), 'pottery': np.float64(46.5), 'sand': np.float64(15.4), 'stone': np.float64(189.9), 'timber': np.float64(116.5), 'weapons': np.float64(27.9), 'wheat': np.float64(593.0), 'wine': np.float64(41.4)}
+    exports {'Viminacium:wheat': np.float64(90.0), 'Viminacium:clay': np.float64(15.0), 'Viminacium:bricks': np.float64(20.0), 'Bononia:iron': np.float64(60.0), 'Bononia:marble': np.float64(10.0), 'Bononia:stone': np.float64(80.0), 'Novae:pottery': np.float64(20.0), 'Novae:furniture': np.float64(30.0), 'Novae:oil': np.float64(20.0), 'Derostorum:stone': np.float64(100.0), 'Derostorum:wine': np.float64(30.0), 'Derostorum:bricks': np.float64(10.0), 'Tarsatica:timber': np.float64(80.0), 'Tarsatica:pottery': np.float64(20.0), 'Tarsatica:weapons': np.float64(10.0)}
+    imports {'Viminacium:olives': np.float64(26.3), 'Bononia:fruit': np.float64(95.0), 'Novae:vines': np.float64(41.4)}
+    routes opened ['Viminacium', 'Bononia', 'Novae', 'Derostorum', 'Tarsatica']
+    build cost 37650 vs start funds 18500 -> payback 0.8 yr; lowest tax that balances: 0%
+    food types used (in order): ['wheat', 'fish', 'fruit']
+    sites (packed): {'farm': 158, 'rock': 763, 'timber': 1811, 'clay': 249, 'sand': 717, 'wharf': 90}; Rome wheat 0; start stock {}
+forts assumed 4; surplus with no trade: None; surplus with the tent mix: 48265.01386828462
+favor: {'salary_year': 960.0, 'savings_income': 960.0, 'gift_gain': 5, 'yearly_net': 4.379310344827586}; caps []
+years (lower bound): {'peace': 17, 'prosperity': 10, 'favor': 11}
+PROBLEMS: none
+build-up: 25% y1.8 lvl6 budget 20000 surplus 26894 capex 13699 treasury 29454 | 50% y3.7 lvl6 budget 44653 surplus 32954 capex 24932 treasury 73080 | 75% y5.5 lvl6 budget 99513 surplus 34857 capex 28041 treasury 132131 | 100% y7.3 lvl19 budget 161673 surplus 50066 capex 38480 treasury 199538 | lowest treasury 4801 at year 0
+
+## RC19_Lindum_SAVE
+goals pop 16000 culture 60 prosperity 100 peace 80 favor 80
+max house level 19 (prosperity value 100); next level blocked by: None
+caps: {'food_types': 5, 'wine_types': 2, 'gods': 5, 'entertainment': 115, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion', 'school'], 50.16666666666667, 0)
+tax 8%, Rome wage 38.0, event money 0/yr, event favor 0/yr
+LP: surplus 89863/yr | tax 47867 exports 80711 imports 9774 fixed 4323
+    pop 16800 plebs 11717 workers 5273/5273 land 5469/15894 prosperity cap 100
+    houses {'1x2': np.float64(180.0), '4x1': np.float64(286.3), '4x2': np.float64(56.8), '19x4': np.float64(25.4)}
+    prod {'bricks': np.float64(177.6), 'clay': np.float64(357.3), 'fish': np.float64(220.8), 'fruit': np.float64(502.3), 'furniture': np.float64(126.7), 'iron': np.float64(88.8), 'oil': np.float64(76.1), 'pottery': np.float64(166.1), 'sand': np.float64(141.3), 'stone': np.float64(118.1), 'timber': np.float64(227.3), 'vines': np.float64(177.6), 'weapons': np.float64(42.0), 'wine': np.float64(97.6)}
+    exports {'Londinium:timber': np.float64(80.0), 'Londinium:vines': np.float64(80.0), 'Londinium:sand': np.float64(52.5), 'Londinium:furniture': np.float64(30.0), 'Isca:pottery': np.float64(30.0), 'Isca:wine': np.float64(50.0), 'Isca:weapons': np.float64(30.0), 'Isca:bricks': np.float64(70.0), 'Deva:pottery': np.float64(40.0), 'Deva:furniture': np.float64(50.0), 'Deva:wine': np.float64(35.0), 'Camelodunum:fish': np.float64(100.0), 'Camelodunum:clay': np.float64(65.0), 'Camelodunum:stone': np.float64(77.5), 'Mamucium:pottery': np.float64(90.0), 'Mamucium:oil': np.float64(40.0), 'Mamucium:bricks': np.float64(50.0), 'Pontum Namnetum:clay': np.float64(36.8), 'Pontum Namnetum:furniture': np.float64(40.0), 'Burdigala:stone': np.float64(21.8), 'Burdigala:bricks': np.float64(55.0), 'Crociatonum:iron': np.float64(46.8), 'Crociatonum:oil': np.float64(30.0)}
+    imports {'Londinium:vegetables': np.float64(101.7), 'Pontum Namnetum:olives': np.float64(76.1)}
+    routes opened ['Londinium', 'Isca', 'Deva', 'Camelodunum', 'Mamucium', 'Pontum Namnetum', 'Burdigala', 'Crociatonum']
+    build cost 63575 vs start funds 16000 -> payback 0.7 yr; lowest tax that balances: 0%
+    food types used (in order): ['fruit', 'fish', 'vegetables']
+    sites (packed): {'farm': 215, 'rock': 847, 'timber': 3120, 'clay': 546, 'sand': 1236, 'wharf': 211}; Rome wheat 0; start stock {}
+forts assumed 3; surplus with no trade: None; surplus with the tent mix: 92350.9802537718
+favor: {'salary_year': 960.0, 'savings_income': 960.0, 'gift_gain': 5, 'yearly_net': 4.428571428571429}; caps []
+years (lower bound): {'peace': 18, 'prosperity': 10, 'favor': 10}
+flows with quest conditions (not applied): [('E27', 'favor_add', -1, ['variable_check variable_uid=wall check=lt value=6', 'time check=gte value={25,25}']), ('E37', 'favor_add', -12, ['variable_check variable_uid=wall check=gte value=6', 'resource_stored_count resource=weapons check=lt value=3 storage_type=all'])]
+PROBLEMS: none
+build-up: 25% y2.7 lvl6 budget 18300 surplus 14946 capex 17415 treasury 18512 | 50% y5.3 lvl6 budget 38227 surplus 28192 capex 36295 treasury 57149 | 75% y8.0 lvl6 budget 95744 surplus 31332 capex 45305 treasury 127505 | 100% y10.7 lvl19 budget 175110 surplus 93458 capex 63360 treasury 275836 | lowest treasury -1415 at year 0
+
+## RC20_Massilia
+goals pop 18000 culture 80 prosperity 100 peace 85 favor 90
+max house level 19 (prosperity value 100); next level blocked by: None
+caps: {'food_types': 4, 'wine_types': 3, 'gods': 5, 'entertainment': 85, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion', 'school', 'library'], 75.16666666666667, 0)
+tax 8%, Rome wage 40.0, event money -3600/yr, event favor 0/yr
+LP: surplus 91495/yr | tax 57718 exports 86475 imports 16479 fixed 6920
+    pop 18900 plebs 13011 workers 5855/5855 land 5436/12676 prosperity cap 100
+    houses {'4x1': np.float64(530.1), '4x2': np.float64(117.7), '19x4': np.float64(29.4)}
+    prod {'bricks': np.float64(172.2), 'clay': np.float64(446.8), 'fish': np.float64(288.0), 'furniture': np.float64(7.1), 'oil': np.float64(153.9), 'olives': np.float64(274.1), 'pottery': np.float64(20.4), 'sand': np.float64(225.1), 'vines': np.float64(232.6), 'weapons': np.float64(102.5), 'wheat': np.float64(900.4), 'wine': np.float64(111.6)}
+    exports {'Cremona:fish': np.float64(110.2), 'Cremona:clay': np.float64(100.0), 'Cremona:oil': np.float64(12.0), 'Cremona:wine': np.float64(12.0), 'Aquilea:olives': np.float64(120.0), 'Aquilea:vines': np.float64(120.0), 'Mediolanum:sand': np.float64(120.0), 'Pisae:fish': np.float64(60.0), 'Pisae:clay': np.float64(140.0), 'Pisae:oil': np.float64(24.0), 'Rome:oil': np.float64(30.0), 'Rome:weapons': np.float64(46.8), 'Aleria:oil': np.float64(30.0), 'Aleria:wine': np.float64(30.0), 'Aleria:bricks': np.float64(16.8), 'Olbia:oil': np.float64(30.0), 'Olbia:wine': np.float64(30.0), 'Olbia:bricks': np.float64(16.8), 'Ariminium:clay': np.float64(100.0), 'Ariminium:sand': np.float64(18.5), 'Ariminium:wine': np.float64(24.0), 'Ariminium:bricks': np.float64(100.0), 'Caralis:weapons': np.float64(40.0), 'Caralis:bricks': np.float64(36.8), 'Brundisium:pottery': np.float64(12.0), 'Brundisium:oil': np.float64(8.0)}
+    imports {'Cremona:vegetables': np.float64(117.8), 'Mediolanum:iron': np.float64(27.5), 'Pisae:timber': np.float64(7.1), 'Olbia:iron': np.float64(75.0)}
+    routes opened ['Cremona', 'Aquilea', 'Mediolanum', 'Pisae', 'Rome', 'Aleria', 'Olbia', 'Ariminium', 'Caralis', 'Brundisium']
+    build cost 73890 vs start funds 14500 -> payback 0.8 yr; lowest tax that balances: 0%
+    food types used (in order): ['wheat', 'fish', 'vegetables']
+    sites (packed): {'farm': 141, 'rock': 987, 'timber': 2673, 'clay': 613, 'sand': 1442, 'wharf': 215}; Rome wheat 0; start stock {}
+forts assumed 3; surplus with no trade: None; surplus with the tent mix: 91495.36797672666
+favor: {'salary_year': 960.0, 'savings_income': 960.0, 'gift_gain': 5, 'yearly_net': 4.25}; caps []
+years (lower bound): {'peace': 19, 'prosperity': 10, 'favor': 12}
+flows with quest conditions (not applied): [('E7', 'money_add', -1800, ['variable_check variable_uid=trade check=gte value=2']), ('E9', 'money_add', 1400, ['resource_stored_count resource=fish check=gte value=64 storage_type=warehouses']), ('E24', 'money_add', -1800, ['variable_check variable_uid=statues check=gte value=2'])]
+PROBLEMS: none
+build-up: 25% y3.0 lvl6 budget 16500 surplus 36672 capex 16821 treasury 52687 | 50% y6.0 lvl6 budget 71508 surplus 83568 capex 49120 treasury 200748 | 75% y9.0 lvl6 budget 251868 surplus 86963 capex 54198 treasury 451468 | 100% y12.0 lvl19 budget 507665 surplus 92087 capex 73890 treasury 700352 | lowest treasury -2321 at year 0
+
+## antiochia
+goals pop 18000 culture 100 prosperity 100 peace 100 favor 100
+max house level 15 (prosperity value 100); next level blocked by: ['second wine missing']
+caps: {'food_types': 3, 'wine_types': 1, 'gods': 5, 'entertainment': 115, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion', 'school', 'academy', 'library'], 122.04166666666667, 0)
+tax 6%, Rome wage 51.0, event money 0/yr, event favor 0.0/yr
+LP: surplus 34755/yr | tax 27318 exports 61583 imports 12619 fixed 1666
+    pop 18900 plebs 14669 workers 6601/6601 land 5791/16682 prosperity cap 100
+    houses {'4x2': np.float64(282.1), '15x3': np.float64(42.3)}
+    prod {'bricks': np.float64(176.8), 'fish': np.float64(84.6), 'fruit': np.float64(84.6), 'furniture': np.float64(18.7), 'iron': np.float64(178.9), 'marble': np.float64(149.1), 'oil': np.float64(10.2), 'pottery': np.float64(10.2), 'sand': np.float64(88.4), 'timber': np.float64(380.7), 'vegetables': np.float64(964.7), 'vines': np.float64(278.8), 'weapons': np.float64(38.4), 'wine': np.float64(96.8)}
+    exports {'Tarsus:timber': np.float64(80.0), 'Tarsus:marble': np.float64(45.0), 'Tarsus:wine': np.float64(20.0), 'Damascus:timber': np.float64(90.0), 'Damascus:vines': np.float64(80.0), 'Damascus:marble': np.float64(55.0), 'Damascus:weapons': np.float64(17.5), 'Caesarea:timber': np.float64(80.0), 'Caesarea:wine': np.float64(15.0), 'Phaphos:wine': np.float64(35.0), 'Phaphos:bricks': np.float64(41.8), 'Alexandrea:vines': np.float64(41.8), 'Alexandrea:bricks': np.float64(35.0), 'Hyerosolema:iron': np.float64(65.0), 'Hyerosolema:marble': np.float64(40.0), 'Hyerosolema:bricks': np.float64(30.0), 'Edessa:timber': np.float64(60.0), 'Edessa:vines': np.float64(60.0), 'Edessa:iron': np.float64(75.0), 'Cyrene:bricks': np.float64(30.0), 'Palmyra:wine': np.float64(15.0), 'Palmyra:weapons': np.float64(12.9), 'Palmyra:bricks': np.float64(15.0), 'Ephesus:timber': np.float64(51.8), 'Ephesus:bricks': np.float64(25.0)}
+    imports {'Caesarea:clay': np.float64(35.0), 'Phaphos:clay': np.float64(33.6), 'Hyerosolema:olives': np.float64(10.2), 'Cyrene:clay': np.float64(30.0)}
+    routes opened ['Tarsus', 'Damascus', 'Caesarea', 'Phaphos', 'Alexandrea', 'Hyerosolema', 'Edessa', 'Cyrene', 'Palmyra', 'Ephesus']
+    build cost 77945 vs start funds 15000 -> payback 2.2 yr; lowest tax that balances: 0%
+    food types used (in order): ['vegetables', 'fruit', 'fish']
+    sites (packed): {'farm': 320, 'rock': 370, 'timber': 4062, 'clay': 535, 'sand': 1284, 'wharf': 180}; Rome wheat 0; start stock {}
+forts assumed 2; surplus with no trade: None; surplus with the tent mix: 34754.98929553835
+favor: {'salary_year': 76.8, 'savings_income': 136.8, 'gift_gain': 10, 'yearly_net': 10.3125}; caps []
+rating set by events: [('E6', 'prosperity', 85, ['stats_prosperity check=gte value=86', 'check_formulas formula=[11] check=lte formula2=[10]+150'])]
+years (lower bound): {'peace': 22, 'prosperity': 10, 'favor': 6}
+flows with quest conditions (not applied): [('E33', 'favor_add', 2, ['variable_check variable_uid=best check=gte value=1']), ('E63', 'money_add', 0, ['variable_check variable_uid=rack check=gte value=2'])]
+PROBLEMS: none
+build-up: 25% y3.0 lvl6 budget 19000 surplus 31938 capex 19028 treasury 43879 | 50% y6.0 lvl6 budget 66907 surplus 42054 capex 35130 treasury 138764 | 75% y9.0 lvl6 budget 177894 surplus 43324 capex 40448 treasury 261513 | 100% y12.0 lvl15 budget 305961 surplus 41642 capex 77935 treasury 351476 | lowest treasury -4028 at year 0
+
+## complutum
+goals pop 22000 culture 100 prosperity 100 peace 0 favor 100
+max house level 19 (prosperity value 100); next level blocked by: None
+caps: {'food_types': 4, 'wine_types': 3, 'gods': 5, 'entertainment': 90, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['religion', 'school', 'academy', 'library'], 106.04166666666667, 5)
+tax 8%, Rome wage 33.5, event money 0/yr, event favor 0/yr
+LP: surplus 100009/yr | tax 56855 exports 93312 imports 15716 fixed 4133
+    pop 23100 plebs 17444 workers 7850/7850 land 7483/15952 prosperity cap 100
+    houses {'1x2': np.float64(247.5), '4x2': np.float64(202.2), '19x4': np.float64(28.3)}
+    prod {'bricks': np.float64(50.1), 'fruit': np.float64(715.7), 'furniture': np.float64(56.8), 'iron': np.float64(395.1), 'oil': np.float64(46.8), 'olives': np.float64(343.0), 'pottery': np.float64(6.8), 'sand': np.float64(870.1), 'stone': np.float64(100.1), 'timber': np.float64(374.4), 'vegetables': np.float64(84.8), 'weapons': np.float64(45.0)}
+    exports {'Emerita Augusta:olives': np.float64(56.8), 'Emerita Augusta:weapons': np.float64(20.0), 'Caesaraugusta:timber': np.float64(165.0), 'Caesaraugusta:stone': np.float64(57.5), 'Caesaraugusta:bricks': np.float64(20.0), 'Salmatike:timber': np.float64(77.5), 'Salmatike:iron': np.float64(150.0), 'Salmatike:furniture': np.float64(15.0), 'Pompaelo:sand': np.float64(180.0), 'Pompaelo:stone': np.float64(42.5), 'Pompaelo:oil': np.float64(20.0), 'Corduba:olives': np.float64(61.8), 'Corduba:weapons': np.float64(15.0), 'Toletum:timber': np.float64(67.5), 'Toletum:olives': np.float64(145.0), 'Toletum:bricks': np.float64(30.0), 'Tarraco-Rome:sand': np.float64(242.5), 'Asturica Augusta:sand': np.float64(222.5), 'Asturica Augusta:oil': np.float64(20.0), 'Carthago Nova:timber': np.float64(7.5), 'Carthago Nova:iron': np.float64(200.0), 'Carthago Nova:furniture': np.float64(35.0), 'Emporiae:olives': np.float64(32.5), 'Emporiae:sand': np.float64(200.0), 'Emporiae:weapons': np.float64(10.0)}
+    imports {'Emerita Augusta:clay': np.float64(31.8), 'Salmatike:wheat': np.float64(84.8), 'Corduba:wine': np.float64(13.6), 'Tarraco-Rome:meat': np.float64(84.8)}
+    routes opened ['Emerita Augusta', 'Caesaraugusta', 'Salmatike', 'Pompaelo', 'Corduba', 'Toletum', 'Tarraco-Rome', 'Asturica Augusta', 'Carthago Nova', 'Emporiae']
+    build cost 81775 vs start funds 10000 -> payback 0.8 yr; lowest tax that balances: 0%
+    requests that the city cannot fill (favor loss): ['gold']
+    monuments needed: [{'monument': 'grand_temple_ceres', 'materials': {'stone': 20, 'timber': 32, 'concrete': 20, 'marble': 28, 'bricks': 28}, 'import_cost': 7700, 'missing': []}, {'monument': 'grand_temple_neptune', 'materials': {'stone': 20, 'timber': 32, 'concrete': 20, 'marble': 28, 'bricks': 28}, 'import_cost': 7700, 'missing': []}, {'monument': 'grand_temple_mercury', 'materials': {'stone': 20, 'timber': 32, 'concrete': 20, 'marble': 28, 'bricks': 28}, 'import_cost': 7700, 'missing': []}, {'monument': 'grand_temple_mars', 'materials': {'stone': 20, 'timber': 32, 'concrete': 20, 'marble': 28, 'bricks': 28}, 'import_cost': 7700, 'missing': []}, {'monument': 'grand_temple_venus', 'materials': {'stone': 20, 'timber': 32, 'concrete': 20, 'marble': 28, 'bricks': 28}, 'import_cost': 7700, 'missing': []}]
+    sites (packed): {'farm': 397, 'rock': 725, 'timber': 3722, 'clay': 683, 'sand': 1611, 'wharf': 225}; Rome wheat 0; start stock {}
+forts assumed 0; surplus with no trade: None; surplus with the tent mix: 102229.30529968081
+favor: {'salary_year': 76.8, 'savings_income': 76.8, 'gift_gain': 5, 'yearly_net': 3.09}; caps []
+rating set by events: [('E10', 'prosperity', 80, ['variable_check variable_uid=GI check=lte value=1', 'stats_prosperity check=gte value=81']), ('E11', 'prosperity', 80, ['variable_check variable_uid=temples check=lte value=1', 'stats_prosperity check=gte value=81']), ('E12', 'prosperity', 80, ['variable_check variable_uid=roadblock check=lte value=3', 'stats_prosperity check=gte value=81']), ('E13', 'prosperity', 80, ['variable_check variable_uid=hipp check=lte value=1', 'stats_prosperity check=gte value=81'])]
+years (lower bound): {'prosperity': 10, 'favor': 20}
+flows with quest conditions (not applied): [('E8', 'favor_add', -60, ['variable_check variable_uid=chariots check=gte value=1'])]
+PROBLEMS: none
+build-up: 25% y3.7 lvl14 budget 14000 surplus 30888 capex 15510 treasury 51117 | 50% y7.3 lvl14 budget 70627 surplus 70757 capex 43135 treasury 209841 | 75% y11.0 lvl14 budget 256976 surplus 79782 capex 52018 treasury 476946 | 100% y14.7 lvl19 budget 532964 surplus 92592 capex 81215 treasury 763767 | lowest treasury -5510 at year 0
+
+## gesoriacum
+goals pop 0 culture 50 prosperity 90 peace 90 favor 80
+max house level 17 (prosperity value 100); next level blocked by: ['entertainment 70>65']
+caps: {'food_types': 3, 'wine_types': 2, 'gods': 5, 'entertainment': 65, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion'], 29.333333333333336, 0)
+tax 8%, Rome wage 33.5, event money 0/yr, event favor 0/yr
+LP: surplus 57464/yr | tax 67468 exports 23067 imports 11100 fixed 566
+    pop 21997 plebs 12190 workers 5486/5486 land 5664/5664 prosperity cap 100
+    houses {'4x2': np.float64(144.0), '8x2': np.float64(61.9), '14x3': np.float64(69.0), '17x3': np.float64(32.1)}
+    prod {'bricks': np.float64(1.8), 'fish': np.float64(72.0), 'furniture': np.float64(71.0), 'iron': np.float64(166.4), 'marble': np.float64(35.0), 'meat': np.float64(989.6), 'pottery': np.float64(39.1), 'sand': np.float64(30.9), 'stone': np.float64(50.0), 'timber': np.float64(101.9), 'vines': np.float64(32.0), 'weapons': np.float64(92.8), 'wine': np.float64(32.0)}
+    exports {'Lutetia:iron': np.float64(40.0), 'Dubris:iron': np.float64(31.8), 'Dubris:weapons': np.float64(45.0), 'Bagacum:timber': np.float64(30.0), 'Bagacum:furniture': np.float64(45.0), 'Nemetacum:marble': np.float64(35.0), 'Nemetacum:weapons': np.float64(30.0), 'Bratustantium:sand': np.float64(30.0), 'Bratustantium:stone': np.float64(50.0)}
+    imports {'Dubris:clay': np.float64(40.0), 'Bagacum:wheat': np.float64(17.5), 'Nemetacum:oil': np.float64(24.3), 'Bratustantium:wheat': np.float64(242.5)}
+    routes opened ['Lutetia', 'Dubris', 'Bagacum', 'Nemetacum', 'Bratustantium']
+    build cost 42502 vs start funds 8000 -> payback 0.7 yr; lowest tax that balances: 0%
+    food types used (in order): ['meat', 'wheat', 'fish']
+    sites (packed): {'farm': 107, 'rock': 112, 'timber': 1387, 'clay': 132, 'sand': 304, 'wharf': 51}; Rome wheat 0; start stock {}
+forts assumed 4; surplus with no trade: None; surplus with the tent mix: 57463.55869251747
+favor: {'salary_year': 96.0, 'savings_income': 96.0, 'gift_gain': 5, 'yearly_net': 6.333333333333334}; caps [('E0', 89, ['variable_check variable_uid=Legionaries Sailed check=lte value=1999'])]
+years (lower bound): {'peace': 20, 'prosperity': 10, 'favor': 7}
+flows with quest conditions (not applied): [('E13', 'money_add', -1200, ['variable_check variable_uid=barrack check=gte value=2'])]
+PROBLEMS: none
+build-up: 25% y0.5 lvl9 budget 11500 surplus 8978 capex 7044 treasury 3201 | 50% y1.0 lvl9 budget 13745 surplus 14385 capex 10672 treasury 5413 | 75% y1.5 lvl9 budget 19585 surplus 15061 capex 12316 treasury 11131 | 100% y2.0 lvl17 budget 26947 surplus 15983 capex 13615 treasury 17593 | lowest treasury -428 at year 0.5
+
+## leiptis_magna
+goals pop 17000 culture 90 prosperity 100 peace 100 favor 75
+max house level 19 (prosperity value 100); next level blocked by: None
+caps: {'food_types': 4, 'wine_types': 3, 'gods': 5, 'entertainment': 115, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion', 'school', 'library'], 75.16666666666667, 0)
+tax 8%, Rome wage 30, event money 0/yr, event favor 0/yr
+LP: surplus 84034/yr | tax 43212 exports 86485 imports 20512 fixed 1012
+    pop 17850 plebs 13018 workers 5858/5858 land 5791/11682 prosperity cap 100
+    houses {'1x2': np.float64(191.2), '4x2': np.float64(147.4), '14x3': np.float64(17.7), '19x4': np.float64(16.2)}
+    prod {'bricks': np.float64(25.8), 'fish': np.float64(192.4), 'fruit': np.float64(572.4), 'furniture': np.float64(97.5), 'gold': np.float64(28.5), 'iron': np.float64(182.8), 'oil': np.float64(329.8), 'olives': np.float64(416.6), 'pottery': np.float64(88.5), 'sand': np.float64(29.7), 'weapons': np.float64(91.0), 'wine': np.float64(12.0)}
+    exports {'Antiochia:gold': np.float64(6.0), 'Antiochia:furniture': np.float64(20.8), 'Antiochia:oil': np.float64(50.0), 'Cyrene:fish': np.float64(40.0), 'Cyrene:olives': np.float64(36.8), 'Byzantium:gold': np.float64(6.0), 'Byzantium:oil': np.float64(45.8), 'Byzantium:bricks': np.float64(25.0), 'Alexandrea ad Aegyptum:pottery': np.float64(11.8), 'Alexandrea ad Aegyptum:oil': np.float64(65.0), 'Creta:pottery': np.float64(31.8), 'Creta:furniture': np.float64(45.0), 'Tarentum:olives': np.float64(21.8), 'Tarentum:iron': np.float64(30.0), 'Tarentum:weapons': np.float64(25.0), 'Roma:gold': np.float64(16.0), 'Roma:oil': np.float64(25.8), 'Roma:weapons': np.float64(35.0), 'Syracusae:fish': np.float64(35.0), 'Syracusae:sand': np.float64(16.8), 'Syracusae:pottery': np.float64(25.0), 'Carthago:iron': np.float64(61.8), 'Carthago:weapons': np.float64(15.0), 'Carailis:pottery': np.float64(11.8), 'Carailis:oil': np.float64(65.0), 'Valentia:furniture': np.float64(21.8), 'Valentia:oil': np.float64(55.0)}
+    imports {'Alexandrea ad Aegyptum:clay': np.float64(30.0), 'Alexandrea ad Aegyptum:timber': np.float64(2.5), 'Roma:clay': np.float64(11.4), 'Roma:timber': np.float64(30.0), 'Syracusae:wheat': np.float64(64.8), 'Syracusae:vines': np.float64(12.0), 'Carthago:clay': np.float64(25.0), 'Carthago:timber': np.float64(40.0), 'Carailis:clay': np.float64(35.0), 'Carailis:timber': np.float64(25.0)}
+    routes opened ['Antiochia', 'Cyrene', 'Byzantium', 'Alexandrea ad Aegyptum', 'Creta', 'Tarentum', 'Roma', 'Syracusae', 'Carthago', 'Carailis', 'Valentia']
+    build cost 83170 vs start funds 10000 -> payback 1.0 yr; lowest tax that balances: 0%
+    food types used (in order): ['fruit', 'fish', 'wheat']
+    sites (packed): {'farm': 140, 'rock': 157, 'timber': 1874, 'clay': 500, 'sand': 1062, 'wharf': 169}; Rome wheat 0; start stock {}
+forts assumed 4; surplus with no trade: None; surplus with the tent mix: 84311.96024744525
+favor: {'salary_year': 96.0, 'savings_income': 96.0, 'gift_gain': 5, 'yearly_net': 5.3}; caps []
+rating set by events: [('E14', 'prosperity', 90, ['variable_check variable_uid=pant check=lte value=1', 'stats_prosperity check=gte value=91'])]
+years (lower bound): {'peace': 22, 'prosperity': 10, 'favor': 7}
+flows with quest conditions (not applied): [('E25', 'money_add', 0, ['variable_check variable_uid=f check=gte value=2'])]
+PROBLEMS: none
+build-up: 25% y2.8 lvl14 budget 13500 surplus 26103 capex 15096 treasury 31883 | 50% y5.7 lvl14 budget 50479 surplus 68500 capex 52428 treasury 128572 | 75% y8.5 lvl14 budget 184500 surplus 81520 capex 62834 treasury 330695 | 100% y11.3 lvl19 budget 397029 surplus 92757 capex 82540 treasury 557880 | lowest treasury -5449 at year 2.8
+
+## londinium
+goals pop 14000 culture 55 prosperity 65 peace 65 favor 65
+max house level 13 (prosperity value 100); next level blocked by: ['education 3>2']
+caps: {'food_types': 2, 'wine_types': 2, 'gods': 5, 'entertainment': 50, 'water': 3, 'education': 2, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion'], 29.333333333333336, 0)
+tax 8%, Rome wage 42.0, event money 0/yr, event favor 0/yr
+LP: surplus 45381/yr | tax 38165 exports 39714 imports 10831 fixed 1340
+    pop 14700 plebs 9641 workers 4339/4339 land 4064/15618 prosperity cap 100
+    houses {'8x2': np.float64(126.9), '13x2': np.float64(120.4)}
+    prod {'bricks': np.float64(76.8), 'clay': np.float64(202.2), 'furniture': np.float64(28.9), 'iron': np.float64(239.9), 'meat': np.float64(151.8), 'pottery': np.float64(83.8), 'sand': np.float64(128.4), 'stone': np.float64(70.2), 'vegetables': np.float64(730.2), 'weapons': np.float64(137.7), 'wine': np.float64(20.0)}
+    exports {'Calleva Atrebatum:iron': np.float64(60.0), 'Calleva Atrebatum:weapons': np.float64(40.0), 'Lindum:sand': np.float64(25.0), 'Lindum:stone': np.float64(20.0), 'Lindum:bricks': np.float64(10.0), 'Lindum:weapons': np.float64(45.0), 'Colonia Nervia Glevensium:clay': np.float64(65.0), 'Colonia Nervia Glevensium:sand': np.float64(65.0), 'Colonia Nervia Glevensium:stone': np.float64(50.0), 'Gesoriacum:pottery': np.float64(11.8), 'Gesoriacum:bricks': np.float64(65.0), 'Mamucium:clay': np.float64(15.0), 'Mamucium:iron': np.float64(40.0), 'Mamucium:pottery': np.float64(10.0), 'Mamucium:weapons': np.float64(30.0)}
+    imports {'Calleva Atrebatum:timber': np.float64(28.9), 'Gesoriacum:oil': np.float64(28.9), 'Gesoriacum:wine': np.float64(8.9), 'Mamucium:vines': np.float64(20.0)}
+    routes opened ['Calleva Atrebatum', 'Lindum', 'Colonia Nervia Glevensium', 'Gesoriacum', 'Mamucium']
+    build cost 33250 vs start funds 18000 -> payback 0.7 yr; lowest tax that balances: 0%
+    food types used (in order): ['vegetables', 'meat']
+    sites (packed): {'farm': 246, 'rock': 245, 'timber': 3310, 'clay': 654, 'sand': 1511, 'wharf': 271}; Rome wheat 0; start stock {}
+forts assumed 5; surplus with no trade: None; surplus with the tent mix: 45381.2758747974
+favor: {'salary_year': 96.0, 'savings_income': 96.0, 'gift_gain': 5, 'yearly_net': 5.333333333333334}; caps []
+years (lower bound): {'peace': 15, 'prosperity': 8, 'favor': 5}
+flows with quest conditions (not applied): [('E54', 'favor_add', 0, ['variable_check variable_uid=weapon check=gte value=1']), ('E74', 'money_add', 0, ['variable_check variable_uid=rack check=gte value=2'])]
+PROBLEMS: none
+build-up: 25% y2.3 lvl5 budget 23000 surplus 36367 capex 14138 treasury 46290 | 50% y4.7 lvl5 budget 65428 surplus 38490 capex 18515 treasury 129245 | 75% y7.0 lvl5 budget 152760 surplus 41542 capex 22972 treasury 218158 | 100% y9.3 lvl13 budget 246130 surplus 45192 capex 33010 treasury 309310 | lowest treasury 3862 at year 0
+
+## palmyra
+goals pop 18000 culture 80 prosperity 80 peace 80 favor 80
+max house level 19 (prosperity value 100); next level blocked by: None
+caps: {'food_types': 4, 'wine_types': 2, 'gods': 5, 'entertainment': 115, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['theater', 'religion', 'school', 'library'], 75.16666666666667, 0)
+tax 6%, Rome wage 25.5, event money 0/yr, event favor 0/yr
+LP: surplus 173851/yr | tax 25851 exports 193249 imports 19036 fixed 1266
+    pop 18900 plebs 17011 workers 7478/7655 land 4582/15945 prosperity cap 80
+    houses {'8x2': np.float64(223.8), '14x3': np.float64(21.0)}
+    prod {'bricks': np.float64(198.0), 'clay': np.float64(389.8), 'furniture': np.float64(5.0), 'gold': np.float64(89.0), 'marble': np.float64(80.4), 'oil': np.float64(137.0), 'pottery': np.float64(124.8), 'sand': np.float64(99.0), 'vines': np.float64(95.6), 'weapons': np.float64(16.0), 'wheat': np.float64(1220.1), 'wine': np.float64(37.0)}
+    exports {'Antiochia:vines': np.float64(46.0), 'Antiochia:gold': np.float64(16.0), 'Antiochia:wine': np.float64(16.0), 'Antiochia:fish': np.float64(66.0), 'Trypolis:vines': np.float64(12.5), 'Trypolis:gold': np.float64(16.0), 'Trypolis:wine': np.float64(16.0), 'Trypolis:bricks': np.float64(66.0), 'Trypolis:fish': np.float64(66.0), 'Trypolis:oil': np.float64(66.0), 'Damascus:gold': np.float64(10.5), 'Damascus:bricks': np.float64(66.0), 'Damascus:clay': np.float64(166.0), 'Carre:bricks': np.float64(66.0), 'Carre:fish': np.float64(10.8), 'Hierosolyma:marble': np.float64(26.0), 'Hierosolyma:gold': np.float64(16.0), 'Hierosolyma:pottery': np.float64(66.0), 'Hierosolyma:oil': np.float64(66.0), 'Roma:marble': np.float64(50.8), 'Roma:gold': np.float64(26.0)}
+    imports {'Antiochia:olives': np.float64(55.9), 'Carre:timber': np.float64(5.0), 'Carre:fruit': np.float64(56.7), 'Carre:olives': np.float64(15.1), 'Hierosolyma:iron': np.float64(16.0), 'Roma:olives': np.float64(66.0)}
+    routes opened ['Antiochia', 'Trypolis', 'Damascus', 'Carre', 'Hierosolyma', 'Roma']
+    build cost 70660 vs start funds 14000 -> payback 0.4 yr; lowest tax that balances: 0%
+    food types used (in order): ['wheat', 'fruit', 'vegetables']
+    sites (packed): {'farm': 260, 'rock': 426, 'timber': 3151, 'clay': 402, 'sand': 1024, 'wharf': 130}; Rome wheat 0; start stock {}
+forts assumed 4; surplus with no trade: None; surplus with the tent mix: 173850.82299938126
+favor: {'salary_year': 76.8, 'savings_income': 376.8, 'gift_gain': 10, 'yearly_net': 10.666666666666666}; caps []
+years (lower bound): {'peace': 18, 'prosperity': 8, 'favor': 4}
+flows with quest conditions (not applied): [('E42', 'favor_add', 3, ['variable_check variable_uid=bestow check=gte value=1']), ('E44', 'favor_add', -8, ['variable_check variable_uid=palace check=lt value=10', 'variable_check variable_uid=zena check=gte value=1', 'variable_check variable_uid=patric check=neq value=1']), ('E48', 'money_add', 0, ['variable_check variable_uid=rack check=gte value=2'])]
+PROBLEMS: none
+build-up: 25% y3.0 lvl13 budget 17500 surplus 22651 capex 17810 treasury 30166 | 50% y6.0 lvl13 budget 51476 surplus 40609 capex 51105 treasury 91761 | 75% y9.0 lvl13 budget 146366 surplus 41728 capex 57342 treasury 209029 | 100% y12.0 lvl19 budget 269872 surplus 172488 capex 69800 treasury 517897 | lowest treasury -3810 at year 0
+
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();

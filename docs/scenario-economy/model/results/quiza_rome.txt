@@ -1,0 +1,25 @@
+## CN_02_Quiza___The_City_to_Neptune (skip E36,E67,E42,E46,E49,E50,E66,E37,E38)
+goals pop 10000 culture 10 prosperity 100 peace 80 favor 90
+max house level 18 (prosperity value 100); next level blocked by: ['entertainment 80>70']
+caps: {'food_types': 4, 'wine_types': 2, 'gods': 5, 'entertainment': 70, 'water': 3, 'education': 3, 'health': 2, 'barber': True, 'bathhouse': True}; reservoirs not usable; Neptune GT module 2 zone 39x39 tiles
+culture max 100, plan (['religion'], 13.333333333333334, 0)
+tax 8%, Rome wage 45.0, event money 0/yr, event favor 0/yr
+LP: surplus 43393/yr | tax 42018 exports 35547 imports 20055 fixed 944
+    pop 10500 plebs 5139 workers 2313/2313 land 2942/6320 prosperity cap 100
+    houses {'0x2': np.float64(157.5), '4x2': np.float64(38.3), '18x4': np.float64(28.2)}
+    prod {'bricks': np.float64(96.0), 'clay': np.float64(295.8), 'fish': np.float64(288.0), 'furniture': np.float64(55.1), 'pottery': np.float64(70.1), 'wine': np.float64(30.0)}
+    exports {'Igilgili:fish': np.float64(24.0), 'Igilgili:clay': np.float64(32.0), 'Igilgili:bricks': np.float64(13.1), 'Siga:fish': np.float64(48.0), 'Siga:clay': np.float64(32.0), 'Siga:furniture': np.float64(8.0), 'Tigava:fish': np.float64(48.0), 'Tigava:clay': np.float64(24.0), 'Tigava:bricks': np.float64(24.0), 'Iol:wine': np.float64(8.0), 'Auzia:fish': np.float64(32.0), 'Auzia:clay': np.float64(24.0), 'Auzia:furniture': np.float64(8.0), 'Zdif:pottery': np.float64(16.0), 'Zdif:furniture': np.float64(16.0), 'Zdif:bricks': np.float64(24.0), 'Hippo Regius:clay': np.float64(24.0), 'Hippo Regius:pottery': np.float64(16.0), 'Hippo Regius:bricks': np.float64(16.0), 'Theveste:clay': np.float64(32.0), 'Theveste:pottery': np.float64(16.0), 'Theveste:furniture': np.float64(16.0), 'Meninx:fish': np.float64(28.8), 'Meninx:wine': np.float64(8.5), 'Meninx:bricks': np.float64(16.0)}
+    imports {'Igilgili:sand': np.float64(24.0), 'Siga:sand': np.float64(24.0), 'Siga:weapons': np.float64(8.0), 'Tigava:timber': np.float64(32.0), 'Iol:timber': np.float64(16.0), 'Auzia:wheat': np.float64(226.6), 'Auzia:oil': np.float64(6.8), 'Hippo Regius:timber': np.float64(7.1), 'Theveste:fruit': np.float64(107.2), 'Theveste:vines': np.float64(30.0)}
+    routes opened ['Igilgili', 'Siga', 'Tigava', 'Iol', 'Auzia', 'Zdif', 'Hippo Regius', 'Theveste', 'Meninx']
+    build cost 36470 vs start funds 9000 -> payback 0.8 yr; lowest tax that balances: 0%
+    food types used (in order): ['wheat', 'fish', 'fruit']
+    monuments needed: [{'monument': 'grand_temple_neptune', 'materials': {'stone': 20, 'timber': 32, 'concrete': 20, 'marble': 28, 'bricks': 28}, 'import_cost': 18780, 'missing': []}]
+    sites (packed): {'farm': 0, 'rock': 0, 'timber': 1258, 'clay': 306, 'sand': 673, 'wharf': 211}; Rome wheat 0; start stock {}
+forts assumed 2; surplus with no trade: None; surplus with the tent mix: 45652.76554702223
+favor: {'salary_year': 0.0, 'savings_income': 120.0, 'gift_gain': 10, 'yearly_net': 10.181818181818182}; caps [('E2', 70, ['building_count_active check=eq value=0 building=grand_temple_neptune'])]
+years (lower bound): {'peace': 18, 'prosperity': 12, 'favor': 5}
+flows with quest conditions (not applied): [('E27', 'favor_add', 24, ['variable_check variable_uid=Status check=neq value=6', 'resource_stored_count resource=fish check=gte value=32 storage_type=warehouses', 'variable_check variable_uid=FavorMonthCounter check=eq value=12'])]
+REQUIREMENT: favor capped at 70 by E2 while building_count_active check=eq value=0 building=grand_temple_neptune
+PROBLEMS: none
+build-up: 25% y1.7 lvl6 budget 9000 surplus 16278 capex 9142 treasury 13422 | 50% y3.3 lvl6 budget 22565 surplus 24908 capex 22185 treasury 34701 | 75% y5.0 lvl6 budget 56886 surplus 25132 capex 29880 treasury 68706 | 100% y6.7 lvl18 budget 98586 surplus 46562 capex 39050 treasury 119281 | lowest treasury -142 at year 0
+
