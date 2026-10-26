@@ -69,4 +69,13 @@ yy, xx = np.mgrid[0:hh, 0:ww]; dd = np.abs(xx + 0.5 - ww / 2) / (ww / 2) + np.ab
 t[..., :3][dd > 0.85] = np.clip(t[..., :3][dd > 0.85] * 1.35, 0, 255)
 assert 'rim' in failed(checks(orig(306), save(Image.fromarray(t.astype(np.uint8)), 'rim.png')))
 
+
+# a road verge that lost its green fails 'edge' (it was skipped when the new ring had <= 10 green pixels)
+o600 = np.asarray(Image.open(orig(600)).convert('RGBA'), float)
+gr600 = (o600[..., 1] > o600[..., 0] + 5) & (o600[..., 1] > o600[..., 2] + 15)
+v = o600.copy(); v[gr600, :3] = [150, 145, 135]                                 # grey stone where the verge was
+lost = Image.fromarray(v.astype(np.uint8)).resize((116, 60), Image.NEAREST)
+assert 'edge' in failed(checks(orig(600), save(lost, 'verge_lost.png'))), checks(orig(600), save(lost, 'verge_lost.png'))['edge']
+assert 'edge' not in failed(checks(orig(600), save(upscaled(600), 'verge_same.png')))
+
 print('all check.py tests passed')

@@ -86,11 +86,17 @@ Add a test to `test_check.py` for every new fault class, then a check. Never loo
 - Ground around a building: take the yard (non-green pixels) and its light colours from the original (`tent.py` yard mask), so `structure` matches. Keep the yard mask 0 from tile distance 0.8, and do not put a transparent plane over the edge grass: a fully transparent plane still made the edge grass darker (`edge` failed).
 - Tall buildings cast shadows over the tile edge, where the engine cuts them. Use `c3.render(..., edge_fade=True)`: shadows fade out toward the front edges.
 - Do not edit a `.sh` script while a batch runs it: bash reads the file during the run.
+- 3D grass tufts make the ground darker (about 50% at full density). They grow only on clearly green pixels, so a terrain tile had fewer tufts in its meadow centre than at its edge: light centre, dark edge, `edge` failed on 29 tiles. `terrain.py` lightens the ground where the tuft density is low (`C3_TUFT_SHADE`). Scatter density that follows a mask needs the same compensation.
+- Roads (591-639) use `terrain.py` paved mode: one Voronoi mesh of laid stones, colour per stone from the original. Plaza (3140-3147) uses mosaic mode (square grid, ~0.75 px stones). 1-2 px grass verges render too light; `verge_lock()` sets each verge pixel's 8x8 block mean to the original colour.
+- `edge` compares our image and the original at the SAME pixels (where the original is green, else ours). It once skipped verges that had lost their green (<= 10 green px): never let a check pass by finding nothing to measure.
+- Flat single-colour sprites (245 black, 733) keep their originals: nothing to remake.
 
 ## Parallel work
 
 - Split by sprite group (one agent = one group/script). Shared files (`c3.py`, `check.py`) change only with tests (`test_check.py`) and a note to the others.
 - GPU: terrain renders run well as 4-6 shards at the same time (CPU-bound, about 4 tiles a minute with 4 shards). Building renders need more GPU memory: 9 renders at the same time gave `Command buffer not completed. status = 5`. 3 terrain shards and 4 tent jobs at the same time also failed (14 of 20 tent jobs). 3 tent jobs alone also failed sometimes. Keep at most 2 Blender renders in total when building sprites are among them (server default `-workers 2`); terrain alone can run 4-6 shards, and check free memory (`top -l 1 | grep PhysMem`).
 - A failed render saves no attempt (`make.sh`, `terrain_make.sh`; test: `blender/test_make.sh`).
+- Paved and mosaic renders need much GPU memory: run them alone or at most 2 at a time.
+- Wait for a batch by PID (`cmd & echo $! >> pids`, then `kill -0`), never with `pgrep -f '<text>'`: the pattern matches the waiting shell itself.
 - Walkers (4,802 animation frames) and interface (2,305) need a separate decision (rigged characters / AI upscale / keep) before work starts.
 - Report progress through the viewer (`build_viewer.py` runs after each build).
