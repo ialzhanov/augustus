@@ -1,6 +1,8 @@
 #include "e2e.h"
 
 #include "core/encoding.h"
+#include "core/image.h"
+#include "core/image_hd.h"
 #include "core/file.h"
 #include "core/lang.h"
 #include "core/random.h"
@@ -84,9 +86,15 @@ static struct {
     char first_problem[MAX_MESSAGE];
 } data;
 
-void e2e_set_active(void)
+static void set_test_dir(const char *test_file);
+
+void e2e_set_active(const char *test_file)
 {
     data.active = 1;
+    set_test_dir(test_file);
+    char hd_dir[FILE_NAME_MAX];
+    snprintf(hd_dir, FILE_NAME_MAX, "%s/hd", data.test_dir);
+    image_hd_set_base_dir(hd_dir);
 }
 
 int e2e_is_active(void)
@@ -331,6 +339,10 @@ static int command_new_map(int argc, char **argv)
         e2e_error("cannot write %s", map_file);
         return E2E_ERROR;
     }
+    // The editor load of the climate graphics clears the main images, also when it stops
+    // before the end, so the next normal load returns early. Force the load of the game
+    // graphics and the HD sprites.
+    image_load_climate(climate, 0, 1, 0);
     uint8_t name[FILE_NAME_MAX];
     encoding_from_utf8("new_map", name, FILE_NAME_MAX);
     scenario_set_name(name);
@@ -574,6 +586,16 @@ static int parse_value(int argc, char **argv, const char *query, int *value)
 }
 
 // check image <name> [max channel difference [max pixels]]
+// check hd <capture> [image group]
+static int check_hd(int argc, char **argv)
+{
+    if (argc != 3 && argc != 4) {
+        e2e_error("check hd needs: check hd <capture> [image group]");
+        return E2E_ERROR;
+    }
+    return e2e_check_hd(argv[2], argc == 4 ? argv[3] : 0);
+}
+
 static int check_image(int argc, char **argv)
 {
     int limits[2] = { 0, 0 };
@@ -589,6 +611,9 @@ static int command_check(int argc, char **argv)
 {
     if (argc >= 2 && strcmp(argv[1], "image") == 0) {
         return check_image(argc, argv);
+    }
+    if (argc >= 2 && strcmp(argv[1], "hd") == 0) {
+        return check_hd(argc, argv);
     }
     compare_op op = OP_NONE;
     int op_index = find_op(argc, argv, &op);

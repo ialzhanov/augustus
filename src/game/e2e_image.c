@@ -2,9 +2,12 @@
 
 #include "city/view.h"
 #include "core/file.h"
+#include "core/image.h"
+#include "core/image_group.h"
 #include "game/e2e.h"
 #include "graphics/renderer.h"
 #include "map/grid.h"
+#include "platform/renderer.h"
 #include "window/city.h"
 
 #include "spng/spng.h"
@@ -24,7 +27,23 @@ typedef struct {
     int width;
     int height;
     color_t *pixels;
+    int draws[IMAGE_MAIN_ENTRIES][2]; // the draws of each main image without and with an HD texture
 } capture;
+
+typedef struct {
+    const char *name;
+    int group;
+} group_name;
+
+// The names are the names in core/image_group.h, in lowercase and without GROUP_. Add a group when a test needs it.
+static const group_name GROUP_NAMES[] = {
+    { "terrain_grass_1", GROUP_TERRAIN_GRASS_1 },
+    { "terrain_meadow", GROUP_TERRAIN_MEADOW },
+    { "terrain_shrub", GROUP_TERRAIN_SHRUB },
+    { "terrain_tree", GROUP_TERRAIN_TREE },
+};
+
+#define NUM_GROUP_NAMES (sizeof(GROUP_NAMES) / sizeof(group_name))
 
 static struct {
     capture captures[MAX_CAPTURES];
@@ -176,7 +195,12 @@ int e2e_capture(const char *name, int x, int y, int zoom, int dx, int dy, int wi
         e2e_error("no memory for the capture %s", name);
         return E2E_ERROR;
     }
+    platform_renderer_e2e_reset_counts();
     window_city_draw_all();
+    for (int id = 0; id < IMAGE_MAIN_ENTRIES; id++) {
+        c->draws[id][0] = platform_renderer_e2e_count(id, 0);
+        c->draws[id][1] = platform_renderer_e2e_count(id, 1);
+    }
     if (!graphics_renderer()->save_screen_buffer(c->pixels, left, top, width, height, width)) {
         e2e_error("the renderer cannot read the pixels of %s", name);
         return E2E_ERROR;
@@ -200,6 +224,60 @@ const color_t *e2e_capture_pixels(const char *name, int *width, int *height)
     *width = c->width;
     *height = c->height;
     return c->pixels;
+}
+
+// The images of a group are from its first image to the first image of the next group
+static void get_group_range(int group, int *first, int *end)
+{
+    *first = image_group(group);
+    *end = IMAGE_MAIN_ENTRIES;
+    for (int other = 0; other < IMAGE_MAX_GROUPS; other++) {
+        int start = image_group(other);
+        if (start > *first && start < *end) {
+            *end = start;
+        }
+    }
+}
+
+int e2e_check_hd(const char *name, const char *group)
+{
+    capture *c = find_capture(name);
+    if (!c) {
+        e2e_error("no capture has the name %s", name);
+        return E2E_ERROR;
+    }
+    int first = 0;
+    int end = IMAGE_MAIN_ENTRIES;
+    if (group) {
+        const group_name *found = 0;
+        for (unsigned int i = 0; i < NUM_GROUP_NAMES; i++) {
+            if (strcmp(GROUP_NAMES[i].name, group) == 0) {
+                found = &GROUP_NAMES[i];
+            }
+        }
+        if (!found) {
+            e2e_error("unknown image group '%s' (add it to GROUP_NAMES in src/game/e2e_image.c)", group);
+            return E2E_ERROR;
+        }
+        get_group_range(found->group, &first, &end);
+    }
+    int hd = 0, original = 0;
+    char original_ids[MAX_NAME] = { 0 };
+    for (int id = first; id < end; id++) {
+        hd += c->draws[id][1];
+        original += c->draws[id][0];
+        if (c->draws[id][0] && strlen(original_ids) < MAX_NAME - 8) {
+            snprintf(original_ids + strlen(original_ids), MAX_NAME - strlen(original_ids), " %d", id);
+        }
+    }
+    const char *what = group ? group : "all images";
+    if (!hd || (group && original)) {
+        e2e_check_failed("check hd %s %s: %d draws with HD, %d draws without HD (images:%s)",
+            name, what, hd, original, original_ids);
+        return E2E_CHECK_FAILED;
+    }
+    e2e_log("ok   check hd %s %s: %d draws with HD, %d draws without HD", name, what, hd, original);
+    return E2E_OK;
 }
 
 static int channel_diff(color_t a, color_t b, int shift)

@@ -634,7 +634,7 @@ static void setup(const augustus_args *args)
 
 #ifdef E2E_TESTS
     if (args->test_file) {
-        e2e_set_active();
+        e2e_set_active(args->test_file);
         // No sound in test mode
         SDL_setenv("SDL_AUDIODRIVER", "dummy", 1);
         SDL_setenv("SDL_AUDIO_DRIVER", "dummy", 1);

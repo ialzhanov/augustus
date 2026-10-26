@@ -1,4 +1,4 @@
 # expect: error
 # A capture that is partly outside the map is an error, not a black image that passes.
-load flat_meadow.svx
+load flat_grass.svx
 capture x camera 79 79 zoom 100 size 400 300

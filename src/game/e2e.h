@@ -15,9 +15,11 @@ typedef enum {
 } e2e_result;
 
 /**
- * Sets the test mode on. Call this before the window is created.
+ * Sets the test mode on and sets the HD sprite folder to tests/e2e/hd/.
+ * Call this before the window is created and before the images load.
+ * @param test_file The test file in tests/e2e/cases/
  */
-void e2e_set_active(void);
+void e2e_set_active(const char *test_file);
 
 /**
  * @return 1 when the program runs a test file, 0 otherwise

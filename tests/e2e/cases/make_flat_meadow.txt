@@ -1,8 +1,0 @@
-# expect: pass
-# Makes saves/flat_meadow.svx: an 80 x 80 map with meadow on all tiles.
-# Run this recipe again after a save version change.
-new_map 80
-terrain meadow 0 0 79 79
-check terrain 40 40 meadow == 1
-check terrain 0 0 meadow == 1
-save flat_meadow.svx

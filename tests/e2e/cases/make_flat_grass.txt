@@ -1,0 +1,9 @@
+# expect: pass
+# Makes saves/flat_grass.svx: an 80 x 80 map with grass on all tiles. The grass
+# images (GROUP_TERRAIN_GRASS_1) have HD sprites; the meadow images do not.
+# Run this recipe again after a save version change.
+new_map 80
+terrain grass 0 0 79 79
+check terrain 40 40 grass == 1
+check terrain 0 0 grass == 1
+save flat_grass.svx

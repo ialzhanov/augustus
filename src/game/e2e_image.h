@@ -35,6 +35,16 @@ const color_t *e2e_capture_pixels(const char *name, int *width, int *height);
  */
 int e2e_check_image(const char *name, int max_channel_diff, int max_pixels);
 
+/**
+ * Checks the use of the HD sprites in a capture. With a group, the check fails when
+ * an image of the group was drawn without an HD texture, or when no image of the
+ * group was drawn. With no group, the check fails when no image was drawn with an HD texture.
+ * @param name The capture name
+ * @param group The image group name, for example "terrain_meadow", or 0
+ * @return E2E_OK, E2E_CHECK_FAILED or E2E_ERROR
+ */
+int e2e_check_hd(const char *name, const char *group);
+
 #endif // E2E_TESTS
 
 #endif // GAME_E2E_IMAGE_H

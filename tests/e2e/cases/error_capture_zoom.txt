@@ -1,4 +1,4 @@
 # expect: error
 # A zoom outside the valid range is an error.
-load flat_meadow.svx
+load flat_grass.svx
 capture x camera 40 40 zoom 20
