@@ -98,6 +98,12 @@ Add a test to `test_check.py` for every new fault class, then a check. Never loo
 - - Trees and shrubs (254-261, 274-305) use `terrain.py` tree mode: `foliage.py` splits the canopy into circles (a sphere of radius R shows as a circle of 41 R px); each becomes a crown of leaf clusters in the original's screen-space colours, with a trunk or a leaf column to the ground. Dense tiles get undergrowth clusters; tiles with single trees on grass (`OPEN_GROUND`) do not: the colour rule takes the tree shadow for foliage, and lit clusters there doubled the contrast. Leaf clusters shade each other: `LEAF_CAL` 1.3.
 - Meadow (262-273): tall blades at the foot of each light yellow vertical run of pixels.
 - Sprites higher than wide: Blender fits `ortho_scale` to the larger side. `c3.render` corrects it; `test_camera.py` (run in Blender) checks a half-tile ground and a pole in three frame shapes. A full-tile ground did not show the fault (the frame cut it).
+- - Rocks (201-244, 534-547) and rubble (658-665, 734, 743, 752, 761, 770): `terrain.py` rock mode, boulder piles on the crown circles (`keep_low=True`). Painted rocks have softer shading than the light gives: `ROCK_SHADE` (base 0.6, emission 0.2). `edge_fade` keeps their long shadows off the edge grass.
+- Gardens (3148-3154): path and curbs flat, hedges and beds as undergrowth clusters (sharp vegetation mask, no blur: purple flowers blurred into the hedge green). Undergrowth heights stay inside the original alpha above each pixel (spill).
+- Entry/exit flags (863-870): pole and arrow plank measured from the white and red/blue pixels.
+- Never use `bpy.ops` in a loop: each op updates the whole scene (6000 pebbles: > 30 min). Build one mesh with numpy (`instances`, `build_tufts`) or copy a template mesh (`c3.rock`).
+- A 3x3 rock render uses about 4 GB: memory got low with other renders; watch `PhysMem`.
+- A module name used twice is a silent fault: `SHORE` was also the shore mask image, so `shore()` ran on every tile (flags lost their top part).
 - - zsh does not split an unquoted variable into words: `./terrain_make.sh $ids` gives one argument. Use `${=ids}`.
 
 ## Parallel work

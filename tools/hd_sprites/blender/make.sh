@@ -17,7 +17,7 @@ O=out/$SUB; mkdir -p $O
 rm -f $O/${ID}_8.png $O/${ID}.png $O/${ID}_8top.png $O/${ID}_top.png   # a failed render must not leave an old image to check
 # the full Blender log of each pass stays in $O/${ID}_blender*.log (a failed render printed no "rror:" line)
 # Blender sometimes stops with no output (exit code in the log); one more try then
-render() { for try in 1 2; do $B -b -P $S -- "$@" > $LOG 2>&1; echo "exit $? (try $try)" >> $LOG; [ -f "$1" ] && break; done; grep -E "rror:" $LOG; }
+render() { : > $LOG; for try in 1 2; do $B -b -P $S -- "$@" >> $LOG 2>&1; echo "exit $? (try $try)" >> $LOG; [ -f "$1" ] && break; done; grep -E "rror:" $LOG; }
 LOG=$O/${ID}_blender.log; render $PWD/$O/${ID}_8.png 8 -- $ID
 [ -f $O/${ID}_8.png ] || { echo "render of $ID failed (no $O/${ID}_8.png): no attempt saved"; tail -5 $O/${ID}_blender.log; exit 1; }
 if [ "$TOP" != 0 ]; then LOG=$O/${ID}_blender_top.log; render $PWD/$O/${ID}_8top.png 8 top -- $ID

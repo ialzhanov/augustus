@@ -38,19 +38,26 @@ def components(m):
     return out
 
 
-def diamond(H, W, tiles=1, grow=1.12):
-    """the tile diamond (with the 2 px steps of the outline at grow 1.12)"""
+def diamond(H, W, tiles=None, grow=1.12):
+    """the footprint diamond of n x n tiles (n from the width), with the 2 px steps of the outline at grow 1.12"""
+    tiles = tiles or max(1, round((W + 2) / 60))
     yy, xx = np.mgrid[0:H, 0:W]
     dd = np.abs(xx + 0.5 - W / 2) / (W / 2) + np.abs(yy + 0.5 - (H - 15 * tiles)) / (15 * tiles)
     return dd <= grow, dd
 
 
+def water(rgb):
+    """blue water pixels (as terrain.py)"""
+    return rgb[..., 2] > np.maximum(rgb[..., 0], rgb[..., 1]) + 0.06
+
+
 def foliage_diff(rgb, alpha):
-    """Lab distance of each pixel from the median grass colour at the tile edge"""
+    """Lab distance of each pixel from the median grass colour at the tile edge (water at the edge left out)"""
     H, W = alpha.shape
     dia, dd = diamond(H, W)
     lab = to_lab(rgb)
-    ref = np.median(lab[(alpha > 0) & dia & (dd > 0.75)], 0)
+    ring = (alpha > 0) & dia & (dd > 0.75)
+    ref = np.median(lab[ring & ~water(rgb)] if (ring & ~water(rgb)).sum() > 10 else lab[ring], 0)
     return np.linalg.norm(lab - ref, axis=-1)
 
 
@@ -59,7 +66,7 @@ def canopy(rgb, alpha):
     H, W = alpha.shape
     dia, _ = diamond(H, W)
     a = alpha > 0
-    m = a & (~dia | (foliage_diff(rgb, alpha) > T))
+    m = a & (~dia | (foliage_diff(rgb, alpha) > T)) & ~water(rgb)   # shore trees: water is never foliage
     er = m & np.roll(m, 1, 0) & np.roll(m, -1, 0) & np.roll(m, 1, 1) & np.roll(m, -1, 1)   # opening: no single pixels
     m = m & (er | np.roll(er, 1, 0) | np.roll(er, -1, 0) | np.roll(er, 1, 1) | np.roll(er, -1, 1))
     keep = np.zeros_like(m)
@@ -94,7 +101,7 @@ def circles(m, rmin=2.0, stop=1.5):
     return out
 
 
-def crowns(rgb, alpha):
+def crowns(rgb, alpha, keep_low=False):
     """crown spheres: (x px, y px, r px, z units, ground row px). The ground point is the lowest non-grass pixel
     (canopy or trunk, Lab distance > T, no opening) in the columns under the circle; the crown centre is z above it."""
     m = canopy(rgb, alpha)
@@ -107,8 +114,8 @@ def crowns(rgb, alpha):
     for x, y, r in cs:
         if r <= 2.5 and any(abs(x - xb) < max(2.0, rb / 3) and y > yb + 0.5 * rb for xb, yb, rb in big):
             continue                                            # a trunk under a crown, not a crown
-        if r < 3.5 and dia[int(y), int(x)]:
-            continue                                            # a low bush: the undergrowth shows it
+        if r < 3.5 and dia[int(y), int(x)] and not keep_low:
+            continue                                            # a low bush: the undergrowth shows it (rocks keep them)
         cols = slice(max(int(x - r / 2), 0), min(int(x + r / 2) + 1, W))
         below = (m | trunk)[int(y):, cols].any(1)               # the rows joined to the circle (a gap of 2 rows ends it)
         gaps = np.nonzero(~below[:-1] & ~below[1:])[0]
