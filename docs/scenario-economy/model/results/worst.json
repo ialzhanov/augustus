@@ -1,0 +1,3284 @@
+[
+ {
+  "map": "Aquileia",
+  "goal": {
+   "pop": 12000,
+   "culture": 85,
+   "prosperity": 100,
+   "peace": 85,
+   "favor": 100
+  },
+  "max_level": 19,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 49199.829956323,
+  "tax_income": 22071.501392235008,
+  "export_income": 58563.3090909091,
+  "import_cost": 11914.979215096726,
+  "workers": 4149.724313161792,
+  "workers_available": 4149.72431316179,
+  "land_used": 3910.5766797678657,
+  "land": 15661.25,
+  "capex": 58380.0,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 49680.923787711974,
+  "blockers": null,
+  "favor": {
+   "salary_year": 96.0,
+   "savings_income": 96.0,
+   "gift_gain": 5,
+   "yearly_net": 6.25
+  },
+  "favor_caps": [
+   [
+    "E2",
+    79,
+    [
+     "OR(variable_check variable_uid=Meat Shipments check=lte value=49 | variable_check variable_uid=Wheat Shipments check=lte value=49)"
+    ]
+   ]
+  ],
+  "requirements": [
+   "favor capped at 79 by E2 while OR(variable_check variable_uid=Meat Shipments check=lte value=49 | variable_check variable_uid=Wheat Shipments check=lte value=49)"
+  ],
+  "problems": [],
+  "years": {
+   "peace": 19,
+   "prosperity": 10,
+   "favor": 10
+  },
+  "tax": 8,
+  "forts": 3,
+  "forum_max": null,
+  "trader_cap": {
+   "Spalatum": 105,
+   "Sirmium": 70,
+   "Naissus": 105,
+   "Tarentum": 58,
+   "Mediolanum": 105,
+   "Barium": 58,
+   "Roma": 105,
+   "Athenae": 58
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 554,
+   "rock": 206,
+   "timber": 3467,
+   "clay": 1584,
+   "sand": 2711,
+   "wharf": 606
+  },
+  "exports": {
+   "Spalatum:meat": 14.7,
+   "Spalatum:sand": 70.0,
+   "Spalatum:wine": 10.0,
+   "Spalatum:weapons": 10.0,
+   "Sirmium:iron": 31.8,
+   "Sirmium:weapons": 20.0,
+   "Sirmium:bricks": 18.0,
+   "Naissus:meat": 40.0,
+   "Naissus:weapons": 30.0,
+   "Naissus:bricks": 15.0,
+   "Tarentum:iron": 2.6,
+   "Tarentum:furniture": 25.0,
+   "Tarentum:bricks": 30.0,
+   "Mediolanum:vines": 35.0,
+   "Mediolanum:iron": 40.0,
+   "Mediolanum:wine": 10.0,
+   "Mediolanum:weapons": 10.0,
+   "Barium:meat": 17.6,
+   "Barium:iron": 40.0,
+   "Roma:pottery": 35.0,
+   "Roma:furniture": 19.7,
+   "Roma:wine": 20.0,
+   "Roma:bricks": 30.0,
+   "Athenae:pottery": 27.6,
+   "Athenae:bricks": 30.0
+  },
+  "imports": {
+   "Mediolanum:clay": 30.0,
+   "Mediolanum:timber": 13.8,
+   "Barium:clay": 57.6,
+   "Roma:clay": 25.0,
+   "Roma:timber": 35.0,
+   "Roma:olives": 4.1,
+   "Athenae:clay": 15.6
+  },
+  "houses": {
+   "0x1": 99.8,
+   "1x2": 117.2,
+   "4x2": 104.6,
+   "19x4": 16.9
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "CN_01_Igilgili___The_City_to_Mercury",
+  "goal": {
+   "pop": 8000,
+   "culture": 30,
+   "prosperity": 75,
+   "peace": 100,
+   "favor": 100
+  },
+  "max_level": 11,
+  "prosperity_ceiling": 80,
+  "max_culture": 77,
+  "surplus": null,
+  "tax_income": null,
+  "export_income": null,
+  "import_cost": null,
+  "workers": null,
+  "workers_available": null,
+  "land_used": null,
+  "land": null,
+  "capex": null,
+  "min_tax": null,
+  "no_trade": null,
+  "tent_mix": null,
+  "blockers": [
+   "food",
+   "population",
+   "trader"
+  ],
+  "favor": {
+   "salary_year": 60.0,
+   "savings_income": 360.0,
+   "gift_gain": 10,
+   "yearly_net": 13.23076923076923
+  },
+  "favor_caps": [
+   [
+    "E2",
+    70,
+    [
+     "building_count_active check=eq value=0 building=grand_temple_mercury"
+    ]
+   ]
+  ],
+  "requirements": [
+   "favor capped at 70 by E2 while building_count_active check=eq value=0 building=grand_temple_mercury"
+  ],
+  "problems": [
+   "economy LP: The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)"
+  ],
+  "years": {
+   "peace": 22,
+   "prosperity": 9,
+   "favor": 5
+  },
+  "tax": 5,
+  "forts": 2,
+  "forum_max": null,
+  "trader_cap": null,
+  "monuments": [
+   {
+    "monument": "grand_temple_mercury",
+    "materials": {
+     "stone": 20,
+     "timber": 32,
+     "concrete": 20,
+     "marble": 28,
+     "bricks": 28
+    },
+    "import_cost": 29920,
+    "missing": []
+   }
+  ],
+  "sites": {
+   "farm": 40,
+   "rock": 74,
+   "timber": 1041,
+   "clay": 79,
+   "sand": 273,
+   "wharf": 40
+  },
+  "exports": null,
+  "imports": null,
+  "houses": null,
+  "unobtainable": null,
+  "event_money": 0
+ },
+ {
+  "map": "CN_02_Quiza___The_City_to_Neptune",
+  "goal": {
+   "pop": 10000,
+   "culture": 10,
+   "prosperity": 100,
+   "peace": 80,
+   "favor": 90
+  },
+  "max_level": 18,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 19970.574642643158,
+  "tax_income": 23753.72534517712,
+  "export_income": 34257.57071086919,
+  "import_cost": 20589.737328385963,
+  "workers": 2537.540134142929,
+  "workers_available": 2537.540134142927,
+  "land_used": 2558.9005017714417,
+  "land": 6319.75,
+  "capex": 48705.0,
+  "min_tax": 1,
+  "no_trade": null,
+  "tent_mix": 26864.402304051804,
+  "blockers": null,
+  "favor": {
+   "salary_year": 0.0,
+   "savings_income": 120.0,
+   "gift_gain": 10,
+   "yearly_net": 10.181818181818182
+  },
+  "favor_caps": [
+   [
+    "E2",
+    70,
+    [
+     "building_count_active check=eq value=0 building=grand_temple_neptune"
+    ]
+   ]
+  ],
+  "requirements": [
+   "favor capped at 70 by E2 while building_count_active check=eq value=0 building=grand_temple_neptune"
+  ],
+  "problems": [],
+  "years": {
+   "peace": 18,
+   "prosperity": 12,
+   "favor": 5
+  },
+  "tax": 8,
+  "forts": 2,
+  "forum_max": null,
+  "trader_cap": {
+   "Igilgili": 58,
+   "Ostia": 38,
+   "Roma": 38,
+   "Siga": 105,
+   "Tigava": 105,
+   "Iol": 58,
+   "Auzia": 105,
+   "Rusazus": 105,
+   "Zdif": 70,
+   "Hippo Regius": 58,
+   "Theveste": 105,
+   "Meninx": 58
+  },
+  "monuments": [
+   {
+    "monument": "grand_temple_neptune",
+    "materials": {
+     "stone": 20,
+     "timber": 32,
+     "concrete": 20,
+     "marble": 28,
+     "bricks": 28
+    },
+    "import_cost": 18780,
+    "missing": []
+   }
+  ],
+  "sites": {
+   "farm": 0,
+   "rock": 0,
+   "timber": 1258,
+   "clay": 306,
+   "sand": 673,
+   "wharf": 211
+  },
+  "exports": {
+   "Igilgili:clay": 32.0,
+   "Roma:clay": 16.0,
+   "Roma:bricks": 22.4,
+   "Siga:clay": 32.0,
+   "Siga:furniture": 8.0,
+   "Tigava:clay": 24.0,
+   "Tigava:bricks": 5.1,
+   "Iol:wine": 8.0,
+   "Iol:weapons": 24.0,
+   "Auzia:clay": 24.0,
+   "Auzia:furniture": 8.0,
+   "Zdif:pottery": 16.0,
+   "Zdif:furniture": 16.0,
+   "Zdif:weapons": 6.4,
+   "Zdif:bricks": 24.0,
+   "Hippo Regius:clay": 24.0,
+   "Hippo Regius:pottery": 16.0,
+   "Hippo Regius:bricks": 16.0,
+   "Theveste:clay": 32.0,
+   "Theveste:pottery": 16.0,
+   "Theveste:furniture": 16.0,
+   "Meninx:wine": 10.9,
+   "Meninx:bricks": 16.0
+  },
+  "imports": {
+   "Igilgili:sand": 24.0,
+   "Ostia:iron": 38.4,
+   "Siga:sand": 24.0,
+   "Tigava:timber": 14.2,
+   "Iol:timber": 9.6,
+   "Iol:fish": 48.0,
+   "Auzia:wheat": 104.7,
+   "Rusazus:fish": 48.5,
+   "Zdif:timber": 16.0,
+   "Hippo Regius:timber": 16.0,
+   "Theveste:fruit": 74.7,
+   "Theveste:vines": 30.0,
+   "Meninx:oil": 7.5
+  },
+  "houses": {
+   "1x2": 107.1,
+   "4x2": 43.5,
+   "11x2": 4.5,
+   "14x3": 6.9,
+   "18x4": 19.7
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "Castra_Regina",
+  "goal": {
+   "pop": 16000,
+   "culture": 50,
+   "prosperity": 75,
+   "peace": 100,
+   "favor": 70
+  },
+  "max_level": 16,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 21561.86856104611,
+  "tax_income": 8000.990712074301,
+  "export_income": 39641.454545454544,
+  "import_cost": 7914.860681114548,
+  "workers": 4152.397443966423,
+  "workers_available": 6085.448916408669,
+  "land_used": 4518.123066579104,
+  "land": 15703.75,
+  "capex": 44320.0,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 21561.86856104611,
+  "blockers": null,
+  "favor": {
+   "salary_year": 76.8,
+   "savings_income": 76.8,
+   "gift_gain": 5,
+   "yearly_net": 4.9411764705882355
+  },
+  "favor_caps": [
+   [
+    "E45",
+    64,
+    [
+     "building_count_any check=lte value=59 building=tower"
+    ]
+   ]
+  ],
+  "requirements": [
+   "favor capped at 64 by E45 while building_count_any check=lte value=59 building=tower"
+  ],
+  "problems": [],
+  "years": {
+   "peace": 22,
+   "prosperity": 9,
+   "favor": 7
+  },
+  "tax": 4,
+  "forts": 5,
+  "forum_max": null,
+  "trader_cap": {
+   "Vindobona": 105,
+   "Vindonissa": 105,
+   "Aquileia": 105,
+   "Verona": 105,
+   "Singidunum": 105,
+   "Avaricum": 105,
+   "Roma": 105
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 232,
+   "rock": 1080,
+   "timber": 3633,
+   "clay": 569,
+   "sand": 1333,
+   "wharf": 266
+  },
+  "exports": {
+   "Vindobona:marble": 104.7,
+   "Vindonissa:gold": 8.0,
+   "Vindonissa:stone": 96.7,
+   "Aquileia:gold": 4.0,
+   "Aquileia:stone": 100.7,
+   "Verona:timber": 104.7,
+   "Singidunum:stone": 104.7,
+   "Avaricum:timber": 4.7,
+   "Avaricum:marble": 100.0,
+   "Roma:iron": 0.7,
+   "Roma:marble": 100.0,
+   "Roma:gold": 4.0
+  },
+  "imports": {
+   "Vindonissa:wine": 5.9,
+   "Verona:pottery": 5.9,
+   "Verona:furniture": 5.9,
+   "Roma:oil": 5.9,
+   "Roma:weapons": 20.0
+  },
+  "houses": {
+   "4x2": 260.1,
+   "15x3": 24.8
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "Cyrene",
+  "goal": {
+   "pop": 10000,
+   "culture": 100,
+   "prosperity": 100,
+   "peace": 85,
+   "favor": 85
+  },
+  "max_level": 15,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": null,
+  "tax_income": null,
+  "export_income": null,
+  "import_cost": null,
+  "workers": null,
+  "workers_available": null,
+  "land_used": null,
+  "land": null,
+  "capex": null,
+  "min_tax": null,
+  "no_trade": null,
+  "tent_mix": null,
+  "blockers": [
+   "food",
+   "labour"
+  ],
+  "favor": {
+   "salary_year": 96.0,
+   "savings_income": 96.0,
+   "gift_gain": 5,
+   "yearly_net": 7.260869565217392
+  },
+  "favor_caps": [
+   [
+    "E24",
+    74,
+    [
+     "variable_check variable_uid=limit check=lte value=1"
+    ]
+   ]
+  ],
+  "requirements": [
+   "favor capped at 74 by E24 while variable_check variable_uid=limit check=lte value=1"
+  ],
+  "problems": [
+   "economy LP: The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)"
+  ],
+  "years": {
+   "peace": 19,
+   "prosperity": 10,
+   "favor": 7
+  },
+  "tax": 8,
+  "forts": 4,
+  "forum_max": null,
+  "trader_cap": null,
+  "monuments": [],
+  "sites": {
+   "farm": 90,
+   "rock": 157,
+   "timber": 1246,
+   "clay": 337,
+   "sand": 792,
+   "wharf": 143
+  },
+  "exports": null,
+  "imports": null,
+  "houses": null,
+  "unobtainable": null,
+  "event_money": 0
+ },
+ {
+  "map": "Marcianopolis",
+  "goal": {
+   "pop": 20000,
+   "culture": 100,
+   "prosperity": 100,
+   "peace": 0,
+   "favor": 100
+  },
+  "max_level": 19,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 128931.03558021417,
+  "tax_income": 26580.0,
+  "export_income": 255202.62602139043,
+  "import_cost": 106960.00882352931,
+  "workers": 8043.750000000002,
+  "workers_available": 8043.75,
+  "land_used": 6428.680569355318,
+  "land": 15702.9,
+  "capex": 187350.0,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 128931.03558021414,
+  "blockers": null,
+  "favor": {
+   "salary_year": 57.6,
+   "savings_income": 57.6,
+   "gift_gain": 5,
+   "yearly_net": 5.794117647058823
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "prosperity": 10,
+   "favor": 11
+  },
+  "tax": 8,
+  "forts": 0,
+  "forum_max": null,
+  "trader_cap": {
+   "Ockzakow": 58,
+   "Byzantium": 105,
+   "Philippopoli": 105,
+   "Heraclea Pontica": 58,
+   "Thessalonica": 105,
+   "Athenae": 58,
+   "Singidunum": 105,
+   "Roma": 58,
+   "Alexandrea ad Aegyptum": 58,
+   "Goro": 58,
+   "Mapopa": 58,
+   "Bialigrod": 105,
+   "Sarmizegetusa": 105,
+   "Aquileia": 105,
+   "Dyrrachium": 105,
+   "Drobeta": 105,
+   "Vindobona": 105,
+   "Caesarean Sardis": 105,
+   "Sinope": 58,
+   "Naissus": 105,
+   "Spalatum": 105
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 245,
+   "rock": 535,
+   "timber": 3684,
+   "clay": 552,
+   "sand": 1538,
+   "wharf": 227
+  },
+  "exports": {
+   "Ockzakow:bricks": 57.6,
+   "Byzantium:marble": 4.7,
+   "Byzantium:bricks": 100.0,
+   "Philippopoli:furniture": 19.7,
+   "Philippopoli:bricks": 85.0,
+   "Heraclea Pontica:timber": 57.6,
+   "Thessalonica:marble": 4.7,
+   "Thessalonica:bricks": 100.0,
+   "Athenae:bricks": 57.6,
+   "Singidunum:wine": 104.7,
+   "Roma:bricks": 57.6,
+   "Alexandrea ad Aegyptum:bricks": 57.6,
+   "Mapopa:marble": 57.6,
+   "Bialigrod:timber": 4.5,
+   "Bialigrod:furniture": 20.2,
+   "Bialigrod:bricks": 80.0,
+   "Sarmizegetusa:fish": 63.5,
+   "Sarmizegetusa:wine": 41.2,
+   "Dyrrachium:marble": 4.7,
+   "Dyrrachium:bricks": 100.0,
+   "Caesarean Sardis:wine": 24.7,
+   "Caesarean Sardis:bricks": 80.0,
+   "Naissus:marble": 4.7,
+   "Naissus:bricks": 100.0,
+   "Spalatum:marble": 104.7
+  },
+  "imports": {
+   "Ockzakow:clay": 57.6,
+   "Byzantium:clay": 100.0,
+   "Byzantium:olives": 4.7,
+   "Heraclea Pontica:sand": 57.6,
+   "Thessalonica:sand": 104.7,
+   "Athenae:sand": 57.6,
+   "Singidunum:clay": 85.3,
+   "Roma:olives": 1.3,
+   "Roma:sand": 56.3,
+   "Alexandrea ad Aegyptum:sand": 57.6,
+   "Mapopa:clay": 57.6,
+   "Bialigrod:clay": 104.7,
+   "Sarmizegetusa:sand": 104.7,
+   "Dyrrachium:wheat": 62.5,
+   "Dyrrachium:clay": 42.2
+  },
+  "houses": {
+   "4x2": 343.8,
+   "19x4": 15.6
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "Narbo_Martius",
+  "goal": {
+   "pop": 12000,
+   "culture": 70,
+   "prosperity": 100,
+   "peace": 90,
+   "favor": 90
+  },
+  "max_level": 19,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 63783.33986428428,
+  "tax_income": 17582.462765022596,
+  "export_income": 71952.98181818181,
+  "import_cost": 5764.808867586067,
+  "workers": 4549.171445689765,
+  "workers_available": 4549.171445689767,
+  "land_used": 4509.773106637248,
+  "land": 7782.599999999999,
+  "capex": 54640.0,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 63783.33986428428,
+  "blockers": null,
+  "favor": {
+   "salary_year": 76.8,
+   "savings_income": 76.8,
+   "gift_gain": 5,
+   "yearly_net": 4.809523809523809
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 20,
+   "prosperity": 10,
+   "favor": 11
+  },
+  "tax": 8,
+  "forts": 5,
+  "forum_max": null,
+  "trader_cap": {
+   "Emporiae": 105,
+   "Massilia": 105,
+   "Regium Lepidi": 105,
+   "Augusta Taurinorum": 105,
+   "Aiacium": 58,
+   "Tolosa": 105,
+   "Olbia": 38,
+   "Roma": 105,
+   "Ostia": 58
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 197,
+   "rock": 67,
+   "timber": 1745,
+   "clay": 281,
+   "sand": 633,
+   "wharf": 104
+  },
+  "exports": {
+   "Emporiae:olives": 64.7,
+   "Emporiae:pottery": 40.0,
+   "Massilia:pottery": 45.0,
+   "Massilia:furniture": 24.7,
+   "Massilia:bricks": 35.0,
+   "Regium Lepidi:oil": 39.7,
+   "Regium Lepidi:wine": 65.0,
+   "Augusta Taurinorum:olives": 14.7,
+   "Augusta Taurinorum:oil": 50.0,
+   "Augusta Taurinorum:wine": 40.0,
+   "Aiacium:gold": 4.0,
+   "Aiacium:oil": 53.6,
+   "Tolosa:olives": 45.0,
+   "Tolosa:gold": 4.0,
+   "Tolosa:sand": 15.7,
+   "Tolosa:bricks": 40.0,
+   "Olbia:olives": 13.4,
+   "Olbia:pottery": 25.0,
+   "Roma:gold": 8.0,
+   "Roma:wine": 51.7,
+   "Roma:bricks": 45.0,
+   "Ostia:wine": 57.6
+  },
+  "imports": {
+   "Regium Lepidi:iron": 6.0,
+   "Tolosa:weapons": 14.0,
+   "Ostia:wheat": 49.8
+  },
+  "houses": {
+   "1x2": 120.3,
+   "4x2": 129.6,
+   "19x4": 12.5
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "Noviomagus",
+  "goal": {
+   "pop": 18000,
+   "culture": 70,
+   "prosperity": 90,
+   "peace": 90,
+   "favor": 70
+  },
+  "max_level": 16,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 25040.24694946796,
+  "tax_income": 25876.147572650625,
+  "export_income": 26026.818181818184,
+  "import_cost": 2827.699860908373,
+  "workers": 6522.193420028892,
+  "workers_available": 6522.1934200288915,
+  "land_used": 5156.303590101645,
+  "land": 12791.65,
+  "capex": 45240.0,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 25040.24694946798,
+  "blockers": null,
+  "favor": {
+   "salary_year": 134.4,
+   "savings_income": 134.4,
+   "gift_gain": 5,
+   "yearly_net": 5.9
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 20,
+   "prosperity": 10,
+   "favor": 6
+  },
+  "tax": 8,
+  "forts": 5,
+  "forum_max": null,
+  "trader_cap": {
+   "Lutetia": 70,
+   "Avaricum": 70,
+   "Argentoratum": 105,
+   "Gesoriacum": 105,
+   "Divodurum": 105
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 146,
+   "rock": 459,
+   "timber": 2349,
+   "clay": 2068,
+   "sand": 2398,
+   "wharf": 1281
+  },
+  "exports": {
+   "Lutetia:weapons": 30.0,
+   "Lutetia:bricks": 35.0,
+   "Avaricum:pottery": 30.0,
+   "Avaricum:furniture": 25.0,
+   "Argentoratum:clay": 4.7,
+   "Argentoratum:stone": 55.0,
+   "Argentoratum:pottery": 45.0,
+   "Gesoriacum:timber": 4.7,
+   "Gesoriacum:iron": 40.0,
+   "Gesoriacum:furniture": 60.0,
+   "Divodurum:stone": 64.7,
+   "Divodurum:weapons": 40.0
+  },
+  "imports": {
+   "Lutetia:olives": 12.4,
+   "Argentoratum:vines": 10.0,
+   "Argentoratum:wine": 1.7
+  },
+  "houses": {
+   "4x2": 203.1,
+   "8x2": 48.7,
+   "11x2": 2.8,
+   "14x3": 49.0
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "Nuceria",
+  "goal": {
+   "pop": 16000,
+   "culture": 85,
+   "prosperity": 100,
+   "peace": 100,
+   "favor": 100
+  },
+  "max_level": 19,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 73553.05884125631,
+  "tax_income": 28313.662142317422,
+  "export_income": 67600.55286800626,
+  "import_cost": 2077.1243782087276,
+  "workers": 5627.994703779766,
+  "workers_available": 5627.994703779766,
+  "land_used": 5877.820056044507,
+  "land": 15203.949999999999,
+  "capex": 133635.0,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 73810.82190204962,
+  "blockers": null,
+  "favor": {
+   "salary_year": 96.0,
+   "savings_income": 96.0,
+   "gift_gain": 5,
+   "yearly_net": 7.1
+  },
+  "favor_caps": [
+   [
+    "E8",
+    79,
+    [
+     "money check=lte value=500000"
+    ]
+   ]
+  ],
+  "requirements": [
+   "favor capped at 79 by E8 while money check=lte value=500000 -> treasury above 500000 needs about 6.8 years of surplus"
+  ],
+  "problems": [],
+  "years": {
+   "peace": 22,
+   "prosperity": 10,
+   "favor": 9
+  },
+  "tax": 8,
+  "forts": 2,
+  "forum_max": null,
+  "trader_cap": {
+   "Capua": 105,
+   "Sibari": 105,
+   "Roma": 105,
+   "Tarentum": 105,
+   "Carailis": 58,
+   "Carthago": 58,
+   "Massilia": 19,
+   "Syracusae": 58,
+   "Barium": 105,
+   "Athenae": 58,
+   "Helvia Recina": 105,
+   "Volsinii": 105,
+   "Verona": 105,
+   "Tarraco": 58,
+   "Lutetia": 105
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 546,
+   "rock": 803,
+   "timber": 3422,
+   "clay": 975,
+   "sand": 2102,
+   "wharf": 298
+  },
+  "exports": {
+   "Capua:olives": 60.0,
+   "Capua:stone": 30.0,
+   "Sibari:vegetables": 80.0,
+   "Sibari:vines": 20.0,
+   "Roma:fruit": 59.7,
+   "Roma:oil": 35.0,
+   "Roma:wine": 10.0,
+   "Tarentum:fruit": 84.7,
+   "Tarentum:wine": 20.0,
+   "Carailis:vegetables": 27.6,
+   "Carailis:wine": 30.0,
+   "Carthago:fruit": 17.6,
+   "Carthago:wine": 40.0,
+   "Massilia:wine": 19.2,
+   "Syracusae:olives": 42.6,
+   "Syracusae:wine": 15.0,
+   "Barium:vegetables": 34.7,
+   "Barium:olives": 60.0,
+   "Barium:wine": 10.0,
+   "Athenae:olives": 12.6,
+   "Athenae:wine": 45.0,
+   "Helvia Recina:vegetables": 84.7,
+   "Helvia Recina:oil": 20.0,
+   "Volsinii:fish": 4.1,
+   "Volsinii:oil": 15.0,
+   "Volsinii:olives": 40.0,
+   "Verona:vegetables": 80.0,
+   "Verona:oil": 20.0,
+   "Verona:vines": 4.7,
+   "Tarraco:fruit": 57.6,
+   "Lutetia:vegetables": 29.7,
+   "Lutetia:fruit": 60.0,
+   "Lutetia:oil": 15.0
+  },
+  "imports": {
+   "Tarentum:clay": 5.2,
+   "Carthago:iron": 8.0,
+   "Tarraco:timber": 5.2
+  },
+  "houses": {
+   "1x2": 180.0,
+   "4x2": 143.6,
+   "19x4": 21.5
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "RC01_Ostia",
+  "goal": {
+   "pop": 1250,
+   "culture": 10,
+   "prosperity": 35,
+   "peace": 5,
+   "favor": 50
+  },
+  "max_level": 9,
+  "prosperity_ceiling": 58,
+  "max_culture": 76,
+  "surplus": 4626.506165897066,
+  "tax_income": 600.0,
+  "export_income": 6045.818181818182,
+  "import_cost": 0.0,
+  "workers": 345.90579196729203,
+  "workers_available": 562.5,
+  "land_used": 319.1942779510794,
+  "land": 1060.8,
+  "capex": 3255.0,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 4626.506165897066,
+  "blockers": null,
+  "favor": {
+   "salary_year": 960.0,
+   "savings_income": 960.0,
+   "gift_gain": 5,
+   "yearly_net": 8.277777777777779
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 3,
+   "prosperity": 4,
+   "favor": 2
+  },
+  "tax": 8,
+  "forts": 0,
+  "forum_max": null,
+  "trader_cap": {
+   "Rome": 105,
+   "Croton": 58
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 26,
+   "rock": 81,
+   "timber": 243,
+   "clay": 96,
+   "sand": 240,
+   "wharf": 30
+  },
+  "exports": {
+   "Rome:wheat": 14.7,
+   "Rome:clay": 60.0,
+   "Rome:timber": 30.0,
+   "Croton:timber": 57.6
+  },
+  "imports": {},
+  "houses": {
+   "6x1": 73.5
+  },
+  "unobtainable": [],
+  "event_money": 1200
+ },
+ {
+  "map": "RC02_Brundisium",
+  "goal": {
+   "pop": 2400,
+   "culture": 25,
+   "prosperity": 50,
+   "peace": 20,
+   "favor": 50
+  },
+  "max_level": 19,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 16513.88207939689,
+  "tax_income": 3486.9187198899176,
+  "export_income": 19604.636363636364,
+  "import_cost": 1638.679927735726,
+  "workers": 939.9103363730184,
+  "workers_available": 939.9103363730184,
+  "land_used": 835.7103419562718,
+  "land": 2329.0,
+  "capex": 10343.0,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 16869.59642890039,
+  "blockers": null,
+  "favor": {
+   "salary_year": 960.0,
+   "savings_income": 1260.0,
+   "gift_gain": 10,
+   "yearly_net": 11.666666666666666
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 6,
+   "prosperity": 6,
+   "favor": 1
+  },
+  "tax": 8,
+  "forts": 0,
+  "forum_max": null,
+  "trader_cap": {
+   "Apulia": 105,
+   "Sena Gallica": 58,
+   "Corcyra": 58,
+   "Rome": 58,
+   "Epidamnos": 58
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 46,
+   "rock": 210,
+   "timber": 522,
+   "clay": 144,
+   "sand": 322,
+   "wharf": 56
+  },
+  "exports": {
+   "Apulia:clay": 70.0,
+   "Apulia:sand": 34.7,
+   "Sena Gallica:marble": 15.0,
+   "Sena Gallica:stone": 40.0,
+   "Corcyra:clay": 29.6,
+   "Corcyra:pottery": 28.0,
+   "Rome:wheat": 2.6,
+   "Rome:pottery": 35.0,
+   "Rome:furniture": 20.0,
+   "Epidamnos:sand": 7.6,
+   "Epidamnos:bricks": 50.0
+  },
+  "imports": {
+   "Apulia:timber": 24.3,
+   "Sena Gallica:fish": 8.6,
+   "Rome:olives": 0.5,
+   "Rome:vines": 1.0
+  },
+  "houses": {
+   "4x2": 40.2,
+   "19x4": 2.2
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "RC03_Capua",
+  "goal": {
+   "pop": 4500,
+   "culture": 30,
+   "prosperity": 60,
+   "peace": 35,
+   "favor": 65
+  },
+  "max_level": 16,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 20949.39298506435,
+  "tax_income": 7856.534396035506,
+  "export_income": 22336.0,
+  "import_cost": 1666.8275807006669,
+  "workers": 1377.7855719595298,
+  "workers_available": 1377.7855719595302,
+  "land_used": 1455.0159301000945,
+  "land": 3931.25,
+  "capex": 14342.5,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 20949.39298506435,
+  "blockers": null,
+  "favor": {
+   "salary_year": 960.0,
+   "savings_income": 960.0,
+   "gift_gain": 5,
+   "yearly_net": 5.25
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 9,
+   "prosperity": 7,
+   "favor": 5
+  },
+  "tax": 8,
+  "forts": 0,
+  "forum_max": null,
+  "trader_cap": {
+   "Terracena": 105,
+   "Regium": 58,
+   "Olbia": 58,
+   "Rome": 58,
+   "Brention": 58
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 116,
+   "rock": 332,
+   "timber": 917,
+   "clay": 373,
+   "sand": 790,
+   "wharf": 156
+  },
+  "exports": {
+   "Terracena:olives": 30.0,
+   "Terracena:vines": 30.0,
+   "Terracena:bricks": 10.0,
+   "Regium:clay": 30.0,
+   "Regium:sand": 17.6,
+   "Regium:pottery": 10.0,
+   "Olbia:olives": 30.0,
+   "Olbia:vines": 7.6,
+   "Olbia:oil": 10.0,
+   "Olbia:wine": 10.0,
+   "Rome:wine": 10.0,
+   "Rome:weapons": 40.0,
+   "Brention:pottery": 10.0,
+   "Brention:bricks": 24.0
+  },
+  "imports": {
+   "Terracena:iron": 20.0,
+   "Regium:timber": 4.4,
+   "Brention:iron": 26.9
+  },
+  "houses": {
+   "4x2": 58.9,
+   "14x3": 18.5
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "RC04_Tarentum",
+  "goal": {
+   "pop": 4500,
+   "culture": 30,
+   "prosperity": 60,
+   "peace": 50,
+   "favor": 60
+  },
+  "max_level": 15,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 25214.89404890611,
+  "tax_income": 6212.206358561905,
+  "export_income": 27553.545454545456,
+  "import_cost": 746.5819178706462,
+  "workers": 1598.0080769783167,
+  "workers_available": 1598.008076978316,
+  "land_used": 1503.796638903465,
+  "land": 4123.349999999999,
+  "capex": 18437.5,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 25214.89404890611,
+  "blockers": null,
+  "favor": {
+   "salary_year": 960.0,
+   "savings_income": 960.0,
+   "gift_gain": 5,
+   "yearly_net": 5.5
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 12,
+   "prosperity": 7,
+   "favor": 4
+  },
+  "tax": 8,
+  "forts": 2,
+  "forum_max": null,
+  "trader_cap": {
+   "Asculum": 105,
+   "Beneventum": 105,
+   "Sipontum": 58,
+   "Ariminium": 105,
+   "Rome": 58
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 94,
+   "rock": 285,
+   "timber": 853,
+   "clay": 287,
+   "sand": 648,
+   "wharf": 115
+  },
+  "exports": {
+   "Asculum:iron": 60.0,
+   "Asculum:stone": 29.7,
+   "Asculum:weapons": 15.0,
+   "Beneventum:iron": 74.7,
+   "Beneventum:weapons": 30.0,
+   "Sipontum:timber": 33.6,
+   "Sipontum:furniture": 24.0,
+   "Ariminium:stone": 50.0,
+   "Ariminium:weapons": 20.0,
+   "Rome:pottery": 24.0,
+   "Rome:wine": 33.6
+  },
+  "imports": {
+   "Sipontum:oil": 2.8
+  },
+  "houses": {
+   "4x2": 68.3,
+   "15x3": 11.7
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "RC05_Tarraco",
+  "goal": {
+   "pop": 5000,
+   "culture": 40,
+   "prosperity": 65,
+   "peace": 55,
+   "favor": 70
+  },
+  "max_level": 19,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 23019.612918480292,
+  "tax_income": 11158.132553197793,
+  "export_income": 20540.909090909092,
+  "import_cost": 1989.3881031607034,
+  "workers": 1626.2955210342802,
+  "workers_available": 1626.2955210342793,
+  "land_used": 1468.6784308806295,
+  "land": 3606.5499999999997,
+  "capex": 18405.0,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 23019.612918480292,
+  "blockers": null,
+  "favor": {
+   "salary_year": 960.0,
+   "savings_income": 960.0,
+   "gift_gain": 5,
+   "yearly_net": 6.214285714285714
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 13,
+   "prosperity": 8,
+   "favor": 5
+  },
+  "tax": 8,
+  "forts": 0,
+  "forum_max": null,
+  "trader_cap": {
+   "Emporiae": 105,
+   "Massilia": 58,
+   "Capua": 58,
+   "Rome": 58,
+   "Otobesa": 105
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 99,
+   "rock": 61,
+   "timber": 727,
+   "clay": 491,
+   "sand": 828,
+   "wharf": 168
+  },
+  "exports": {
+   "Emporiae:timber": 30.0,
+   "Emporiae:marble": 10.0,
+   "Emporiae:stone": 30.0,
+   "Massilia:marble": 7.6,
+   "Massilia:weapons": 50.0,
+   "Capua:marble": 15.0,
+   "Capua:weapons": 30.0,
+   "Rome:pottery": 9.6,
+   "Rome:furniture": 24.0,
+   "Rome:bricks": 24.0,
+   "Otobesa:clay": 40.0,
+   "Otobesa:timber": 24.7,
+   "Otobesa:sand": 40.0
+  },
+  "imports": {
+   "Emporiae:fish": 32.7,
+   "Massilia:olives": 2.0,
+   "Capua:vines": 3.9
+  },
+  "houses": {
+   "4x1": 278.0,
+   "19x4": 8.2
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "RC06_Syracusae",
+  "goal": {
+   "pop": 7000,
+   "culture": 40,
+   "prosperity": 75,
+   "peace": 60,
+   "favor": 65
+  },
+  "max_level": 15,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 25763.14314886699,
+  "tax_income": 11671.136160047776,
+  "export_income": 29962.8,
+  "import_cost": 3913.14032381142,
+  "workers": 2216.90140713646,
+  "workers_available": 2216.9014071364586,
+  "land_used": 2210.7023735054822,
+  "land": 6112.349999999999,
+  "capex": 22490.0,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 25763.14314886699,
+  "blockers": null,
+  "favor": {
+   "salary_year": 960.0,
+   "savings_income": 960.0,
+   "gift_gain": 5,
+   "yearly_net": 5.9411764705882355
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 14,
+   "prosperity": 8,
+   "favor": 5
+  },
+  "tax": 8,
+  "forts": 2,
+  "forum_max": null,
+  "trader_cap": {
+   "Rhegium": 105,
+   "Brundisium": 58,
+   "Capua": 58,
+   "Rome": 58,
+   "Himera": 70
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 101,
+   "rock": 528,
+   "timber": 1205,
+   "clay": 324,
+   "sand": 737,
+   "wharf": 97
+  },
+  "exports": {
+   "Rhegium:clay": 50.0,
+   "Rhegium:olives": 30.0,
+   "Rhegium:pottery": 10.0,
+   "Brundisium:olives": 33.6,
+   "Brundisium:oil": 24.0,
+   "Capua:pottery": 40.0,
+   "Capua:bricks": 17.6,
+   "Rome:olives": 9.6,
+   "Rome:oil": 24.0,
+   "Rome:wine": 24.0,
+   "Himera:furniture": 30.0,
+   "Himera:weapons": 30.0
+  },
+  "imports": {
+   "Brundisium:timber": 36.5,
+   "Capua:iron": 38.0
+  },
+  "houses": {
+   "4x2": 94.7,
+   "14x3": 26.9
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "RC07_Miletus",
+  "goal": {
+   "pop": 6500,
+   "culture": 40,
+   "prosperity": 85,
+   "peace": 65,
+   "favor": 65
+  },
+  "max_level": 19,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 25094.691255935893,
+  "tax_income": 14964.658810792653,
+  "export_income": 28025.2,
+  "import_cost": 2371.6160898756766,
+  "workers": 1991.2961240801706,
+  "workers_available": 1991.2961240801708,
+  "land_used": 2138.102859330302,
+  "land": 5162.05,
+  "capex": 21252.5,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 25703.138071075282,
+  "blockers": null,
+  "favor": {
+   "salary_year": 960.0,
+   "savings_income": 960.0,
+   "gift_gain": 5,
+   "yearly_net": 6.125
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 15,
+   "prosperity": 9,
+   "favor": 5
+  },
+  "tax": 8,
+  "forts": 2,
+  "forum_max": null,
+  "trader_cap": {
+   "Lydia": 105,
+   "Rhodes": 58,
+   "Athenae": 58,
+   "Corinthus": 58,
+   "Herculaneum": 58
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 50,
+   "rock": 425,
+   "timber": 1033,
+   "clay": 287,
+   "sand": 530,
+   "wharf": 163
+  },
+  "exports": {
+   "Lydia:fish": 44.7,
+   "Lydia:olives": 30.0,
+   "Lydia:vines": 30.0,
+   "Rhodes:oil": 30.0,
+   "Rhodes:wine": 18.0,
+   "Athenae:marble": 30.0,
+   "Athenae:stone": 27.6,
+   "Corinthus:oil": 22.6,
+   "Corinthus:wine": 35.0,
+   "Herculaneum:marble": 30.0,
+   "Herculaneum:weapons": 27.6
+  },
+  "imports": {
+   "Lydia:wheat": 48.0,
+   "Lydia:iron": 38.4,
+   "Rhodes:clay": 2.9,
+   "Athenae:timber": 2.9
+  },
+  "houses": {
+   "1x2": 73.1,
+   "4x1": 182.9,
+   "19x4": 12.0
+  },
+  "unobtainable": [],
+  "event_money": -6000
+ },
+ {
+  "map": "RC08_Mediolanum_SAVE",
+  "goal": {
+   "pop": 8000,
+   "culture": 45,
+   "prosperity": 85,
+   "peace": 90,
+   "favor": 75
+  },
+  "max_level": 19,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 46299.3899650479,
+  "tax_income": 17060.98449687944,
+  "export_income": 46093.63636363636,
+  "import_cost": 4324.367579288395,
+  "workers": 2669.575184925051,
+  "workers_available": 2669.5751849250482,
+  "land_used": 2462.27490580059,
+  "land": 14646.35,
+  "capex": 26620.0,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 46299.3899650479,
+  "blockers": null,
+  "favor": {
+   "salary_year": 960.0,
+   "savings_income": 960.0,
+   "gift_gain": 5,
+   "yearly_net": 5.777777777777778
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 20,
+   "prosperity": 9,
+   "favor": 7
+  },
+  "tax": 8,
+  "forts": 4,
+  "forum_max": null,
+  "trader_cap": {
+   "Genua": 105,
+   "Arretium": 105,
+   "Patavium": 105,
+   "Aquileia": 105,
+   "Massilia": 105,
+   "Bonoria": 105
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 190,
+   "rock": 604,
+   "timber": 2904,
+   "clay": 930,
+   "sand": 1774,
+   "wharf": 365
+  },
+  "exports": {
+   "Genua:clay": 30.0,
+   "Genua:timber": 50.0,
+   "Genua:sand": 24.7,
+   "Arretium:vines": 29.7,
+   "Arretium:marble": 30.0,
+   "Arretium:stone": 45.0,
+   "Patavium:timber": 70.0,
+   "Patavium:weapons": 34.7,
+   "Aquileia:marble": 30.0,
+   "Aquileia:weapons": 11.9,
+   "Massilia:pottery": 30.0,
+   "Massilia:furniture": 30.0,
+   "Massilia:wine": 30.0,
+   "Bonoria:weapons": 54.7,
+   "Bonoria:bricks": 50.0
+  },
+  "imports": {
+   "Arretium:iron": 60.0,
+   "Aquileia:olives": 3.0,
+   "Massilia:iron": 60.0
+  },
+  "houses": {
+   "4x2": 114.1,
+   "19x4": 12.3
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "RC09_Lugdunum",
+  "goal": {
+   "pop": 8000,
+   "culture": 45,
+   "prosperity": 90,
+   "peace": 60,
+   "favor": 70
+  },
+  "max_level": 15,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 32736.940952036042,
+  "tax_income": 12860.195259159245,
+  "export_income": 39448.41818181818,
+  "import_cost": 3807.526838088809,
+  "workers": 2597.652420648316,
+  "workers_available": 2597.652420648313,
+  "land_used": 2394.3095083351645,
+  "land": 5665.25,
+  "capex": 29844.999999999996,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 32736.940952036057,
+  "blockers": null,
+  "favor": {
+   "salary_year": 960.0,
+   "savings_income": 960.0,
+   "gift_gain": 5,
+   "yearly_net": 7.0625
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 14,
+   "prosperity": 9,
+   "favor": 5
+  },
+  "tax": 8,
+  "forts": 0,
+  "forum_max": null,
+  "trader_cap": {
+   "Narbo": 105,
+   "Burdigala": 105,
+   "Portus Namnetum": 58,
+   "Massilia": 58,
+   "Lutetia": 105,
+   "Genua": 105
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 118,
+   "rock": 537,
+   "timber": 1165,
+   "clay": 297,
+   "sand": 749,
+   "wharf": 104
+  },
+  "exports": {
+   "Narbo:iron": 50.0,
+   "Narbo:gold": 8.0,
+   "Burdigala:clay": 35.0,
+   "Burdigala:sand": 28.7,
+   "Burdigala:pottery": 16.0,
+   "Burdigala:bricks": 25.0,
+   "Portus Namnetum:furniture": 40.0,
+   "Portus Namnetum:weapons": 17.6,
+   "Massilia:furniture": 50.0,
+   "Massilia:weapons": 7.6,
+   "Lutetia:gold": 8.0,
+   "Lutetia:wine": 16.0,
+   "Lutetia:weapons": 16.0,
+   "Genua:iron": 60.0,
+   "Genua:wine": 20.0
+  },
+  "imports": {
+   "Narbo:timber": 17.0,
+   "Genua:timber": 80.0,
+   "Genua:olives": 7.0
+  },
+  "houses": {
+   "4x2": 111.0,
+   "14x3": 29.2
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "RC10_Carthago_SAVE",
+  "goal": {
+   "pop": 8000,
+   "culture": 45,
+   "prosperity": 90,
+   "peace": 75,
+   "favor": 80
+  },
+  "max_level": 15,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 31006.905568922426,
+  "tax_income": 13772.536927764206,
+  "export_income": 31481.875158979758,
+  "import_cost": 1760.2541733745306,
+  "workers": 2475.4638043172936,
+  "workers_available": 2475.4638043172936,
+  "land_used": 2452.0891885895217,
+  "land": 8607.1,
+  "capex": 31095.0,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 31006.905568922426,
+  "blockers": null,
+  "favor": {
+   "salary_year": 960.0,
+   "savings_income": 960.0,
+   "gift_gain": 5,
+   "yearly_net": 5.434782608695652
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 17,
+   "prosperity": 9,
+   "favor": 8
+  },
+  "tax": 8,
+  "forts": 3,
+  "forum_max": null,
+  "trader_cap": {
+   "Thapsus": 105,
+   "Munda": 58,
+   "Cyrene": 58,
+   "Syracusae": 58,
+   "Massilia": 38,
+   "Alexandria": 58,
+   "Utica": 35
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 83,
+   "rock": 429,
+   "timber": 1317,
+   "clay": 348,
+   "sand": 930,
+   "wharf": 145
+  },
+  "exports": {
+   "Thapsus:fish": 86.0,
+   "Thapsus:olives": 3.7,
+   "Thapsus:oil": 15.0,
+   "Munda:fruit": 2.6,
+   "Munda:vines": 35.0,
+   "Munda:wine": 20.0,
+   "Cyrene:iron": 12.6,
+   "Cyrene:marble": 30.0,
+   "Cyrene:weapons": 15.0,
+   "Syracusae:marble": 35.0,
+   "Syracusae:stone": 2.6,
+   "Syracusae:oil": 20.0,
+   "Massilia:marble": 3.4,
+   "Massilia:oil": 35.0,
+   "Alexandria:marble": 2.6,
+   "Alexandria:oil": 20.0,
+   "Alexandria:wine": 35.0
+  },
+  "imports": {
+   "Munda:clay": 7.0,
+   "Cyrene:timber": 7.0
+  },
+  "houses": {
+   "4x2": 105.8,
+   "15x3": 29.0
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "RC11_Tarsus_SAVE",
+  "goal": {
+   "pop": 8250,
+   "culture": 45,
+   "prosperity": 90,
+   "peace": 65,
+   "favor": 75
+  },
+  "max_level": 15,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": null,
+  "tax_income": null,
+  "export_income": null,
+  "import_cost": null,
+  "workers": null,
+  "workers_available": null,
+  "land_used": null,
+  "land": null,
+  "capex": null,
+  "min_tax": null,
+  "no_trade": null,
+  "tent_mix": 21754.130429716664,
+  "blockers": [
+   "food",
+   "population",
+   "trader"
+  ],
+  "favor": {
+   "salary_year": 960.0,
+   "savings_income": 960.0,
+   "gift_gain": 5,
+   "yearly_net": 5.944444444444445
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [
+   "economy LP: The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)"
+  ],
+  "years": {
+   "peace": 15,
+   "prosperity": 9,
+   "favor": 6
+  },
+  "tax": 8,
+  "forts": 2,
+  "forum_max": null,
+  "trader_cap": null,
+  "monuments": [],
+  "sites": {
+   "farm": 0,
+   "rock": 64,
+   "timber": 1263,
+   "clay": 568,
+   "sand": 1024,
+   "wharf": 252
+  },
+  "exports": null,
+  "imports": null,
+  "houses": null,
+  "unobtainable": null,
+  "event_money": 0
+ },
+ {
+  "map": "RC12_Tingis",
+  "goal": {
+   "pop": 11000,
+   "culture": 50,
+   "prosperity": 95,
+   "peace": 80,
+   "favor": 90
+  },
+  "max_level": 19,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 33200.54952283213,
+  "tax_income": 26514.37319984485,
+  "export_income": 32185.846889952154,
+  "import_cost": 10876.732674257639,
+  "workers": 3129.5393035922084,
+  "workers_available": 3129.539303592208,
+  "land_used": 2952.4764003711657,
+  "land": 8999.8,
+  "capex": 30015.0,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 33200.549522832145,
+  "blockers": null,
+  "favor": {
+   "salary_year": 960.0,
+   "savings_income": 960.0,
+   "gift_gain": 5,
+   "yearly_net": 4.777777777777778
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 18,
+   "prosperity": 10,
+   "favor": 11
+  },
+  "tax": 8,
+  "forts": 3,
+  "forum_max": null,
+  "trader_cap": {
+   "Emporiae": 105,
+   "Massilia": 58,
+   "Caralis": 58,
+   "Carthago Nova": 105,
+   "Lixus": 58
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 163,
+   "rock": 320,
+   "timber": 1691,
+   "clay": 480,
+   "sand": 1157,
+   "wharf": 162
+  },
+  "exports": {
+   "Emporiae:clay": 70.0,
+   "Emporiae:sand": 9.7,
+   "Emporiae:bricks": 25.0,
+   "Massilia:oil": 30.0,
+   "Massilia:weapons": 12.3,
+   "Caralis:pottery": 50.0,
+   "Caralis:wine": 7.6,
+   "Carthago Nova:clay": 54.7,
+   "Carthago Nova:bricks": 50.0,
+   "Lixus:pottery": 40.0,
+   "Lixus:furniture": 17.6
+  },
+  "imports": {
+   "Emporiae:iron": 10.0,
+   "Massilia:vines": 19.1,
+   "Caralis:olives": 38.0,
+   "Carthago Nova:timber": 25.6,
+   "Carthago Nova:iron": 20.0,
+   "Lixus:meat": 57.6
+  },
+  "houses": {
+   "4x2": 133.7,
+   "14x3": 19.1,
+   "19x4": 14.4
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "RC13_Valencia",
+  "goal": {
+   "pop": 12000,
+   "culture": 55,
+   "prosperity": 100,
+   "peace": 75,
+   "favor": 70
+  },
+  "max_level": 19,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 47133.32884097389,
+  "tax_income": 30839.784662264596,
+  "export_income": 36573.381002508584,
+  "import_cost": 3568.514458962328,
+  "workers": 3557.063807193361,
+  "workers_available": 3557.0638071933586,
+  "land_used": 3167.130440966193,
+  "land": 12776.35,
+  "capex": 43000.0,
+  "min_tax": 0,
+  "no_trade": 12081.937530936893,
+  "tent_mix": 47133.32884097389,
+  "blockers": null,
+  "favor": {
+   "salary_year": 960.0,
+   "savings_income": 1560.0,
+   "gift_gain": 10,
+   "yearly_net": 5.030303030303031
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 17,
+   "prosperity": 10,
+   "favor": 6
+  },
+  "tax": 8,
+  "forts": 2,
+  "forum_max": null,
+  "trader_cap": {
+   "Emporiae": 105,
+   "Massilia": 58,
+   "Rome": 58,
+   "Tarraco": 105,
+   "Genua": 58,
+   "Arminium": 58,
+   "Alalia": 58,
+   "Narbo Martius": 105,
+   "Capua": 58,
+   "Caralis": 58
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 186,
+   "rock": 936,
+   "timber": 2812,
+   "clay": 895,
+   "sand": 1797,
+   "wharf": 377
+  },
+  "exports": {
+   "Emporiae:clay": 104.7,
+   "Massilia:gold": 8.0,
+   "Massilia:sand": 49.6,
+   "Rome:marble": 30.0,
+   "Rome:gold": 8.0,
+   "Rome:stone": 19.6,
+   "Tarraco:iron": 69.7,
+   "Tarraco:marble": 35.0,
+   "Genua:vines": 57.6,
+   "Arminium:fish": 50.1,
+   "Arminium:iron": 7.5,
+   "Alalia:clay": 57.6,
+   "Narbo Martius:marble": 24.0,
+   "Narbo Martius:gold": 8.0,
+   "Narbo Martius:stone": 72.7,
+   "Capua:sand": 57.6,
+   "Caralis:clay": 57.6
+  },
+  "imports": {
+   "Emporiae:fruit": 93.9
+  },
+  "houses": {
+   "4x2": 152.0,
+   "19x4": 23.5
+  },
+  "unobtainable": [],
+  "event_money": -562
+ },
+ {
+  "map": "RC14_Lutetia_SAVE",
+  "goal": {
+   "pop": 12000,
+   "culture": 50,
+   "prosperity": 95,
+   "peace": 80,
+   "favor": 75
+  },
+  "max_level": 15,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 34920.379035977356,
+  "tax_income": 10412.633125229533,
+  "export_income": 49395.74545454545,
+  "import_cost": 4322.148365773042,
+  "workers": 4449.783656176159,
+  "workers_available": 4596.8417186926235,
+  "land_used": 3437.3332944761637,
+  "land": 15167.4,
+  "capex": 51260.00000000001,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 34920.37903597735,
+  "blockers": null,
+  "favor": {
+   "salary_year": 960.0,
+   "savings_income": 960.0,
+   "gift_gain": 5,
+   "yearly_net": 6.571428571428571
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 18,
+   "prosperity": 10,
+   "favor": 6
+  },
+  "tax": 5,
+  "forts": 3,
+  "forum_max": null,
+  "trader_cap": {
+   "Agendincum": 105,
+   "Juliobona": 58,
+   "Avaricum": 105,
+   "Portus Namnetum": 105,
+   "Augustodurum": 58,
+   "Narbo Martius": 105,
+   "Rome": 58,
+   "Burdigala": 105
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 213,
+   "rock": 986,
+   "timber": 3035,
+   "clay": 914,
+   "sand": 1858,
+   "wharf": 378
+  },
+  "exports": {
+   "Agendincum:timber": 64.7,
+   "Agendincum:bricks": 40.0,
+   "Juliobona:stone": 29.6,
+   "Juliobona:weapons": 28.0,
+   "Avaricum:sand": 39.7,
+   "Avaricum:pottery": 45.0,
+   "Avaricum:furniture": 20.0,
+   "Portus Namnetum:stone": 76.7,
+   "Portus Namnetum:weapons": 28.0,
+   "Augustodurum:clay": 2.6,
+   "Augustodurum:pottery": 20.0,
+   "Augustodurum:furniture": 35.0,
+   "Narbo Martius:iron": 15.7,
+   "Narbo Martius:stone": 75.0,
+   "Narbo Martius:weapons": 14.0,
+   "Rome:weapons": 24.0,
+   "Rome:bricks": 33.6,
+   "Burdigala:timber": 80.7,
+   "Burdigala:furniture": 24.0
+  },
+  "imports": {
+   "Agendincum:marble": 0.3,
+   "Avaricum:oil": 4.8,
+   "Rome:wine": 4.8
+  },
+  "houses": {
+   "8x2": 134.4,
+   "14x3": 19.8
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "RC15_Caesarea",
+  "goal": {
+   "pop": 8500,
+   "culture": 50,
+   "prosperity": 95,
+   "peace": 70,
+   "favor": 75
+  },
+  "max_level": 15,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": null,
+  "tax_income": null,
+  "export_income": null,
+  "import_cost": null,
+  "workers": null,
+  "workers_available": null,
+  "land_used": null,
+  "land": null,
+  "capex": null,
+  "min_tax": null,
+  "no_trade": null,
+  "tent_mix": 33896.07364434009,
+  "blockers": [
+   "food",
+   "population",
+   "tents<=30%",
+   "trader"
+  ],
+  "favor": {
+   "salary_year": 960.0,
+   "savings_income": 960.0,
+   "gift_gain": 5,
+   "yearly_net": 7.611111111111111
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [
+   "economy LP: The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)"
+  ],
+  "years": {
+   "peace": 16,
+   "prosperity": 10,
+   "favor": 5
+  },
+  "tax": 8,
+  "forts": 3,
+  "forum_max": null,
+  "trader_cap": null,
+  "monuments": [],
+  "sites": {
+   "farm": 105,
+   "rock": 535,
+   "timber": 1643,
+   "clay": 419,
+   "sand": 1104,
+   "wharf": 168
+  },
+  "exports": null,
+  "imports": null,
+  "houses": null,
+  "unobtainable": null,
+  "event_money": 0
+ },
+ {
+  "map": "RC16_Damascus",
+  "goal": {
+   "pop": 12500,
+   "culture": 60,
+   "prosperity": 95,
+   "peace": 80,
+   "favor": 85
+  },
+  "max_level": 15,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 18306.900401183884,
+  "tax_income": 13418.478260869564,
+  "export_income": 39888.0,
+  "import_cost": 2781.929347826087,
+  "workers": 4027.3776286818365,
+  "workers_available": 4631.453804347826,
+  "land_used": 3758.037280638093,
+  "land": 9415.449999999999,
+  "capex": 52415.0,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 18306.900401183884,
+  "blockers": null,
+  "favor": {
+   "salary_year": 960.0,
+   "savings_income": 960.0,
+   "gift_gain": 5,
+   "yearly_net": 4.842105263157895
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 18,
+   "prosperity": 10,
+   "favor": 10
+  },
+  "tax": 8,
+  "forts": 3,
+  "forum_max": 1,
+  "trader_cap": {
+   "Miletus": 105,
+   "Pergamum": 105,
+   "Tarsus": 105,
+   "Cyrene": 105,
+   "Melitene": 105,
+   "Laodicea": 105,
+   "Alexandria": 105
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 170,
+   "rock": 820,
+   "timber": 1890,
+   "clay": 145,
+   "sand": 595,
+   "wharf": 26
+  },
+  "exports": {
+   "Miletus:iron": 34.7,
+   "Miletus:stone": 60.0,
+   "Miletus:wine": 10.0,
+   "Pergamum:olives": 60.0,
+   "Pergamum:iron": 30.7,
+   "Pergamum:weapons": 14.0,
+   "Tarsus:timber": 74.7,
+   "Tarsus:furniture": 20.0,
+   "Tarsus:oil": 10.0,
+   "Cyrene:stone": 80.7,
+   "Cyrene:weapons": 24.0,
+   "Melitene:olives": 60.0,
+   "Melitene:vines": 40.0,
+   "Melitene:iron": 4.7,
+   "Laodicea:stone": 61.7,
+   "Laodicea:oil": 15.0,
+   "Laodicea:wine": 28.0,
+   "Alexandria:stone": 76.7,
+   "Alexandria:weapons": 28.0
+  },
+  "imports": {
+   "Cyrene:clay": 5.3,
+   "Alexandria:wheat": 44.2
+  },
+  "houses": {
+   "5x2": 171.5,
+   "15x3": 22.1
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "RC17_Londinium_SAVE",
+  "goal": {
+   "pop": 17500,
+   "culture": 50,
+   "prosperity": 95,
+   "peace": 85,
+   "favor": 85
+  },
+  "max_level": 13,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 6526.681710528604,
+  "tax_income": 12306.392147474264,
+  "export_income": 45426.01212121212,
+  "import_cost": 24668.729054167885,
+  "workers": 6021.815926346056,
+  "workers_available": 6410.1029446971515,
+  "land_used": 4714.176556085754,
+  "land": 16371.85,
+  "capex": 58370.0,
+  "min_tax": 2,
+  "no_trade": null,
+  "tent_mix": 6526.68171052862,
+  "blockers": null,
+  "favor": {
+   "salary_year": 960.0,
+   "savings_income": 960.0,
+   "gift_gain": 5,
+   "yearly_net": 6.703703703703704
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 19,
+   "prosperity": 10,
+   "favor": 7
+  },
+  "tax": 4,
+  "forts": 5,
+  "forum_max": null,
+  "trader_cap": {
+   "Camelodunum": 105,
+   "Mamucium": 105,
+   "Isca": 105,
+   "Lindum": 105,
+   "Pontum Namnetum": 58,
+   "Juliobonna": 58,
+   "Crociatonum": 58,
+   "Burdigala": 58
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 183,
+   "rock": 802,
+   "timber": 3257,
+   "clay": 883,
+   "sand": 1958,
+   "wharf": 326
+  },
+  "exports": {
+   "Camelodunum:fish": 44.7,
+   "Camelodunum:timber": 60.0,
+   "Mamucium:timber": 78.0,
+   "Mamucium:weapons": 26.7,
+   "Isca:sand": 1.7,
+   "Isca:pottery": 38.0,
+   "Isca:bricks": 65.0,
+   "Lindum:timber": 24.7,
+   "Lindum:furniture": 40.0,
+   "Lindum:bricks": 40.0,
+   "Pontum Namnetum:pottery": 27.6,
+   "Pontum Namnetum:bricks": 30.0,
+   "Juliobonna:furniture": 57.6,
+   "Crociatonum:furniture": 57.6,
+   "Burdigala:weapons": 57.6
+  },
+  "imports": {
+   "Camelodunum:iron": 50.0,
+   "Isca:iron": 55.0,
+   "Pontum Namnetum:oil": 18.8,
+   "Juliobonna:marble": 0.1,
+   "Crociatonum:vines": 18.8
+  },
+  "houses": {
+   "9x2": 178.1,
+   "13x2": 77.5
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "RC18_Sarmizegetusa",
+  "goal": {
+   "pop": 11000,
+   "culture": 60,
+   "prosperity": 95,
+   "peace": 75,
+   "favor": 85
+  },
+  "max_level": 19,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 29082.798311602695,
+  "tax_income": 28263.77165936997,
+  "export_income": 34948.545454545456,
+  "import_cost": 13118.733425815375,
+  "workers": 3261.155824485513,
+  "workers_available": 3261.155824485513,
+  "land_used": 2836.2176328944497,
+  "land": 9012.55,
+  "capex": 37530.0,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 29082.798311602695,
+  "blockers": null,
+  "favor": {
+   "salary_year": 960.0,
+   "savings_income": 960.0,
+   "gift_gain": 5,
+   "yearly_net": 4.379310344827586
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 17,
+   "prosperity": 10,
+   "favor": 11
+  },
+  "tax": 8,
+  "forts": 4,
+  "forum_max": null,
+  "trader_cap": {
+   "Viminacium": 105,
+   "Bononia": 105,
+   "Novae": 105,
+   "Derostorum": 105,
+   "Tarsatica": 105
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 158,
+   "rock": 763,
+   "timber": 1811,
+   "clay": 249,
+   "sand": 717,
+   "wharf": 90
+  },
+  "exports": {
+   "Viminacium:wheat": 69.7,
+   "Viminacium:clay": 15.0,
+   "Viminacium:bricks": 20.0,
+   "Bononia:iron": 14.7,
+   "Bononia:marble": 10.0,
+   "Bononia:stone": 80.0,
+   "Novae:pottery": 20.0,
+   "Novae:furniture": 30.0,
+   "Novae:oil": 20.0,
+   "Derostorum:stone": 64.7,
+   "Derostorum:wine": 30.0,
+   "Derostorum:bricks": 10.0,
+   "Tarsatica:timber": 74.7,
+   "Tarsatica:pottery": 20.0,
+   "Tarsatica:weapons": 10.0
+  },
+  "imports": {
+   "Viminacium:olives": 25.7,
+   "Bononia:fruit": 86.1,
+   "Novae:vines": 40.3
+  },
+  "houses": {
+   "4x2": 139.4,
+   "19x4": 21.5
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "RC19_Lindum_SAVE",
+  "goal": {
+   "pop": 16000,
+   "culture": 60,
+   "prosperity": 100,
+   "peace": 80,
+   "favor": 80
+  },
+  "max_level": 19,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 54351.404525179445,
+  "tax_income": 33850.87468773117,
+  "export_income": 57375.55984059378,
+  "import_cost": 8509.090909090903,
+  "workers": 5128.8942179580845,
+  "workers_available": 5128.894217958083,
+  "land_used": 5457.042811431952,
+  "land": 15894.15,
+  "capex": 60685.0,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 54702.48869719103,
+  "blockers": null,
+  "favor": {
+   "salary_year": 960.0,
+   "savings_income": 960.0,
+   "gift_gain": 5,
+   "yearly_net": 4.428571428571429
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 18,
+   "prosperity": 10,
+   "favor": 10
+  },
+  "tax": 8,
+  "forts": 3,
+  "forum_max": null,
+  "trader_cap": {
+   "Londinium": 105,
+   "Isca": 105,
+   "Deva": 105,
+   "Camelodunum": 105,
+   "Mamucium": 105,
+   "Pontum Namnetum": 58,
+   "Burdigala": 58,
+   "Crociatonum": 58
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 215,
+   "rock": 847,
+   "timber": 3120,
+   "clay": 546,
+   "sand": 1236,
+   "wharf": 211
+  },
+  "exports": {
+   "Londinium:timber": 74.7,
+   "Londinium:furniture": 30.0,
+   "Isca:wine": 50.0,
+   "Isca:weapons": 30.0,
+   "Isca:bricks": 24.7,
+   "Deva:pottery": 19.7,
+   "Deva:furniture": 50.0,
+   "Deva:wine": 35.0,
+   "Camelodunum:fish": 34.3,
+   "Camelodunum:clay": 65.0,
+   "Camelodunum:stone": 5.4,
+   "Mamucium:pottery": 33.9,
+   "Mamucium:oil": 20.9,
+   "Mamucium:bricks": 50.0,
+   "Pontum Namnetum:pottery": 17.6,
+   "Pontum Namnetum:furniture": 40.0,
+   "Burdigala:stone": 2.6,
+   "Burdigala:bricks": 55.0,
+   "Crociatonum:iron": 27.6,
+   "Crociatonum:oil": 30.0
+  },
+  "imports": {
+   "Londinium:vegetables": 104.7,
+   "Pontum Namnetum:olives": 57.6
+  },
+  "houses": {
+   "0x2": 252.0,
+   "4x2": 122.3,
+   "14x3": 1.8,
+   "19x4": 26.2
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "RC20_Massilia",
+  "goal": {
+   "pop": 18000,
+   "culture": 80,
+   "prosperity": 100,
+   "peace": 85,
+   "favor": 90
+  },
+  "max_level": 19,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 47127.314341347315,
+  "tax_income": 39189.55368015303,
+  "export_income": 58144.033062708135,
+  "import_cost": 14143.416912010205,
+  "workers": 5817.892567187297,
+  "workers_available": 5817.892567187298,
+  "land_used": 5006.393485447932,
+  "land": 12676.05,
+  "capex": 71160.0,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 47127.314341347315,
+  "blockers": null,
+  "favor": {
+   "salary_year": 960.0,
+   "savings_income": 960.0,
+   "gift_gain": 5,
+   "yearly_net": 4.25
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 19,
+   "prosperity": 10,
+   "favor": 12
+  },
+  "tax": 8,
+  "forts": 3,
+  "forum_max": null,
+  "trader_cap": {
+   "Cremona": 105,
+   "Aquilea": 105,
+   "Mediolanum": 105,
+   "Pisae": 105,
+   "Rome": 58,
+   "Aleria": 58,
+   "Olbia": 58,
+   "Ariminium": 105,
+   "Caralis": 58,
+   "Brundisium": 19
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 141,
+   "rock": 987,
+   "timber": 2673,
+   "clay": 613,
+   "sand": 1442,
+   "wharf": 215
+  },
+  "exports": {
+   "Cremona:clay": 80.7,
+   "Cremona:oil": 12.0,
+   "Cremona:wine": 12.0,
+   "Aquilea:vines": 104.7,
+   "Mediolanum:fish": 17.2,
+   "Mediolanum:sand": 87.5,
+   "Pisae:clay": 80.7,
+   "Pisae:oil": 24.0,
+   "Rome:oil": 30.0,
+   "Rome:weapons": 27.6,
+   "Aleria:oil": 30.0,
+   "Aleria:wine": 27.6,
+   "Olbia:oil": 30.0,
+   "Olbia:wine": 27.6,
+   "Ariminium:wine": 24.0,
+   "Ariminium:bricks": 80.7,
+   "Caralis:weapons": 40.0,
+   "Caralis:bricks": 17.6,
+   "Brundisium:pottery": 11.2,
+   "Brundisium:oil": 8.0
+  },
+  "imports": {
+   "Cremona:vegetables": 104.7,
+   "Mediolanum:iron": 83.3,
+   "Pisae:timber": 8.2
+  },
+  "houses": {
+   "4x1": 480.1,
+   "4x2": 128.6,
+   "14x3": 8.2,
+   "19x4": 26.2
+  },
+  "unobtainable": [],
+  "event_money": -3600
+ },
+ {
+  "map": "antiochia",
+  "goal": {
+   "pop": 18000,
+   "culture": 100,
+   "prosperity": 100,
+   "peace": 100,
+   "favor": 100
+  },
+  "max_level": 15,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 10793.03517710925,
+  "tax_income": 17466.985074626864,
+  "export_income": 43669.680699497316,
+  "import_cost": 9666.734328358207,
+  "workers": 6600.895522388061,
+  "workers_available": 6600.89552238806,
+  "land_used": 5469.478991748191,
+  "land": 16682.1,
+  "capex": 67360.0,
+  "min_tax": 2,
+  "no_trade": null,
+  "tent_mix": 10793.035177109243,
+  "blockers": null,
+  "favor": {
+   "salary_year": 76.8,
+   "savings_income": 136.8,
+   "gift_gain": 10,
+   "yearly_net": 10.3125
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 22,
+   "prosperity": 10,
+   "favor": 6
+  },
+  "tax": 6,
+  "forts": 2,
+  "forum_max": null,
+  "trader_cap": {
+   "Tarsus": 105,
+   "Damascus": 105,
+   "Caesarea": 105,
+   "Phaphos": 58,
+   "Alexandrea": 58,
+   "Hyerosolema": 105,
+   "Edessa": 105,
+   "Cyrene": 58,
+   "Roma": 58,
+   "Palmyra": 105,
+   "Ephesus": 58
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 320,
+   "rock": 370,
+   "timber": 4062,
+   "clay": 535,
+   "sand": 1284,
+   "wharf": 180
+  },
+  "exports": {
+   "Tarsus:timber": 36.1,
+   "Tarsus:marble": 45.0,
+   "Tarsus:wine": 20.0,
+   "Damascus:vines": 49.7,
+   "Damascus:marble": 55.0,
+   "Caesarea:timber": 80.0,
+   "Caesarea:wine": 15.0,
+   "Phaphos:wine": 35.0,
+   "Phaphos:bricks": 22.6,
+   "Alexandrea:vines": 22.6,
+   "Alexandrea:bricks": 35.0,
+   "Hyerosolema:marble": 40.0,
+   "Hyerosolema:bricks": 30.0,
+   "Edessa:timber": 44.7,
+   "Edessa:vines": 60.0,
+   "Palmyra:wine": 15.0,
+   "Palmyra:bricks": 15.0,
+   "Ephesus:timber": 32.6,
+   "Ephesus:bricks": 25.0
+  },
+  "imports": {
+   "Caesarea:clay": 16.4,
+   "Phaphos:clay": 57.6,
+   "Hyerosolema:olives": 10.2
+  },
+  "houses": {
+   "4x2": 282.1,
+   "15x3": 42.3
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "complutum",
+  "goal": {
+   "pop": 22000,
+   "culture": 100,
+   "prosperity": 100,
+   "peace": 0,
+   "favor": 100
+  },
+  "max_level": 19,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 41400.39502113484,
+  "tax_income": 40599.82124962676,
+  "export_income": 51350.563636363644,
+  "import_cost": 17007.916172321748,
+  "workers": 7596.287961679537,
+  "workers_available": 7596.287961679538,
+  "land_used": 6843.173887426083,
+  "land": 15951.949999999999,
+  "capex": 78245.0,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 41823.99523496861,
+  "blockers": null,
+  "favor": {
+   "salary_year": 76.8,
+   "savings_income": 76.8,
+   "gift_gain": 5,
+   "yearly_net": 3.09
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "prosperity": 10,
+   "favor": 20
+  },
+  "tax": 8,
+  "forts": 0,
+  "forum_max": null,
+  "trader_cap": {
+   "Emerita Augusta": 58,
+   "Caesaraugusta": 105,
+   "Salmatike": 105,
+   "Pompaelo": 105,
+   "Corduba": 58,
+   "Toletum": 105,
+   "Tarraco-Rome": 105,
+   "Asturica Augusta": 105,
+   "Carthago Nova": 105,
+   "Emporiae": 105
+  },
+  "monuments": [
+   {
+    "monument": "grand_temple_ceres",
+    "materials": {
+     "stone": 20,
+     "timber": 32,
+     "concrete": 20,
+     "marble": 28,
+     "bricks": 28
+    },
+    "import_cost": 7700,
+    "missing": []
+   },
+   {
+    "monument": "grand_temple_neptune",
+    "materials": {
+     "stone": 20,
+     "timber": 32,
+     "concrete": 20,
+     "marble": 28,
+     "bricks": 28
+    },
+    "import_cost": 7700,
+    "missing": []
+   },
+   {
+    "monument": "grand_temple_mercury",
+    "materials": {
+     "stone": 20,
+     "timber": 32,
+     "concrete": 20,
+     "marble": 28,
+     "bricks": 28
+    },
+    "import_cost": 7700,
+    "missing": []
+   },
+   {
+    "monument": "grand_temple_mars",
+    "materials": {
+     "stone": 20,
+     "timber": 32,
+     "concrete": 20,
+     "marble": 28,
+     "bricks": 28
+    },
+    "import_cost": 7700,
+    "missing": []
+   },
+   {
+    "monument": "grand_temple_venus",
+    "materials": {
+     "stone": 20,
+     "timber": 32,
+     "concrete": 20,
+     "marble": 28,
+     "bricks": 28
+    },
+    "import_cost": 7700,
+    "missing": []
+   }
+  ],
+  "sites": {
+   "farm": 397,
+   "rock": 725,
+   "timber": 3722,
+   "clay": 683,
+   "sand": 1611,
+   "wharf": 225
+  },
+  "exports": {
+   "Emerita Augusta:olives": 37.6,
+   "Emerita Augusta:weapons": 20.0,
+   "Caesaraugusta:timber": 84.7,
+   "Caesaraugusta:bricks": 20.0,
+   "Salmatike:iron": 89.7,
+   "Salmatike:furniture": 15.0,
+   "Pompaelo:sand": 84.7,
+   "Pompaelo:oil": 20.0,
+   "Corduba:olives": 42.6,
+   "Corduba:weapons": 15.0,
+   "Toletum:olives": 74.7,
+   "Toletum:bricks": 30.0,
+   "Tarraco-Rome:sand": 104.7,
+   "Asturica Augusta:sand": 84.7,
+   "Asturica Augusta:oil": 20.0,
+   "Carthago Nova:iron": 69.7,
+   "Carthago Nova:furniture": 35.0,
+   "Emporiae:sand": 94.7,
+   "Emporiae:weapons": 10.0
+  },
+  "imports": {
+   "Emerita Augusta:clay": 32.5,
+   "Salmatike:wheat": 93.3,
+   "Corduba:wine": 14.9,
+   "Tarraco-Rome:meat": 93.3
+  },
+  "houses": {
+   "1x1": 217.5,
+   "1x2": 193.1,
+   "4x2": 191.4,
+   "19x4": 31.1
+  },
+  "unobtainable": [
+   "gold"
+  ],
+  "event_money": 0
+ },
+ {
+  "map": "gesoriacum",
+  "goal": {
+   "pop": 0,
+   "culture": 50,
+   "prosperity": 90,
+   "peace": 90,
+   "favor": 80
+  },
+  "max_level": 17,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 28312.963093912167,
+  "tax_income": 35930.01998174241,
+  "export_income": 22299.0,
+  "import_cost": 8428.584415584415,
+  "workers": 5407.309317299095,
+  "workers_available": 5407.309317299093,
+  "land_used": 4806.899075955589,
+  "land": 5664.4,
+  "capex": 38051.43681641637,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 28312.963093912163,
+  "blockers": null,
+  "favor": {
+   "salary_year": 96.0,
+   "savings_income": 96.0,
+   "gift_gain": 5,
+   "yearly_net": 6.333333333333334
+  },
+  "favor_caps": [
+   [
+    "E0",
+    89,
+    [
+     "variable_check variable_uid=Legionaries Sailed check=lte value=1999"
+    ]
+   ]
+  ],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 20,
+   "prosperity": 10,
+   "favor": 7
+  },
+  "tax": 8,
+  "forts": 4,
+  "forum_max": null,
+  "trader_cap": {
+   "Lutetia": 70,
+   "Dubris": 58,
+   "Bagacum": 105,
+   "Nemetacum": 105,
+   "Bratustantium": 105
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 107,
+   "rock": 112,
+   "timber": 1387,
+   "clay": 132,
+   "sand": 304,
+   "wharf": 51
+  },
+  "exports": {
+   "Lutetia:iron": 40.0,
+   "Dubris:iron": 12.6,
+   "Dubris:weapons": 45.0,
+   "Bagacum:timber": 30.0,
+   "Bagacum:furniture": 45.0,
+   "Nemetacum:marble": 35.0,
+   "Nemetacum:weapons": 30.0,
+   "Bratustantium:sand": 30.0,
+   "Bratustantium:stone": 50.0
+  },
+  "imports": {
+   "Dubris:clay": 40.0,
+   "Bagacum:wheat": 80.0,
+   "Nemetacum:oil": 17.1,
+   "Bratustantium:wheat": 104.7
+  },
+  "houses": {
+   "4x2": 96.9,
+   "8x2": 91.8,
+   "14x3": 55.1,
+   "17x3": 16.1
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "leiptis_magna",
+  "goal": {
+   "pop": 17000,
+   "culture": 90,
+   "prosperity": 100,
+   "peace": 100,
+   "favor": 75
+  },
+  "max_level": 19,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 53668.9569224944,
+  "tax_income": 26206.115679801092,
+  "export_income": 66689.19999999998,
+  "import_cost": 13197.935517241389,
+  "workers": 6083.456896551699,
+  "workers_available": 6083.456896551701,
+  "land_used": 5527.561537833158,
+  "land": 11681.55,
+  "capex": 82555.0,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 53668.95692249437,
+  "blockers": null,
+  "favor": {
+   "salary_year": 96.0,
+   "savings_income": 96.0,
+   "gift_gain": 5,
+   "yearly_net": 5.3
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 22,
+   "prosperity": 10,
+   "favor": 7
+  },
+  "tax": 8,
+  "forts": 4,
+  "forum_max": null,
+  "trader_cap": {
+   "Antiochia": 58,
+   "Cyrene": 58,
+   "Byzantium": 58,
+   "Alexandrea ad Aegyptum": 58,
+   "Creta": 58,
+   "Tarentum": 58,
+   "Roma": 58,
+   "Syracusae": 58,
+   "Carthago": 58,
+   "Carailis": 58,
+   "Valentia": 58
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 140,
+   "rock": 157,
+   "timber": 1874,
+   "clay": 500,
+   "sand": 1062,
+   "wharf": 169
+  },
+  "exports": {
+   "Antiochia:gold": 6.0,
+   "Antiochia:furniture": 1.6,
+   "Antiochia:oil": 50.0,
+   "Cyrene:olives": 57.6,
+   "Byzantium:gold": 6.0,
+   "Byzantium:oil": 26.6,
+   "Byzantium:bricks": 25.0,
+   "Alexandrea ad Aegyptum:oil": 57.6,
+   "Creta:pottery": 12.6,
+   "Creta:furniture": 45.0,
+   "Tarentum:olives": 2.6,
+   "Tarentum:iron": 30.0,
+   "Tarentum:weapons": 25.0,
+   "Roma:gold": 16.0,
+   "Roma:oil": 6.6,
+   "Roma:weapons": 35.0,
+   "Syracusae:fish": 32.6,
+   "Syracusae:pottery": 25.0,
+   "Carthago:iron": 42.6,
+   "Carthago:weapons": 15.0,
+   "Carailis:oil": 57.6,
+   "Valentia:furniture": 2.6,
+   "Valentia:oil": 55.0
+  },
+  "imports": {
+   "Byzantium:clay": 23.6,
+   "Byzantium:timber": 29.1,
+   "Roma:timber": 30.0,
+   "Syracusae:wheat": 46.7,
+   "Syracusae:vines": 10.9,
+   "Carailis:clay": 35.0
+  },
+  "houses": {
+   "1x2": 103.8,
+   "4x1": 22.4,
+   "4x2": 198.5,
+   "14x3": 22.2,
+   "19x4": 11.7
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "londinium",
+  "goal": {
+   "pop": 14000,
+   "culture": 55,
+   "prosperity": 65,
+   "peace": 65,
+   "favor": 65
+  },
+  "max_level": 13,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 25414.80393150217,
+  "tax_income": 21840.000000000004,
+  "export_income": 32144.181818181816,
+  "import_cost": 6440.0,
+  "workers": 4453.949519699923,
+  "workers_available": 4725.000000000001,
+  "land_used": 3704.1459935613443,
+  "land": 15617.9,
+  "capex": 31665.0,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 25414.803931502156,
+  "blockers": null,
+  "favor": {
+   "salary_year": 96.0,
+   "savings_income": 96.0,
+   "gift_gain": 5,
+   "yearly_net": 5.333333333333334
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 15,
+   "prosperity": 8,
+   "favor": 5
+  },
+  "tax": 8,
+  "forts": 5,
+  "forum_max": null,
+  "trader_cap": {
+   "Calleva Atrebatum": 105,
+   "Lindum": 70,
+   "Colonia Nervia Glevensium": 105,
+   "Gesoriacum": 58,
+   "Mamucium": 70
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 246,
+   "rock": 245,
+   "timber": 3310,
+   "clay": 654,
+   "sand": 1511,
+   "wharf": 271
+  },
+  "exports": {
+   "Calleva Atrebatum:iron": 60.0,
+   "Calleva Atrebatum:weapons": 40.0,
+   "Lindum:sand": 14.8,
+   "Lindum:bricks": 10.0,
+   "Lindum:weapons": 45.0,
+   "Colonia Nervia Glevensium:sand": 65.0,
+   "Colonia Nervia Glevensium:stone": 39.7,
+   "Gesoriacum:bricks": 57.6,
+   "Mamucium:iron": 29.8,
+   "Mamucium:pottery": 10.0,
+   "Mamucium:weapons": 30.0
+  },
+  "imports": {
+   "Calleva Atrebatum:timber": 20.0,
+   "Gesoriacum:oil": 20.0,
+   "Mamucium:vines": 20.0
+  },
+  "houses": {
+   "8x2": 138.2,
+   "13x2": 83.3
+  },
+  "unobtainable": [],
+  "event_money": 0
+ },
+ {
+  "map": "palmyra",
+  "goal": {
+   "pop": 18000,
+   "culture": 80,
+   "prosperity": 80,
+   "peace": 80,
+   "favor": 80
+  },
+  "max_level": 19,
+  "prosperity_ceiling": 100,
+  "max_culture": 100,
+  "surplus": 102427.33731951017,
+  "tax_income": 16845.122131754255,
+  "export_income": 119772.72727272728,
+  "import_cost": 9794.463360473721,
+  "workers": 6838.3530715344905,
+  "workers_available": 7290.59955588453,
+  "land_used": 3987.9917684742813,
+  "land": 15945.15,
+  "capex": 66140.0,
+  "min_tax": 0,
+  "no_trade": null,
+  "tent_mix": 102427.33731951017,
+  "blockers": null,
+  "favor": {
+   "salary_year": 76.8,
+   "savings_income": 376.8,
+   "gift_gain": 10,
+   "yearly_net": 10.666666666666666
+  },
+  "favor_caps": [],
+  "requirements": [],
+  "problems": [],
+  "years": {
+   "peace": 18,
+   "prosperity": 8,
+   "favor": 4
+  },
+  "tax": 6,
+  "forts": 4,
+  "forum_max": null,
+  "trader_cap": {
+   "Antiochia": 105,
+   "Trypolis": 105,
+   "Damascus": 105,
+   "Carre": 58,
+   "Hierosolyma": 105,
+   "Roma": 58
+  },
+  "monuments": [],
+  "sites": {
+   "farm": 260,
+   "rock": 426,
+   "timber": 3151,
+   "clay": 402,
+   "sand": 1024,
+   "wharf": 130
+  },
+  "exports": {
+   "Antiochia:vines": 6.7,
+   "Antiochia:gold": 16.0,
+   "Antiochia:wine": 16.0,
+   "Antiochia:fish": 66.0,
+   "Trypolis:bricks": 66.0,
+   "Trypolis:fish": 38.7,
+   "Damascus:bricks": 66.0,
+   "Damascus:clay": 38.7,
+   "Carre:bricks": 57.6,
+   "Hierosolyma:marble": 26.0,
+   "Hierosolyma:gold": 16.0,
+   "Hierosolyma:pottery": 62.7,
+   "Roma:marble": 31.6,
+   "Roma:gold": 26.0
+  },
+  "imports": {
+   "Antiochia:fruit": 1.2,
+   "Carre:timber": 4.8,
+   "Carre:fruit": 52.8,
+   "Hierosolyma:iron": 16.0,
+   "Roma:olives": 4.8
+  },
+  "houses": {
+   "8x2": 213.2,
+   "14x3": 20.0
+  },
+  "unobtainable": [],
+  "event_money": 0
+ }
+]

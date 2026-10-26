@@ -1,0 +1,25 @@
+## CN_02_Quiza___The_City_to_Neptune (skip E35,E39,E40,E41,E4)
+goals pop 10000 culture 10 prosperity 100 peace 80 favor 90
+max house level 13 (prosperity value 100); next level blocked by: ['education 3>2']
+caps: {'food_types': 4, 'wine_types': 1, 'gods': 5, 'entertainment': 70, 'water': 3, 'education': 2, 'health': 2, 'barber': True, 'bathhouse': True}
+culture max 100, plan (['religion'], 13.333333333333334, 0)
+tax 8%, Rome wage 45.0, event money 0/yr, event favor 0/yr
+LP: surplus 21067/yr | tax 28019 exports 47962 imports 37849 fixed 1944
+    pop 10000 plebs 5800 workers 2444/2610 land 2538/6320 prosperity cap 100
+    houses {'1x2': np.float64(78.1), '8x2': np.float64(3.6), '11x2': np.float64(39.8), '13x2': np.float64(100.0)}
+    prod {'bricks': np.float64(96.0), 'clay': np.float64(339.4), 'fish': np.float64(288.0), 'furniture': np.float64(80.0), 'pottery': np.float64(97.8), 'weapons': np.float64(76.8)}
+    exports {'Igilgili:fish': np.float64(24.0), 'Igilgili:clay': np.float64(32.0), 'Igilgili:bricks': np.float64(3.5), 'Roma:clay': np.float64(16.0), 'Roma:bricks': np.float64(24.0), 'Siga:fish': np.float64(48.0), 'Siga:clay': np.float64(32.0), 'Siga:furniture': np.float64(6.1), 'Tigava:fish': np.float64(48.0), 'Tigava:clay': np.float64(24.0), 'Tigava:bricks': np.float64(24.0), 'Iol:fish': np.float64(32.0), 'Iol:weapons': np.float64(20.8), 'Auzia:fish': np.float64(32.0), 'Auzia:clay': np.float64(24.0), 'Auzia:furniture': np.float64(8.0), 'Rusazus:fish': np.float64(100.0), 'Zdif:pottery': np.float64(16.0), 'Zdif:furniture': np.float64(16.0), 'Zdif:weapons': np.float64(24.0), 'Hippo Regius:clay': np.float64(24.0), 'Hippo Regius:pottery': np.float64(16.0), 'Hippo Regius:bricks': np.float64(16.0), 'Theveste:clay': np.float64(32.0), 'Theveste:pottery': np.float64(16.0), 'Theveste:furniture': np.float64(16.0), 'Meninx:fish': np.float64(18.7), 'Meninx:weapons': np.float64(24.0), 'Meninx:bricks': np.float64(16.0)}
+    imports {'Igilgili:sand': np.float64(24.0), 'Igilgili:oil': np.float64(24.0), 'Ostia:iron': np.float64(76.8), 'Roma:wine': np.float64(24.0), 'Siga:sand': np.float64(24.0), 'Tigava:timber': np.float64(32.0), 'Iol:timber': np.float64(16.0), 'Auzia:wheat': np.float64(241.0), 'Auzia:oil': np.float64(1.6), 'Zdif:timber': np.float64(16.0), 'Hippo Regius:timber': np.float64(16.0), 'Theveste:fruit': np.float64(242.5), 'Meninx:oil': np.float64(8.0)}
+    routes opened ['Igilgili', 'Ostia', 'Roma', 'Siga', 'Tigava', 'Iol', 'Auzia', 'Rusazus', 'Zdif', 'Hippo Regius', 'Theveste', 'Meninx']
+    build cost 49945 vs start funds 9000 -> payback 2.4 yr; lowest tax that balances: 2%
+    food types used (in order): ['fruit', 'wheat']
+    monuments needed: [{'monument': 'grand_temple_neptune', 'materials': {'stone': 20, 'timber': 32, 'concrete': 20, 'marble': 28, 'bricks': 28}, 'import_cost': 18780, 'missing': []}]
+    sites (packed): {'farm': 0, 'rock': 0, 'timber': 1258, 'clay': 306, 'sand': 673, 'wharf': 211}; Rome wheat 0; start stock {}
+forts assumed 2; surplus with no trade: None; surplus with the tent mix: 21066.565602379567
+favor: {'salary_year': 0.0, 'savings_income': 0.0, 'gift_gain': 0, 'yearly_net': 0.18181818181818166}; caps [('E2', 70, ['building_count_active check=eq value=0 building=grand_temple_neptune'])]
+years (lower bound): {'peace': 18, 'prosperity': 12, 'favor': 276}
+flows with quest conditions (not applied): [('E27', 'favor_add', 24, ['variable_check variable_uid=Status check=neq value=6', 'resource_stored_count resource=fish check=gte value=32 storage_type=warehouses', 'variable_check variable_uid=FavorMonthCounter check=eq value=12']), ('E37', 'favor_add', -5, ['variable_check variable_uid=Status check=eq value=6', 'resource_stored_count resource=fish check=lt value=48 storage_type=warehouses']), ('E38', 'favor_add', 2, ['variable_check variable_uid=Status check=eq value=6', 'resource_stored_count resource=fish check=gte value=48 storage_type=warehouses'])]
+REQUIREMENT: favor capped at 70 by E2 while building_count_active check=eq value=0 building=grand_temple_neptune
+PROBLEMS: none
+build-up: 25% y1.7 lvl6 budget 9000 surplus 15278 capex 9142 treasury 12589 | 50% y3.3 lvl6 budget 21732 surplus 23544 capex 21435 treasury 32648 | 75% y5.0 lvl6 budget 54083 surplus 24132 capex 29880 treasury 63933 | 100% y6.7 lvl13 budget 93813 surplus 24091 capex 49845 treasury 84153 | lowest treasury -142 at year 0
+
