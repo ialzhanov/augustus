@@ -18,12 +18,12 @@ Remake an original Caesar III sprite as an HD (2x) image that the patched August
 | Decoder (paths below: relative to `tools/hd_sprites/`) | `sg.py` — `SG(~/caesar3, 'C3').decode(id)`, `.groups[g]` = first id of group g |
 | Blender library | `blender/c3.py` — scene, camera, light, materials, props, grass, render, top pass |
 | Sprite scripts | `blender/tent.py`, `blender/casa.py` (old standalone), `blender/terrain.py` |
-| Build one sprite | `blender/make.sh SCRIPT ID [install]` — 8x render (+top), 2x file, sharpen, checks, viewer |
-| Build terrain | `blender/terrain_make.sh [install] ID...` (central climate only) |
+| Build one sprite | `[C3_CLIMATE=c3_north] blender/make.sh SCRIPT ID [install]` — 8x render (+top), 2x file, sharpen, checks, viewer. `C3_CLIMATE` selects the original, the output and attempt folders. The sprite scripts (`c3.py` grass, `tent.py`) and the `edge` check (central grass reference) do not use the climate yet, so a north or south build fails its checks |
+| Build terrain | `blender/terrain_make.sh [install] ID...` (`C3_CLIMATE=c3_north` or `c3_south` for the other climates) |
 | Checks | `blender/check.py ORIG HD HAS_TOP [TOP]`; regression tests `blender/test_check.py` (run first by both build scripts) |
-| Originals (PNG) | `originals/<id>.png` (all 8,698; gitignored, made by `export_originals.py`) |
+| Originals (PNG) | `originals/<id>.png` (central, 8,699) and `originals/c3_north/`, `originals/c3_south/` (722 and 746 images that differ from the central ones, list in `originals/climates.json`); gitignored, made by `export_originals.py` |
 | CC0 photo textures | `tex/<ambientCG id>/` (gitignored, `fetch_textures.sh`) (Fabric061, Ground108, Ground054, Ground037, Grass004, Grass001, Planks037A, RoofingTiles006, Plaster007, Rock064, Gravel023) |
-| Progress viewer | `cd viewer/server && go run .` then http://127.0.0.1:8642 — attempts, install, uninstall, generate (new seed); `viewer/index.html` from disk is read-only |
+| Progress viewer | `cd viewer/server && go run .` then http://127.0.0.1:8642 — filters by status, climate, footprint, category, group; attempts, install, uninstall, generate (new seed); `viewer/index.html` from disk is read-only |
 | Attempts | every build is saved in `blender/out/attempts/<id>/<time>/` (`blender/attempt.py`); `C3_SEED=n` gives a new variation |
 | Script registry | `blender/scripts.json`: add every new sprite script with its id range, else the viewer cannot generate it |
 | Group names | `src/core/image_group.h` (repo root) (`GROUP_BUILDING_HOUSE_TENT = 26`, ...) |
@@ -31,6 +31,8 @@ Remake an original Caesar III sprite as an HD (2x) image that the patched August
 | Blender | `/Applications/Blender.app/Contents/MacOS/Blender -b -P script.py -- OUT.png SCALE [top] -- ARGS` |
 
 ## Engine facts (do not break)
+
+- Each climate (`c3`, `c3_north`, `c3_south`) has its own sprites. A north or south image that differs from the central one (720-750 per climate, some with another size) needs its own HD file. A central attempt installs only to the climates whose image is the same (`sg.climates_of`, `blender/attempt.py targets`).
 
 - HD file = original size x integer density (2..8). We install **2x**: the closest zoom is 200%, and 2:1 bilinear at 100% is clean. Larger densities only blur at 100% (no mipmaps).
 - Isometric sprites: the engine keeps the footprint rows (bottom `30 n` px) and **masks them to the original stepped tile outline**; the top part (rows above `H - 15 n`) comes from `<id>_top.png` (building only, ground cut out) or from the full image. A sprite needs `_top.png` when the original has a top part (`SG.img[id]['top']`).
