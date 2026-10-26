@@ -43,8 +43,9 @@ type scriptRange struct {
 }
 
 type server struct {
-	root    string
-	scripts []scriptRange
+	root     string
+	scripts  []scriptRange
+	variants map[string]map[int]bool // climate -> ids whose image differs from the central climate's
 
 	dataMu   sync.Mutex
 	dataJSON []byte
@@ -59,6 +60,7 @@ type server struct {
 type job struct {
 	ID      int       `json:"id"`
 	Sprite  int       `json:"sprite"`
+	Climate string    `json:"climate"`
 	Seed    int       `json:"seed"`
 	Script  string    `json:"script"`
 	Status  string    `json:"status"` // queued, running, done, failed
@@ -76,6 +78,9 @@ func main() {
 	}
 	s := &server{root: root, queue: make(chan *job, 1000)}
 	if err := s.loadScripts(); err != nil {
+		log.Fatal(err)
+	}
+	if err := s.loadVariants(); err != nil {
 		log.Fatal(err)
 	}
 	for i := 0; i < *workers; i++ {
@@ -144,12 +149,61 @@ func (s *server) scriptFor(id int) string {
 	return ""
 }
 
-// climatesFor: terrain is coloured by the central climate's originals, so it installs only to c3.
-func (s *server) climatesFor(id int) []string {
-	if s.scriptFor(id) == "terrain" {
-		return climates[:1]
+// loadVariants reads originals/climates.json (written by export_originals.py).
+func (s *server) loadVariants() error {
+	b, err := os.ReadFile(filepath.Join(s.root, "originals", "climates.json"))
+	if err != nil {
+		return fmt.Errorf("%w (run export_originals.py)", err)
 	}
-	return climates
+	var f map[string][]int
+	if err := json.Unmarshal(b, &f); err != nil {
+		return fmt.Errorf("climates.json: %w", err)
+	}
+	s.variants = map[string]map[int]bool{}
+	for c, ids := range f {
+		s.variants[c] = map[int]bool{}
+		for _, id := range ids {
+			s.variants[c][id] = true
+		}
+	}
+	return nil
+}
+
+// targets are the climate folders an attempt of (climate, id) installs to: a central attempt also goes to each
+// climate whose image is the same as the central one; a north or south attempt goes only to its own climate.
+// The same rule is in blender/attempt.py (targets).
+func (s *server) targets(climate string, id int) []string {
+	if climate != "c3" {
+		return []string{climate}
+	}
+	out := []string{"c3"}
+	for _, c := range climates[1:] {
+		if !s.variants[c][id] {
+			out = append(out, c)
+		}
+	}
+	return out
+}
+
+// checkClimate accepts an empty climate as the central one and refuses an unknown name (it becomes a path part).
+func checkClimate(c *string) error {
+	if *c == "" {
+		*c = "c3"
+	}
+	for _, k := range climates {
+		if *c == k {
+			return nil
+		}
+	}
+	return fmt.Errorf("unknown climate %q", *c)
+}
+
+// sub is the folder part of a climate in originals/ and blender/out/: the central climate has none.
+func sub(climate string) string {
+	if climate == "c3" {
+		return ""
+	}
+	return climate
 }
 
 func writeJSON(w http.ResponseWriter, code int, v any) {
@@ -195,11 +249,20 @@ func readRequest(r *http.Request, v any) error {
 
 func (s *server) handleGenerate(w http.ResponseWriter, r *http.Request) {
 	var req struct {
-		ID   int  `json:"id"`
-		Seed *int `json:"seed"`
+		ID      int    `json:"id"`
+		Climate string `json:"climate"`
+		Seed    *int   `json:"seed"`
 	}
 	if err := readRequest(r, &req); err != nil {
 		fail(w, http.StatusBadRequest, err)
+		return
+	}
+	if err := checkClimate(&req.Climate); err != nil {
+		fail(w, http.StatusBadRequest, err)
+		return
+	}
+	if req.Climate != "c3" && !s.variants[req.Climate][req.ID] {
+		fail(w, http.StatusBadRequest, fmt.Errorf("sprite %d of %s is the central image: generate it in c3", req.ID, req.Climate))
 		return
 	}
 	script := s.scriptFor(req.ID)
@@ -214,13 +277,13 @@ func (s *server) handleGenerate(w http.ResponseWriter, r *http.Request) {
 	s.jobsMu.Lock()
 	defer s.jobsMu.Unlock()
 	for _, j := range s.jobs {
-		if j.Sprite == req.ID && (j.Status == "queued" || j.Status == "running") {
-			fail(w, http.StatusConflict, fmt.Errorf("sprite %d already has job %d (%s)", req.ID, j.ID, j.Status))
+		if j.Sprite == req.ID && j.Climate == req.Climate && (j.Status == "queued" || j.Status == "running") {
+			fail(w, http.StatusConflict, fmt.Errorf("sprite %s %d already has job %d (%s)", req.Climate, req.ID, j.ID, j.Status))
 			return
 		}
 	}
 	s.nextID++
-	j := &job{ID: s.nextID, Sprite: req.ID, Seed: seed, Script: script, Status: "queued", Queued: time.Now()}
+	j := &job{ID: s.nextID, Sprite: req.ID, Climate: req.Climate, Seed: seed, Script: script, Status: "queued", Queued: time.Now()}
 	s.jobs = append(s.jobs, j)
 	s.queue <- j
 	writeJSON(w, http.StatusAccepted, j)
@@ -246,7 +309,7 @@ func (s *server) worker() {
 			cmd = exec.Command("bash", "make.sh", j.Script, strconv.Itoa(j.Sprite))
 		}
 		cmd.Dir = filepath.Join(s.root, "blender")
-		cmd.Env = append(os.Environ(), "C3_SEED="+strconv.Itoa(j.Seed))
+		cmd.Env = append(os.Environ(), "C3_SEED="+strconv.Itoa(j.Seed), "C3_CLIMATE="+j.Climate)
 		out, err := cmd.CombinedOutput()
 		s.withJobs(func() {
 			j.Ended, j.Log = time.Now(), tail(string(out), 4000)
@@ -275,18 +338,18 @@ func tail(s string, n int) string {
 }
 
 type attemptMeta struct {
-	Seed   int                       `json:"seed"`
-	Script string                    `json:"script"`
+	Seed   int               `json:"seed"`
+	Script string            `json:"script"`
 	Checks map[string][2]any `json:"checks"`
 }
 
-func (s *server) attemptDir(id int, stamp string) (string, error) {
+func (s *server) attemptDir(climate string, id int, stamp string) (string, error) {
 	if stamp == "" || filepath.Base(stamp) != stamp || stamp == "." || stamp == ".." {
 		return "", fmt.Errorf("invalid attempt %q", stamp)
 	}
-	d := filepath.Join(s.root, "blender", "out", "attempts", strconv.Itoa(id), stamp)
+	d := filepath.Join(s.root, "blender", "out", "attempts", sub(climate), strconv.Itoa(id), stamp)
 	if _, err := os.Stat(filepath.Join(d, "meta.json")); err != nil {
-		return "", fmt.Errorf("sprite %d has no attempt %s", id, stamp)
+		return "", fmt.Errorf("sprite %s %d has no attempt %s", climate, id, stamp)
 	}
 	return d, nil
 }
@@ -328,15 +391,20 @@ func copyFile(src, dst string) error {
 
 func (s *server) handleInstall(w http.ResponseWriter, r *http.Request) {
 	var req struct {
-		ID    int    `json:"id"`
-		Stamp string `json:"stamp"`
-		Force bool   `json:"force"`
+		ID      int    `json:"id"`
+		Climate string `json:"climate"`
+		Stamp   string `json:"stamp"`
+		Force   bool   `json:"force"`
 	}
 	if err := readRequest(r, &req); err != nil {
 		fail(w, http.StatusBadRequest, err)
 		return
 	}
-	dir, err := s.attemptDir(req.ID, req.Stamp)
+	if err := checkClimate(&req.Climate); err != nil {
+		fail(w, http.StatusBadRequest, err)
+		return
+	}
+	dir, err := s.attemptDir(req.Climate, req.ID, req.Stamp)
 	if err != nil {
 		fail(w, http.StatusNotFound, err)
 		return
@@ -351,7 +419,8 @@ func (s *server) handleInstall(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	id := strconv.Itoa(req.ID)
-	for _, c := range s.climatesFor(req.ID) {
+	to := s.targets(req.Climate, req.ID)
+	for _, c := range to {
 		d := filepath.Join(*gameHD, c)
 		if err := os.MkdirAll(d, 0o755); err != nil {
 			fail(w, http.StatusInternalServerError, err)
@@ -374,19 +443,24 @@ func (s *server) handleInstall(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	s.invalidate()
-	writeJSON(w, http.StatusOK, map[string]any{"installed": req.ID, "stamp": req.Stamp, "climates": s.climatesFor(req.ID), "failed_checks": bad})
+	writeJSON(w, http.StatusOK, map[string]any{"installed": req.ID, "stamp": req.Stamp, "climates": to, "failed_checks": bad})
 }
 
 func (s *server) handleUninstall(w http.ResponseWriter, r *http.Request) {
 	var req struct {
-		ID int `json:"id"`
+		ID      int    `json:"id"`
+		Climate string `json:"climate"`
 	}
 	if err := readRequest(r, &req); err != nil {
 		fail(w, http.StatusBadRequest, err)
 		return
 	}
+	if err := checkClimate(&req.Climate); err != nil {
+		fail(w, http.StatusBadRequest, err)
+		return
+	}
 	removed := 0
-	for _, c := range climates {
+	for _, c := range s.targets(req.Climate, req.ID) {
 		for _, name := range []string{strconv.Itoa(req.ID) + ".png", strconv.Itoa(req.ID) + "_top.png"} {
 			if err := os.Remove(filepath.Join(*gameHD, c, name)); err == nil {
 				removed++
