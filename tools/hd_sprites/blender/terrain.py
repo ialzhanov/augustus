@@ -22,6 +22,7 @@ if sys.argv[-2] == '--':   # make.sh gives only the id (sprites with a top part)
 else:
     ID, SRC = int(sys.argv[-2]), sys.argv[-1]
 TERRAIN_CAL = [float(v) for v in os.environ.get('C3_TERRAIN_CAL', '2.756,2.575,2.208').split(',')]   # terrain render vs its original (edge grass, with the tuft density compensation)
+ROCK_SHADE = (0.6, 0.2)   # rock: base colour factor, emission (ambient) factor
 ROCK_CAL = [float(v) for v in os.environ.get('C3_ROCK_CAL', '1,1,1').split(',')]   # x GAIN for rock outcrops
 LEAF_CAL = [float(v) for v in os.environ.get('C3_LEAF_CAL', '1.3,1.28,1.0').split(',')]   # x GAIN: leaf clusters shade each other (edge, 274-286; 1.4 made 274 too light)
 WATER_CAL = [float(v) for v in os.environ.get('C3_WATER_CAL', '0.519,0.540,0.590').split(',')]   # x TERRAIN_CAL: water colour unchanged by the terrain recalibration
@@ -42,11 +43,13 @@ WALLS = {833: (0.2, [(0.147, -0.001, 0.97, 0.22, 90)]),   # fit 0.396 thick (sha
          842: (0.451, [(-0.025, -0.156, 0.814, 0.443, 0), (0.186, -0.019, 0.395, 0.449, 0)]),
          843: (0.204, [(0.231, -0.322, 0.474, 0.336, 0), (0.277, 0.061, 0.394, 0.428, 45)]),
          844: (0.27, [(-0.068, -0.186, 0.677, 0.207, 0), (0.108, -0.323, 0.542, 0.278, 45)])}
-TREE = 254 <= ID <= 261 or 274 <= ID <= 305   # shrubs (cypresses) and trees: crowns of leaf clusters (foliage.py)
+TREE = 254 <= ID <= 261 or 274 <= ID <= 305 or ID in (376, 378, 379, 382, 388, 390, 393, 394, 397, 398, 402, 431)   # shrubs (cypresses) and trees: crowns of leaf clusters (foliage.py)
 OPEN_GROUND = set(range(254, 262)) | {276, 278, 280}   # single trees on grass: no undergrowth (the colour rule takes their
                                                        # shadow for foliage; lit clusters there gave 1.7 x the contrast)
-ROCK = 201 <= ID <= 244 or 534 <= ID <= 547   # rock outcrops (1x1 to 3x3): rough rocks on the crown circles of foliage.py
+ROCK = 201 <= ID <= 244 or 534 <= ID <= 547 or 658 <= ID <= 665 or ID in (734, 743, 752, 761, 770)   # rock outcrops
+# (1x1 to 3x3) and rubble: rough boulders on the crown circles of foliage.py
 GARDEN = 3148 <= ID <= 3154   # gardens: gravel path and curbs flat, hedges and beds as leaf clusters, a cypress crown
+FLAG = 863 <= ID <= 870   # entry/exit signs: a white pole and a red or blue plank, measured from the original's pixels
 MEADOW = 262 <= ID <= 273   # tall dry grass stalks (light yellow vertical runs) on grass, some above the tile
 CRACK = 444 <= ID <= 475   # earthquake chasms: the original's dark pixels sink into the ground (3D walls)
 CRACK_DEPTH = float(os.environ.get('C3_CRACK_DEPTH', '0.15'))   # chasm floor below the ground (units; 35.5 game px = 1)
@@ -119,8 +122,11 @@ def shore_models():
 known = alpha > 0
 if SHORE:   # the ground under the walls and rocks continues the water and grass around them
     known = known & ~shore_models()
+if FLAG:   # the same under the pole and the plank
+    lf = rgb @ np.array([0.299, 0.587, 0.114])
+    known = known & ~(((lf > 0.6) & (rgb.max(-1) - rgb.min(-1) < 0.15)) | (rgb[..., 0] > rgb[..., 1] + 0.15) | (rgb[..., 2] > rgb[..., 0] + 0.15))
 if TREE or ROCK or GARDEN:   # tree tiles: the ground is undergrowth in the original's colours (no fill under the canopy)
-    CANOPY, CROWNS = foliage.crowns(rgb, alpha)
+    CANOPY, CROWNS = foliage.crowns(rgb, alpha, keep_low=ROCK)   # rocks: low ones too (else a flat grey smudge)
     if GARDEN:   # the colour rule measures from the edge (a hedge here): only the parts above the diamond are crowns
         dia_c, _ = foliage.diamond(H, W, grow=1.0)
         CROWNS = [cr for cr in CROWNS if not dia_c[int(cr[1]), int(cr[0])]]
@@ -161,7 +167,7 @@ if TREE or MEADOW or ROCK or GARDEN:   # leaf colours: the original with its can
         nw = ~k & (wk > 0); full[nw] = gr[nw]; k = k | nw
     FOLIAGE = save_image('foliage', np.stack([box_blur(full[..., j], 0 if GARDEN else 1) for j in range(3)], -1), True)   # garden: purple flowers blurred into the hedge green (edge)
 # paved roads: the sharp layout (a blur mixes the light stones into the 1 px green verges)
-LAYOUT = save_image('layout', np.stack([box_blur(fill[..., k], 0 if PAVED else 2) for k in range(3)], -1), True)
+LAYOUT = save_image('layout', np.stack([box_blur(fill[..., k], 0 if PAVED or ROCK else 2) for k in range(3)], -1), True)   # rock: the blur spread rock grey into the grass edge
 # distance from the shore (sprite pixels, up to 4) for depth, foam and the wet band
 def grow(m):
     """one pixel wider; no wrap at the image edge (np.roll put foam into the tile corners)"""
@@ -178,7 +184,7 @@ for k in range(1, 4):
 MASKS = save_image('masks', np.stack([box_blur(water.astype(float)), box_blur(dirt.astype(float), 2),
                                       np.clip(dist_w / 5, 0, 1)], -1), False)
 # blue: local density of the 3D grass tufts (they grow on 'grassy' pixels only, so the density changes across a tile)
-SHORE = save_image('shore', np.stack([((dist_l > 0) & (dist_l <= 2)).astype(float), ((dist_w > 0) & (dist_w <= 1.5)).astype(float),
+SHORE_IMG = save_image('shore', np.stack([((dist_l > 0) & (dist_l <= 2)).astype(float), ((dist_w > 0) & (dist_w <= 1.5)).astype(float),
                                       box_blur(grassy.astype(float), 2)], -1), False)
 # tufts and their shadows make the ground darker by this fraction at full density (tile 306: edge -3.8 L with tufts, +16 L
 # without). The ground is lightened where there are fewer tufts, so a tile is not lighter in its centre (fewer tufts on
@@ -236,7 +242,7 @@ def m_terrain():
     v = c3.coord()
     lay = window_tex(LAYOUT)
     base = c3.mix(lay.outputs['Color'], GAIN, 1.0, 'MULTIPLY')                    # broad colour of the original
-    masks, shore = window_tex(MASKS, 'Linear'), window_tex(SHORE, 'Linear')
+    masks, shore = window_tex(MASKS, 'Linear'), window_tex(SHORE_IMG, 'Linear')
     # land: grass photo varied with the meadow photo, sand/dirt photo where the original is not green
     gcol, gnrm = photo('grass', v, 2.5)
     mcol, mnrm = photo('meadow', v, 1.6)
@@ -692,9 +698,16 @@ def trees():
     gx, gy = world_of(xs + rng.uniform(-0.5, 0.5, len(xs)), ys + rng.uniform(-0.5, 0.5, len(ys)))
     keep = (np.abs(gx) < LIMIT) & (np.abs(gy) < LIMIT)
     hgt = rng.uniform(0, 1, len(xs)) * (0.008 + 0.07 * sc)
+    # the top of a cluster stays inside the original's shape: opaque rows above its pixel (garden hedges at the back
+    # edges stood above the tile outline: spill 1.1-2%)
+    up = np.zeros((H, W)); run = np.zeros(W)
+    for yy in range(H):
+        run = np.where(alpha[yy] > 0, run + 1, 0); up[yy] = run
+    hgt = np.minimum(hgt, np.maximum(up[ys, xs] - 1.5, 0) / 35.5)
     if cs:   # a garden without a part above the diamond has no crowns
         instances('leaves', np.concatenate(cs), np.concatenate(ss), leaves, rng)
     keep &= ID not in OPEN_GROUND
+    keep &= ~water[np.clip(ys, 0, H - 1), np.clip(xs, 0, W - 1)]   # no undergrowth on the water of shore tiles
     if keep.any():   # lighter only where dense (LEAF_CAL on single clusters on open grass: ground contrast 1.65 x on 254)
         instances('undergrowth', np.stack([gx, gy, hgt], 1)[keep], rng.uniform(0.009, 0.018, len(xs))[keep] * (0.7 + 0.5 * sc[keep]),
                   material('undergrowth', m_leaves(spread=0.6, cal=(1, 1, 1))), rng, boost=1 + (0.15 if GARDEN else 0.4) * sc[keep])
@@ -740,8 +753,11 @@ def m_rock():
         bw = N.nodes.new('ShaderNodeRGBToBW'); c3.link(img('Color', True), bw.inputs['Color'])
         det = c3.node('ShaderNodeMath'); det.operation = 'DIVIDE'; c3.link(bw.outputs['Val'], det.inputs[0]); det.inputs[1].default_value = 0.162
         col = c3.mix(c3.mix(lay.outputs['Color'], tuple(GAIN[i] * ROCK_CAL[i] for i in range(3)), 1.0, 'MULTIPLY'), det.outputs['Value'], 1.0, 'MULTIPLY')
-        nm = N.nodes.new('ShaderNodeNormalMap'); nm.inputs['Strength'].default_value = 1.0; c3.link(img('NormalGL', False), nm.inputs['Color'])
-        return col, nm.outputs['Normal'], 0.85
+        nm = N.nodes.new('ShaderNodeNormalMap'); nm.inputs['Strength'].default_value = 1.6; c3.link(img('NormalGL', False), nm.inputs['Color'])
+        # softer shading than the light gives: sunlit tops were 1.2 x, shaded sides 0.85 x the painted rock (rim)
+        bsdf = N.nodes['Principled BSDF']; c3.link(col, bsdf.inputs['Emission Color'])
+        bsdf.inputs['Emission Strength'].default_value = ROCK_SHADE[1]
+        return c3.mix(col, (ROCK_SHADE[0],) * 3, 1.0, 'MULTIPLY'), nm.outputs['Normal'], 0.85
     return f
 
 
@@ -749,19 +765,20 @@ BOULDER = None
 
 
 def boulder(loc, scale, mat):
-    """an angular boulder without bpy.ops (each op updates the whole scene: 400 boulders took > 30 min): one shared
-    coarse icosphere, turned at random on all axes, displaced by Voronoi cells, flat shaded: broken rock faces
-    (a subdivided smooth one made a soft lumpy mound)"""
+    """a rough boulder without bpy.ops (each op updates the whole scene: 400 boulders took > 30 min): one shared
+    icosphere, subdivided, displaced like c3.rock, a turn about z and a small tilt (a full turn on all axes pointed the
+    flat axis anywhere: taller boulders on the grass edge). Flat shading and the photo normal map give broken faces."""
     global BOULDER
     if BOULDER is None:
         import bmesh
         bm = bmesh.new(); bmesh.ops.create_icosphere(bm, subdivisions=3, radius=1.0)
-        BOULDER = bpy.data.meshes.new('boulder'); bm.to_mesh(BOULDER); bm.free()
+        BOULDER = bpy.data.meshes.new('boulder'); bm.to_mesh(BOULDER); bm.free()   # flat shaded (use_smooth False)
         BOULDER.materials.append(mat)
     o = bpy.data.objects.new('boulder', BOULDER); c3.sc.collection.objects.link(o)
     o.location, o.scale = loc, scale
-    o.rotation_euler = (random.uniform(0, 6.3), random.uniform(0, 6.3), random.uniform(0, 6.3))
-    for tex, strength in ((c3.CLOUDS, 0.25), (c3.CRACKLE, 0.25)):
+    o.rotation_euler = (random.uniform(-0.2, 0.2), random.uniform(-0.2, 0.2), random.uniform(0, math.pi))
+    o.modifiers.new('sub', 'SUBSURF').levels = 2 if len(CROWNS) < 40 else 1
+    for tex, strength in ((c3.CLOUDS, 0.35), (c3.CRACKLE, 0.18)):
         d = o.modifiers.new('d', 'DISPLACE'); d.texture = tex; d.strength = strength
     return o
 
@@ -782,6 +799,51 @@ def rocks():
     print(f'rock {ID}: {len(CROWNS)} rocks')
 
 
+def flag():
+    """pole: the white pixels (base = lowest row, top = highest). Plank: the main axis of the red or blue pixels gives
+    its ends; they are at the plank's centre height on the pole, so each end pixel converts to a world point"""
+    c3.GROUND.update(bpy.data.objects.keys())
+    r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
+    L = rgb @ np.array([0.299, 0.587, 0.114])
+    pole = (alpha > 0) & (L > 0.6) & (rgb.max(-1) - rgb.min(-1) < 0.15)
+    sign = (alpha > 0) & ((r > g + 0.15) | (b > r + 0.15)) & ~pole
+    py, px = np.nonzero(pole)
+    base_y = py.max() + 1; base_x = np.median(px) + 0.5; top_y = py.min() + 1.5   # the pole column: all white pixels
+                                                                                # (the lowest rows also had light ground)
+    gx, gy = world_of(base_x, base_y - 0.5)
+    height = (base_y - top_y) / 35.5
+    white = c3.material('pole', lambda: (tuple(lin(rgb[pole].mean(0)) * np.array(c3.GAIN) * 0.8), None, 0.5))   # a fixed colour
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.035, depth=height, location=(gx, gy, height / 2))   # 3 px wide
+    bpy.context.object.data.materials.append(white)
+    sy, sx = np.nonzero(sign); pts = np.stack([sx + 0.5, sy + 0.5], 1); centre = pts.mean(0)
+    axis = np.linalg.svd(pts - centre)[2][0]; t = (pts - centre) @ axis; wide = (pts - centre) @ np.array([-axis[1], axis[0]])
+    zc = (base_y - centre[1] - 2) / 35.5                       # the plank crosses the pole at its centre (- 2 px: clip)
+    ends = [world_of(*(centre + axis * tk + [0, 35.5 * zc])) for tk in (t.min(), t.max())]
+    (x1, y1), (x2, y2) = ends
+    length = math.hypot(x2 - x1, y2 - y1); thick = (wide.max() - wide.min() + 1) / 35.5   # + 1: the shaded edge pixels (+ 3: clip at the top)
+    plank = c3.material('plank', c3.m_photo('Plaster007', scale=6.0, normal=0.5,
+                                            tint=tuple(1.5 * lin(rgb[sign].mean(0)) * np.array(c3.GAIN) / 0.5)))   # painted board; 1.5: its side faces the shade
+    # an arrow: the tip at the narrower end of the sign pixels (a square end stood 12 px wide in the top row: clip)
+    narrow = [np.ptp(wide[np.abs(t - te) < 3]) if (np.abs(t - te) < 3).sum() > 1 else 0 for te in (t.min(), t.max())]
+    tip = 1 if narrow[1] <= narrow[0] else -1                 # +1: the tip at end 2
+    a, hh, dd = length / 2, thick / 2, 0.025
+    prof = [(-a, -hh), (a - thick, -hh), (a, 0), (a - thick, hh), (-a, hh)]   # x along the plank, z up
+    import bmesh
+    bm = bmesh.new()
+    front = [bm.verts.new((tip * x, -dd, z)) for x, z in prof]; back = [bm.verts.new((tip * x, dd, z)) for x, z in prof]
+    bm.faces.new(front[::-1] if tip > 0 else front); bm.faces.new(back if tip > 0 else back[::-1])
+    for k in range(5):
+        q = [front[k], front[(k + 1) % 5], back[(k + 1) % 5], back[k]]
+        bm.faces.new(q if tip > 0 else q[::-1])
+    me = bpy.data.meshes.new('plank'); bm.to_mesh(me); bm.free(); me.materials.append(plank)
+    o = bpy.data.objects.new('plank', me); c3.sc.collection.objects.link(o)
+    o.location = ((x1 + x2) / 2, (y1 + y2) / 2, zc); o.rotation_euler.z = math.atan2(y2 - y1, x2 - x1)
+    bv = o.modifiers.new('bv', 'BEVEL'); bv.width = 0.008; bv.segments = 2
+    print(f'flag {ID}: pole {height:.2f} high, plank {length:.2f} x {thick:.2f} at {zc:.2f}')
+
+
+if FLAG:
+    flag()
 if SHORE:
     shore()
 if TREE or GARDEN:
@@ -790,7 +852,7 @@ if ROCK:
     rocks()
 if MEADOW:
     meadow()
-c3.render(W, H, tiles=NT, samples=64, edge_fade=ID in WALLS)   # rocks: short shadows (edge_fade lit the edge band: rim)
+c3.render(W, H, tiles=NT, samples=64, edge_fade=ID in WALLS or ROCK)   # shore rocks: short shadows (edge_fade lit the edge band: rim); rock outcrops: long shadows on the edge grass
 
 
 def verge_lock():
