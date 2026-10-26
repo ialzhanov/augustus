@@ -92,12 +92,7 @@ select { background: var(--tufa); border: 1px solid var(--line); border-radius: 
 .thumb { position: relative; height: calc(var(--thumb) * .68); background: var(--ground); }
 .thumb img { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
 .thumb img.px { image-rendering: pixelated; }
-.thumb .b { visibility: hidden; }
-.card:hover .thumb .a.swap { visibility: hidden; }
-.card:hover .thumb .b { visibility: visible; }
 .thumb .split { clip-path: inset(0 0 0 50%); }
-.thumb .hint { position: absolute; right: 5px; bottom: 4px; font-size: 11px; color: #fffc; background: #0008; border-radius: 4px; padding: 0 5px; visibility: hidden; }
-.card:hover .hint { visibility: visible; }
 .foot { display: flex; align-items: center; gap: 6px; padding: 5px 8px; font-size: 13px; }
 .foot .id { color: var(--dim); }
 .foot .cl { width: 8px; height: 8px; border-radius: 50%; }
@@ -393,7 +388,7 @@ function renderToolbar() {
   $('toolbar').innerHTML = `<div class="count num">${current.length.toLocaleString()} <span>of ${D.sprites.length.toLocaleString()} sprites</span></div>
     ${sum}${tags.join('')}${tags.length > 1 ? '<button class="clear" id="clearall">Clear all</button>' : ''}
     <div class="tools">
-      ${seg('show', [['new', 'New', 'show the new version; hover shows the original'], ['orig', 'Original', 'show the original; hover shows the new version'], ['split', 'Split', 'left half original, right half new']])}
+      ${seg('show', [['new', 'New', 'show the installed 8x render; the original if nothing passing is installed'], ['orig', 'Original', 'show the original'], ['split', 'Split', 'left half original, right half installed render']])}
       ${seg('size', [['s', 'S'], ['m', 'M'], ['l', 'L']])}
       <select id="bg" aria-label="Thumbnail background">${[['dark', 'Dark ground'], ['grass', 'Grass'], ['sand', 'Sand'], ['check', 'Checker']].map(([v, l]) => `<option value="${v}" ${st.bg === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
       <select id="sort" aria-label="Sort">${[['id', 'Sort by id'], ['recent', 'Recently rendered'], ['status', 'Sort by status']].map(([v, l]) => `<option value="${v}" ${st.sort === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
@@ -439,13 +434,15 @@ function img(src, w, h, cls, style = '') {
   return `<img class="${cls}" src="${esc(src)}" width="${w}" height="${h}" style="width:${w}px;height:${h}px;${style}" alt="" decoding="async">`;
 }
 function card(s) {
-  const [w, h, z] = fit(s), o = origSrc(s), n = s.hd ? `${s.hd}?${s.rendered}` : null;
+  // the card shows what is installed: the 8x render of the installed attempt, else the original
+  const [w, h, z] = fit(s), o = origSrc(s);
+  const inst = s.status === 'installed' && (s.attempts || []).find(a => a.stamp === s.installed_attempt);
+  const n = s.status !== 'installed' ? null : inst ? attFile(s, inst, '_8') : s.hd8 ? `${s.hd8}?${s.rendered}` : null;
   const O = cls => img(o, w, h, 'px ' + cls), N = cls => img(n, w, h, cls, footClip(s, z));
   let t;
-  if (!n) t = O('a');
-  else if (st.show === 'orig') t = O('a swap') + N('b') + '<span class="hint">new</span>';
+  if (!n || st.show === 'orig') t = O('a');
   else if (st.show === 'split') t = O('a') + N('a split');
-  else t = N('a swap') + O('b') + '<span class="hint">original</span>';
+  else t = N('a');
   const fails = s.fails.length ? `<div class="fails">${s.fails.join(' · ')}</div>` : '';
   return `<div class="card" tabindex="0" data-k="${s.key}" aria-label="sprite ${s.id}, ${CLIMATE[s.cl]}, ${STATUS[s.status]}">
     <div class="thumb">${t}</div>
