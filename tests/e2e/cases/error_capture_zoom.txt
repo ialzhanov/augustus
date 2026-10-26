@@ -1,4 +1,5 @@
 # expect: error
+# expect-log: the zoom 20 is outside the range 50 to
 # A zoom outside the valid range is an error.
 load flat_grass.svx
 capture x camera 40 40 zoom 20

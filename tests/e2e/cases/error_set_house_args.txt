@@ -1,4 +1,5 @@
 # expect: error
+# expect-log: set house needs
 # "set house" with missing words is an error.
 load small_city.svx
 set house

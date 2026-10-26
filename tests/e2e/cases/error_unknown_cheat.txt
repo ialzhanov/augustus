@@ -1,4 +1,5 @@
 # expect: error
+# expect-log: cheat needs
 # An unknown cheat word is an error. The game itself ignores it.
 load small_city.svx
 cheat addmony 1000

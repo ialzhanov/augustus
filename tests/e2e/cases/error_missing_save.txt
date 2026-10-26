@@ -1,3 +1,5 @@
 # expect: error
+# expect-log: cannot load the savegame
+# expect-log: saves/no_such.svx
 # A load of a savegame that does not exist stops the test with exit code 2 and the path.
 load no_such.svx

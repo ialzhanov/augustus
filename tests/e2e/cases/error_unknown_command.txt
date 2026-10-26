@@ -1,3 +1,4 @@
 # expect: error
+# expect-log: ERROR line 4: unknown command 'frobnicate'
 # An unknown command stops the test with exit code 2 and the line number.
 frobnicate 1
