@@ -5,7 +5,7 @@
 # ~/caesar3/hd/<climate>/ (each climate has its own terrain originals); a failing one leaves the game as it is.
 # Tiles whose original has a part above the diamond (trees on shores) are skipped: terrain.py renders flat ground.
 cd "$(dirname "$0")"
-B=/Applications/Blender.app/Contents/MacOS/Blender; P=~/.local/share/uv/tools/mflux/bin/python
+B=${BLENDER:-/Applications/Blender.app/Contents/MacOS/Blender}; P=~/.local/share/uv/tools/mflux/bin/python
 $P test_check.py >/dev/null || { echo "check.py regression tests failed: fix check.py first"; exit 1; }
 INSTALL=0; [ "$1" = install ] && { INSTALL=1; shift; }
 export C3_CLIMATE=${C3_CLIMATE:-c3}
@@ -16,7 +16,9 @@ for ID in "$@"; do
   H=$($P -c "from PIL import Image; print(Image.open('$ORIG').height)")
   if [ "$H" != 30 ]; then echo "skip $ID (height $H: has a part above the tile)"; skip=$((skip+1)); continue; fi
   export C3_SEED=${SEED0:-$ID}
+  rm -f $O/${ID}_8.png $O/${ID}.png   # a failed render must not leave an old image to check
   $B -b -P terrain.py -- $PWD/$O/${ID}_8.png 8 -- $ID $ORIG 2>&1 | grep -E "rror:" || true
+  if [ ! -f $O/${ID}_8.png ]; then echo "FAIL $C3_CLIMATE $ID: render failed, no attempt saved"; fail=$((fail+1)); continue; fi
   $P -c "from PIL import Image; im=Image.open('$O/${ID}_8.png'); im.resize((im.width//4, im.height//4), Image.LANCZOS).save('$O/${ID}.png')"
   $P post.py $O/${ID}.png
   $P cmp.py $O/${ID}_8.png $ORIG $O/${ID}_cmp.png

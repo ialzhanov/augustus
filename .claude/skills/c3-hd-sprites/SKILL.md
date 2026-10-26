@@ -83,10 +83,14 @@ Add a test to `test_check.py` for every new fault class, then a check. Never loo
 - Masks and colour layouts must extend past the tile edge (fill transparent corners), else the edge gets a rim.
 - Light is calibrated (`c3.LIGHT`, `c3.GAIN`, `GRASS_CAL`, terrain/water CAL). After changing light, run `blender/calibrate.sh` and recalibrate terrain.
 - One sprite group shares one script with a `VARIANTS` dict (see `tent.py`).
+- Ground around a building: take the yard (non-green pixels) and its light colours from the original (`tent.py` yard mask), so `structure` matches. Keep the yard mask 0 from tile distance 0.8, and do not put a transparent plane over the edge grass: a fully transparent plane still made the edge grass darker (`edge` failed).
+- Tall buildings cast shadows over the tile edge, where the engine cuts them. Use `c3.render(..., edge_fade=True)`: shadows fade out toward the front edges.
+- Do not edit a `.sh` script while a batch runs it: bash reads the file during the run.
 
 ## Parallel work
 
 - Split by sprite group (one agent = one group/script). Shared files (`c3.py`, `check.py`) change only with tests (`test_check.py`) and a note to the others.
-- GPU: run at most 2 Blender renders at a time on this Mac (M3 Pro, 18 GB).
+- GPU: terrain renders run well as 4-6 shards at the same time (CPU-bound, about 4 tiles a minute with 4 shards). Building renders need more GPU memory: 9 renders at the same time gave `Command buffer not completed. status = 5`. 3 terrain shards and 4 tent jobs at the same time also failed (14 of 20 tent jobs). 3 tent jobs alone also failed sometimes. Keep at most 2 Blender renders in total when building sprites are among them (server default `-workers 2`); terrain alone can run 4-6 shards, and check free memory (`top -l 1 | grep PhysMem`).
+- A failed render saves no attempt (`make.sh`, `terrain_make.sh`; test: `blender/test_make.sh`).
 - Walkers (4,802 animation frames) and interface (2,305) need a separate decision (rigged characters / AI upscale / keep) before work starts.
 - Report progress through the viewer (`build_viewer.py` runs after each build).

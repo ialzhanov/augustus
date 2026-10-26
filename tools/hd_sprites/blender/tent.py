@@ -5,6 +5,7 @@ Ridge tents of patched canvas on lashed poles, with amphorae, sacks, baskets, bl
 Layout follows the original sprites: x_s = 29 + 29 (x + y), y_s = (H - 15) + 15 (x - y) - 35.5 z.
 """
 import math, os, random, sys
+import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import bmesh, bpy
 from mathutils import Matrix, Vector
@@ -19,16 +20,16 @@ H_PX = {2779: 30, 2780: 30, 2781: 33, 2782: 34}[ID]
 # base in the original sprite (measured at 12x zoom), converted with the camera formula by px().
 FAB2780 = (72, 42, 30)   # dark maroon-brown slope (the sampled boxes mix in poles and grass)
 VARIANTS = {
-    2779: dict(rot=0, L=0.42, W=0.32, H=0.22, fabric=(100, 89, 69), patch=(159, 107, 68),
+    2779: dict(rot=0, L=0.42, W=0.32, H=0.22, fabric=(74, 74, 62), patch=(159, 107, 68), patch_area=(-0.06, 0.12, 0.12),
                pots=[(40, 12), (46, 14)], sacks=[(12, 16), (16, 20), (24, 22), (30, 23)],
                blankets=[(18, 14, 0.3)], baskets=[(36, 22)], fire=None, stools=[]),
     2780: dict(rot=-90, L=0.30, W=0.28, H=0.26, fabric=FAB2780,
                patch=None, pots=[(18, 13), (48, 13)], sacks=[(9, 15), (13, 17)],
                blankets=[(20, 19, 1.2)], baskets=[(26, 24)], fire=(40, 22), stools=[]),
-    2781: dict(rot=-90, L=0.40, W=0.36, H=0.31, fabric=(121, 111, 63), front=(60, 40, 26),
+    2781: dict(rot=-90, L=0.40, W=0.36, H=0.31, fabric=(140, 128, 72), front=(78, 54, 34),
                pots=[(12, 17), (38, 17), (39, 23)], post_pot=(12, 17), sacks=[(49, 18), (22, 25)],
                blankets=[(28, 26, 0.2)], baskets=[(17, 22)], fire=None, stools=[]),
-    2782: dict(rot=0, L=0.42, W=0.36, H=0.37, fabric=(112, 112, 66), patch=(141, 96, 66), patch_size=(0.7, 0.6),
+    2782: dict(rot=0, L=0.42, W=0.36, H=0.37, fabric=(112, 112, 66), patch=(141, 96, 66), patch_area=(0.0, 0.2, 0.17),
                pots=[(15, 22), (18, 21), (47, 17)], sacks=[(26, 27), (33, 28)],
                blankets=[(38, 25, 0.6)], baskets=[(22, 25)], fire=None, stools=[]),
 }
@@ -43,6 +44,68 @@ def px(x_s, y_s):
 
 c3.setup(seed=ID)
 M = c3.M
+HERE = os.path.dirname(os.path.abspath(__file__))
+
+
+# ---------- yard from the original: where it is not green, a sand/straw yard; its light colours give the yard colour ----------
+def box_blur(m, n=1):
+    for _ in range(n):
+        p = np.pad(m, 1, mode='edge')
+        m = (p[1:-1, 1:-1] + p[:-2, 1:-1] + p[2:, 1:-1] + p[1:-1, :-2] + p[1:-1, 2:]) / 5
+    return m
+
+
+def save_image(name, arr, colour):
+    """H x W x 3 array (0..1) -> PNG in out/ -> loaded image (Cycles does not see pixels edited in memory)"""
+    h, w = arr.shape[:2]
+    im = bpy.data.images.new(name, w, h, alpha=False)
+    p = np.ones((h, w, 4)); p[..., :3] = arr
+    im.pixels.foreach_set(p[::-1].astype(np.float32).ravel())
+    path = os.path.join(HERE, 'out', f'{name}_{ID}.png')
+    im.filepath_raw = path; im.file_format = 'PNG'; im.save()
+    loaded = bpy.data.images.load(path); loaded.colorspace_settings.name = 'sRGB' if colour else 'Non-Color'
+    return loaded
+
+
+_o = bpy.data.images.load(os.path.join(HERE, '..', 'originals', f'{ID}.png'))
+_px = np.array(_o.pixels[:]).reshape(_o.size[1], _o.size[0], 4)[::-1]      # top row first, sRGB
+_rgb, _a = _px[..., :3], _px[..., 3]
+_r, _g, _b = _rgb[..., 0], _rgb[..., 1], _rgb[..., 2]
+YARD_PX = (_a > 0) & ~((_g > _r + 0.02) & (_g > _b + 0.08))                # not grass
+# yard colour: light yard pixels grown into the rest (no dark tent/prop colour bleeds onto the ground), then blurred
+fill = _rgb * 1.0; known = YARD_PX & (_rgb.mean(-1) >= 0.4)
+if not known.any():
+    known = YARD_PX.copy()
+for _ in range(60):
+    if known.all(): break
+    w = box_blur(known.astype(float))
+    grown = np.stack([box_blur(fill[..., k] * known) for k in range(3)], -1) / np.maximum(w, 1e-6)[..., None]
+    new = ~known & (w > 0); fill[new] = grown[new]; known = known | new
+YARD_COL = save_image('yardcol', np.stack([box_blur(fill[..., k], 2) for k in range(3)], -1), True)
+_yy, _xx = np.mgrid[0:_a.shape[0], 0:_a.shape[1]]
+_dist = np.abs((_xx + 0.5 - 29) / 29.0) + np.abs((_yy + 0.5 - (H_PX - 15)) / 15.0)    # 0 = tile centre, 1 = tile edge
+_mask = np.clip(box_blur(YARD_PX.astype(float), 1) * 2.0 - 0.6, 0, 1) * np.clip((0.8 - _dist) / 0.1, 0, 1)   # grass at the tile edge
+YARD_MASK = save_image('yardmask', np.repeat(_mask[..., None], 3, -1), False)
+SAND_MEAN = (0.331, 0.257, 0.155)                                          # Ground054, linear mean colour
+
+
+def m_yard():
+    """sand photo (Ground054) coloured by the original's yard colour, faded out where the original is grass"""
+    N = c3.N
+    def window(image):
+        t = N.nodes.new('ShaderNodeTexImage'); t.image = image; t.interpolation = 'Cubic'; t.extension = 'EXTEND'
+        tc = N.nodes.new('ShaderNodeTexCoord'); c3.link(tc.outputs['Window'], t.inputs['Vector']); return t
+    col, nrm, rough = c3.m_photo('Ground054', scale=3.0, tint=tuple(c3.GAIN[i] / SAND_MEAN[i] for i in range(3)), normal=1.0)()
+    col = c3.mix(col, window(YARD_COL).outputs['Color'], 1.0, 'MULTIPLY')
+    bsdf = N.nodes['Principled BSDF']
+    c3.link(window(YARD_MASK).outputs['Color'], bsdf.inputs['Alpha'])
+    return col, nrm, rough
+
+
+def yard_at(x, y):
+    """world (x, y) on the ground -> is the original a yard there"""
+    xs, ys = int(29 + 29 * (x + y)), int((H_PX - 15) + 15 * (x - y))
+    return 0 <= ys < _mask.shape[0] and 0 <= xs < _mask.shape[1] and _mask[ys, xs] > 0.5   # the drawn yard, not single brown pixels
 
 
 def m_canvas(c1, c2):
@@ -78,17 +141,38 @@ def canvas_layers(col, v):
     return c3.mix(c3.mix(c3.mix(col, seam, 1.0, 'MULTIPLY'), hz, 1.0, 'MULTIPLY'), stain, 1.0, 'MULTIPLY')
 
 
-def canvas(srgb):
-    """photo canvas (Fabric061, neutral grey ~0.25 linear) tinted so it renders as the original's sRGB colour"""
-    lin = [((c / 255 + 0.055) / 1.055) ** 2.4 if c / 255 > 0.04045 else c / 255 / 12.92 for c in srgb]
+def to_lin(srgb):
+    return [((c / 255 + 0.055) / 1.055) ** 2.4 if c / 255 > 0.04045 else c / 255 / 12.92 for c in srgb]
+
+
+def canvas(srgb, lower=None):
+    """photo canvas (Fabric061, neutral grey ~0.25 linear) tinted so it renders as the original's sRGB colour;
+    lower: sRGB colour of the lower part of the walls (2781: dark brown walls under an olive roof)"""
+    lin = to_lin(srgb)
+
+    def extra(col, v):
+        col = canvas_layers(col, v)
+        sep = c3.N.nodes.new('ShaderNodeSeparateXYZ'); c3.link(v, sep.inputs['Vector'])
+        if lower:
+            ratio = tuple(a / b for a, b in zip(to_lin(lower), lin))
+            band = c3.ramp(sep.outputs['Z'], (0.0, ratio), (V['H'] * 0.45, ratio), (V['H'] * 0.55, (1, 1, 1)))
+            col = c3.mix(col, band, 1.0, 'MULTIPLY')
+        if V.get('patch'):           # sewn-on patch: a canvas area of another colour, x0 +- xh along the tent, above z0
+            x0, xh, z0 = V['patch_area']
+            ratio = tuple(a / b for a, b in zip(to_lin(V['patch']), lin))
+            dx = c3.node('ShaderNodeMath'); dx.operation = 'SUBTRACT'; c3.link(sep.outputs['X'], dx.inputs[0]); dx.inputs[1].default_value = x0
+            ax = c3.node('ShaderNodeMath'); ax.operation = 'ABSOLUTE'; c3.link(dx.outputs['Value'], ax.inputs[0])
+            inx = c3.ramp(ax.outputs['Value'], (xh - 0.01, (1, 1, 1)), (xh, (0, 0, 0)))
+            inz = c3.ramp(sep.outputs['Z'], (z0, (0, 0, 0)), (z0 + 0.01, (1, 1, 1)))
+            fac = c3.mix(inx, inz, 1.0, 'MULTIPLY')
+            col = c3.mix(col, c3.mix(col, ratio, 1.0, 'MULTIPLY'), fac)
+        return col
     # x 0.7: tent slopes face the sun more than flat ground (GAIN is calibrated on flat ground)
     return c3.m_photo('Fabric061', scale=7.0, tint=tuple(0.7 * lin[i] * c3.GAIN[i] / 0.25 for i in range(3)), normal=0.8,
-                      extra=canvas_layers)
+                      extra=extra)
 
 
-M['canvas'] = c3.material('canvas', canvas(V['fabric']))
-if V.get('patch'):
-    M['patch'] = c3.material('patch', canvas(V['patch']))
+M['canvas'] = c3.material('canvas', canvas(V['fabric'], V.get('lower')))
 if V.get('front'):
     M['front'] = c3.material('front', canvas(V['front']))
 M['dirt'] = c3.material('dirt_photo', c3.m_photo('Ground108', scale=3.0, tint=(1.15, 1.1, 1.05), normal=1.0))
@@ -138,10 +222,9 @@ def rod(a, b, r, mat, verts=8):
 # ---------- ground: trodden dirt around the tent and a path to the entrance ----------
 with c3.ground():
     c3.box('ground', (0, 0, -0.001), (1.12, 1.12, 0.002), 'grass')   # larger than the tile: the engine cuts the exact shape
-    bpy.ops.mesh.primitive_circle_add(vertices=48, radius=0.38, fill_type='NGON', location=(0, 0, 0.001))
-    d = bpy.context.object; d.scale = (1.0, 0.82, 1); d.rotation_euler.z = math.radians(V['rot'])
-    d.data.materials.append(M['dirt'])
-    c3.box('path', tuple(world((0.33, 0, 0.0012))), (0.26, 0.12, 0.002), 'dirt', rot=math.radians(V['rot']))
+    M['yard'] = c3.material('yard', m_yard)
+    if not os.environ.get('C3_NOYARD'):
+        c3.box('yard', (0, 0, 0.0005), (0.8, 0.8, 0.001), 'yard')   # mask is 0 past 0.4: no transparent plane over the edge grass
     for _ in range(14):
         a, r = random.uniform(0, 6.3), random.uniform(0.25, 0.40)
         c3.rock((r * math.cos(a), r * math.sin(a), 0.004), random.uniform(0.007, 0.015))
@@ -151,10 +234,6 @@ with c3.ground():
 L, W, H = V['L'], V['W'], V['H']
 sheet = c3.link_obj('canvas', canvas_mesh(L, W, H), 'canvas'); sheet.matrix_world = ROT
 sheet.modifiers.new('sol', 'SOLIDIFY').thickness = 0.004
-if V.get('patch'):                                       # patched panel on the back slope
-    ps = V.get('patch_size', (0.45, 0.5))
-    p = c3.link_obj('patch', canvas_mesh(L * ps[0], W * ps[1], H * ps[1], sag=0.0, nu=10, nv=8), 'patch')
-    p.matrix_world = ROT @ Matrix.Translation((-L * 0.1, W * 0.22, H * 0.4)) @ Matrix.Rotation(0.65, 4, 'X')
 end_mat = 'front' if V.get('front') else 'canvas'
 tri('back', [world((-L / 2, -W / 2, 0)), world((-L / 2, W / 2, 0)), world((-L / 2, 0, H))], end_mat)
 tri('inside', [world((L / 2 - 0.03, -W / 2 * 0.8, 0)), world((L / 2 - 0.03, W / 2 * 0.8, 0)), world((L / 2 - 0.03, 0, H * 0.85))], 'dark')
@@ -199,8 +278,8 @@ if V['fire']:
 
 
 def open_ground(x, y):
-    return x * x + (y * 1.22) ** 2 > 0.38 ** 2
+    return not yard_at(x, y)
 
 
 c3.grass(1800, open_ground)
-c3.render(58, H_PX)
+c3.render(58, H_PX, edge_fade=True)
