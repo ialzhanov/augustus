@@ -18,7 +18,7 @@ Remake an original Caesar III sprite as an HD (2x) image that the patched August
 | Decoder (paths below: relative to `tools/hd_sprites/`) | `sg.py` — `SG(~/caesar3, 'C3').decode(id)`, `.groups[g]` = first id of group g |
 | Blender library | `blender/c3.py` — scene, camera, light, materials, props, grass, render, top pass |
 | Sprite scripts | `blender/tent.py`, `blender/casa.py` (old standalone), `blender/terrain.py` |
-| Build one sprite | `[C3_CLIMATE=c3_north] blender/make.sh SCRIPT ID [install]` — 8x render (+top), 2x file, sharpen, checks, viewer. A sprite script reads `C3_CLIMATE` to remake a north or south image |
+| Build one sprite | `[C3_CLIMATE=c3_north] blender/make.sh SCRIPT ID [install]` — 8x render (+top), 2x file, sharpen, checks, viewer. `C3_CLIMATE` selects the original, the output and attempt folders. The sprite scripts (`c3.py` grass, `tent.py`) and the `edge` check (central grass reference) do not use the climate yet, so a north or south build fails its checks |
 | Build terrain | `blender/terrain_make.sh [install] ID...` (`C3_CLIMATE=c3_north` or `c3_south` for the other climates) |
 | Checks | `blender/check.py ORIG HD HAS_TOP [TOP]`; regression tests `blender/test_check.py` (run first by both build scripts) |
 | Originals (PNG) | `originals/<id>.png` (central, 8,699) and `originals/c3_north/`, `originals/c3_south/` (722 and 746 images that differ from the central ones, list in `originals/climates.json`); gitignored, made by `export_originals.py` |

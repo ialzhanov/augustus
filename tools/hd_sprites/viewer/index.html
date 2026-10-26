@@ -505,10 +505,10 @@ function openDetail(key, keepSel) {
   const actions = LIVE ? `<div class="actions">
       ${a ? `<button class="btn primary" id="inst" ${a.stamp === s.installed_attempt ? 'disabled' : ''}>${a.stamp === s.installed_attempt ? 'Installed' : 'Install this attempt'}</button>
              ${a.ok ? '' : '<label class="note"><input type="checkbox" id="force"> Install although checks fail</label>'}` : ''}
-      ${s.script ? `<button class="btn" id="gen" ${busy ? 'disabled' : ''}>${busy ? (busy.status === 'running' ? 'Rendering…' : 'Queued…') : 'Generate new attempt'}</button>
+      ${s.script && s.cl === 'c3' ? `<button class="btn" id="gen" ${busy ? 'disabled' : ''}>${busy ? (busy.status === 'running' ? 'Rendering…' : 'Queued…') : 'Generate new attempt'}</button>
                     ${a ? `<button class="btn" id="regen" ${busy ? 'disabled' : ''}>Render seed ${a.seed} again</button>` : ''}` : ''}
       ${s.installed ? '<button class="btn" id="uninst">Uninstall</button>' : ''}
-      <span class="note">${s.status === 'stale' ? 'The game has a file that no attempt of this climate made (for example a central render). ' : ''}${a || s.installed ? `Install and uninstall change: ${to}.` : ''}${s.script ? '' : ' No build script for this sprite (blender/scripts.json).'}</span>
+      <span class="note">${s.status === 'stale' ? 'The game has a file that no attempt of this climate made (for example a central render). ' : ''}${a || s.installed ? `Install and uninstall change: ${to}.` : ''}${!s.script ? ' No build script for this sprite (blender/scripts.json).' : s.cl !== 'c3' ? ' Generate works only for the central climate: the sprite scripts and checks do not use the climate yet.' : ''}</span>
     </div>` : `<div class="note">Read-only. Start <code>viewer/server</code> to install and generate.</div>`;
   const attHTML = atts.length ? `<div class="sec"><h3>Attempts<span>${atts.length} · select one to compare</span></h3><div class="atts">${atts.map(x => `
       <button class="att ${x.stamp === sel ? 'on' : ''}" data-stamp="${x.stamp}" title="seed ${x.seed}${x.fails.length ? ' · fails: ' + x.fails.join(', ') : ''}">

@@ -20,7 +20,7 @@ The `c3-hd-sprites` skill (`.claude/skills/c3-hd-sprites/SKILL.md`) describes th
 | `blender/c3.py` | Shared Blender scene: camera, calibrated light, materials, props, grass, render, top pass |
 | `blender/tent.py`, `blender/terrain.py` | Sprite scripts (tents 2779-2782; grass, water and shore tiles) |
 | `blender/casa.py` | Older standalone casa script (from before `c3.py`; its camera scale is about 3% small) |
-| `blender/make.sh SCRIPT ID [install]` | Renders one sprite at 8x, makes the 2x file, checks it, installs it when all checks pass (`C3_CLIMATE=c3_north` for a north image) |
+| `blender/make.sh SCRIPT ID [install]` | Renders one sprite at 8x, makes the 2x file, checks it, installs it when all checks pass (`C3_CLIMATE=c3_north` selects the north original and folders) |
 | `blender/terrain_make.sh [install] ID...` | The same for terrain tiles (`C3_CLIMATE` selects the climate) |
 | `blender/check.py`, `blender/test_check.py` | Checks for an HD sprite, and their regression tests |
 | `blender/calibrate.sh` | Calibrates the light gain and the grass colour |
@@ -47,3 +47,6 @@ farms, docks and more), and some of them have a different size. The viewer lists
 image differs. Files of a north or south sprite are under a climate folder: `originals/c3_north/`,
 `blender/out/c3_north/`, `blender/out/attempts/c3_north/`. A central attempt installs to `c3` and to each climate
 whose image is the same as the central one; a north or south attempt installs only to its own climate.
+
+The sprite scripts (`c3.py` grass, `tent.py`) and the `edge` check in `check.py` (central grass reference) do not use
+the climate yet. Thus the viewer does not offer Generate for a north or south sprite.
