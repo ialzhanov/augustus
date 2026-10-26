@@ -6,12 +6,14 @@
 #include "core/random.h"
 #include "core/time.h"
 #include "game/animation.h"
+#include "game/e2e_image.h"
 #include "game/e2e_state.h"
 #include "game/file.h"
 #include "game/file_io.h"
 #include "game/game.h"
 #include "game/file_editor.h"
 #include "game/tick.h"
+#include "platform/renderer.h"
 #include "game/time.h"
 #include "scenario/allowed_building.h"
 #include "scenario/editor_map.h"
@@ -130,6 +132,39 @@ void e2e_error(const char *format, ...)
     snprintf(text, sizeof(text), "ERROR line %d: %s", data.line, message);
     write_line(text);
     remember_problem(text);
+}
+
+void e2e_check_failed(const char *format, ...)
+{
+    char message[MAX_MESSAGE];
+    va_list args;
+    va_start(args, format);
+    vsnprintf(message, MAX_MESSAGE, format, args);
+    va_end(args);
+    char text[MAX_MESSAGE + 32];
+    snprintf(text, sizeof(text), "FAIL line %d: %s", data.line, message);
+    write_line(text);
+    remember_problem(text);
+}
+
+const char *e2e_out_dir(void)
+{
+    return data.out_dir;
+}
+
+const char *e2e_test_dir(void)
+{
+    return data.test_dir;
+}
+
+const char *e2e_test_name(void)
+{
+    return data.test_name;
+}
+
+int e2e_update_images(void)
+{
+    return data.update_images;
 }
 
 static void join_args(int argc, char **argv, char *text, int length)
@@ -359,6 +394,23 @@ static int command_events(int argc, char **argv)
     return E2E_OK;
 }
 
+// capture <name> camera x y zoom z [offset dx dy] [size w h]
+static int command_capture(int argc, char **argv)
+{
+    int camera[2], zoom = 0, offset[2] = { 0, 0 }, size[2] = { 0, 0 };
+    int ok = argc >= 7 && strcmp(argv[2], "camera") == 0 && parse_int(argv[3], &camera[0]) &&
+        parse_int(argv[4], &camera[1]) && strcmp(argv[5], "zoom") == 0 && parse_int(argv[6], &zoom);
+    for (int i = 7; ok && i < argc; i += 3) {
+        int *target = strcmp(argv[i], "offset") == 0 ? offset : strcmp(argv[i], "size") == 0 ? size : 0;
+        ok = target && i + 2 < argc && parse_int(argv[i + 1], &target[0]) && parse_int(argv[i + 2], &target[1]);
+    }
+    if (!ok) {
+        e2e_error("capture needs: capture <name> camera x y zoom z [offset dx dy] [size w h]");
+        return E2E_ERROR;
+    }
+    return e2e_capture(argv[1], camera[0], camera[1], zoom, offset[0], offset[1], size[0], size[1]);
+}
+
 static int command_seed(int argc, char **argv)
 {
     int seed;
@@ -521,8 +573,23 @@ static int parse_value(int argc, char **argv, const char *query, int *value)
     return 0;
 }
 
+// check image <name> [max channel difference [max pixels]]
+static int check_image(int argc, char **argv)
+{
+    int limits[2] = { 0, 0 };
+    if (argc < 3 || argc > 5 || (argc > 3 && !parse_int(argv[3], &limits[0])) ||
+        (argc > 4 && !parse_int(argv[4], &limits[1]))) {
+        e2e_error("check image needs: check image <capture> [max channel difference [max pixels]]");
+        return E2E_ERROR;
+    }
+    return e2e_check_image(argv[2], limits[0], limits[1]);
+}
+
 static int command_check(int argc, char **argv)
 {
+    if (argc >= 2 && strcmp(argv[1], "image") == 0) {
+        return check_image(argc, argv);
+    }
     compare_op op = OP_NONE;
     int op_index = find_op(argc, argv, &op);
     if (op_index < 2 || op_index == argc - 1) {
@@ -547,11 +614,7 @@ static int command_check(int argc, char **argv)
         e2e_log("ok   line %d: check %s: actual %d", data.line, text, actual);
         return E2E_OK;
     }
-    char message[MAX_MESSAGE * 2];
-    snprintf(message, sizeof(message), "FAIL line %d: check %s: actual %d, expected %d",
-        data.line, text, actual, expected);
-    write_line(message);
-    remember_problem(message);
+    e2e_check_failed("check %s: actual %d, expected %d", text, actual, expected);
     return E2E_CHECK_FAILED;
 }
 
@@ -570,6 +633,7 @@ static const e2e_command COMMANDS[] = {
     { "config", e2e_command_config },
     { "cheat", e2e_command_cheat },
     { "mark", command_mark },
+    { "capture", command_capture },
     { "seed", command_seed },
     { "dump", command_dump },
     { "run", command_run },
@@ -694,8 +758,12 @@ int e2e_run(const char *test_file, const char *out_dir, int update_images)
     random_set_test_seed(DEFAULT_SEED);
 
     int result;
-    FILE *fp = fopen(test_file, "r");
-    if (fp) {
+    FILE *fp = platform_renderer_is_software() ? 0 : fopen(test_file, "r");
+    if (platform_renderer_is_software()) {
+        // A software capture does not show the defects of the GPU texture filter
+        e2e_error("SDL uses the software renderer: the tests need the GPU renderer");
+        result = E2E_ERROR;
+    } else if (fp) {
         int has_read = read_file(fp);
         fclose(fp);
         result = has_read ? run_lines() : E2E_ERROR;

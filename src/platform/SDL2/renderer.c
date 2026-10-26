@@ -122,6 +122,13 @@ static struct {
     int disable_linear_filter;
 } data;
 
+#ifdef E2E_TESTS
+int platform_renderer_is_software(void)
+{
+    return data.is_software_renderer;
+}
+#endif
+
 static int save_screen_buffer(color_t *pixels, int x, int y, int width, int height, int row_width)
 {
     if (data.paused) {

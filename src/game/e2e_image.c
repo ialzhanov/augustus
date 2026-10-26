@@ -1,0 +1,314 @@
+#include "e2e_image.h"
+
+#include "city/view.h"
+#include "core/file.h"
+#include "game/e2e.h"
+#include "graphics/renderer.h"
+#include "map/grid.h"
+#include "window/city.h"
+
+#include "spng/spng.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+
+#define MAX_CAPTURES 128
+#define MAX_NAME 128
+#define MIN_ZOOM 50
+#define COLOR_DIFF (ALPHA_OPAQUE | 0x00ff00ff)
+
+typedef struct {
+    char name[MAX_NAME];
+    int width;
+    int height;
+    color_t *pixels;
+} capture;
+
+static struct {
+    capture captures[MAX_CAPTURES];
+    int num_captures;
+} data;
+
+static capture *find_capture(const char *name)
+{
+    for (int i = 0; i < data.num_captures; i++) {
+        if (strcmp(data.captures[i].name, name) == 0) {
+            return &data.captures[i];
+        }
+    }
+    return 0;
+}
+
+static capture *new_capture(const char *name, int width, int height)
+{
+    capture *c = find_capture(name);
+    if (!c) {
+        if (data.num_captures == MAX_CAPTURES) {
+            return 0;
+        }
+        c = &data.captures[data.num_captures++];
+        snprintf(c->name, MAX_NAME, "%s", name);
+    }
+    free(c->pixels);
+    c->pixels = malloc(sizeof(color_t) * width * height);
+    c->width = width;
+    c->height = height;
+    return c->pixels ? c : 0;
+}
+
+static int write_png(const char *filename, const color_t *pixels, int width, int height)
+{
+    size_t size = (size_t) width * height * 3;
+    uint8_t *rgb = malloc(size);
+    if (!rgb) {
+        return 0;
+    }
+    for (int i = 0; i < width * height; i++) {
+        rgb[i * 3 + 0] = (uint8_t) COLOR_COMPONENT(pixels[i], COLOR_BITSHIFT_RED);
+        rgb[i * 3 + 1] = (uint8_t) COLOR_COMPONENT(pixels[i], COLOR_BITSHIFT_GREEN);
+        rgb[i * 3 + 2] = (uint8_t) COLOR_COMPONENT(pixels[i], COLOR_BITSHIFT_BLUE);
+    }
+    FILE *fp = fopen(filename, "wb");
+    spng_ctx *ctx = spng_ctx_new(SPNG_CTX_ENCODER);
+    struct spng_ihdr ihdr = {
+        .width = width,
+        .height = height,
+        .bit_depth = 8,
+        .color_type = SPNG_COLOR_TYPE_TRUECOLOR
+    };
+    int ok = fp && ctx && !spng_set_png_file(ctx, fp) && !spng_set_ihdr(ctx, &ihdr) &&
+        !spng_encode_image(ctx, rgb, size, SPNG_FMT_PNG, SPNG_ENCODE_FINALIZE);
+    spng_ctx_free(ctx);
+    if (fp) {
+        fclose(fp);
+    }
+    free(rgb);
+    return ok;
+}
+
+// Reads a PNG file. The caller frees the pixels.
+static color_t *read_png(const char *filename, int *width, int *height)
+{
+    FILE *fp = fopen(filename, "rb");
+    if (!fp) {
+        return 0;
+    }
+    spng_ctx *ctx = spng_ctx_new(0);
+    struct spng_ihdr ihdr;
+    size_t size;
+    color_t *pixels = 0;
+    uint8_t *rgba = 0;
+    if (ctx && !spng_set_png_file(ctx, fp) && !spng_get_ihdr(ctx, &ihdr) &&
+        !spng_decoded_image_size(ctx, SPNG_FMT_RGBA8, &size)) {
+        rgba = malloc(size);
+        pixels = malloc(sizeof(color_t) * ihdr.width * ihdr.height);
+        if (rgba && pixels && !spng_decode_image(ctx, rgba, size, SPNG_FMT_RGBA8, 0)) {
+            for (unsigned int i = 0; i < ihdr.width * ihdr.height; i++) {
+                pixels[i] = ALPHA_OPAQUE | (rgba[i * 4] << COLOR_BITSHIFT_RED) |
+                    (rgba[i * 4 + 1] << COLOR_BITSHIFT_GREEN) | (rgba[i * 4 + 2] << COLOR_BITSHIFT_BLUE);
+            }
+            *width = ihdr.width;
+            *height = ihdr.height;
+        } else {
+            free(pixels);
+            pixels = 0;
+        }
+    }
+    free(rgba);
+    spng_ctx_free(ctx);
+    fclose(fp);
+    return pixels;
+}
+
+static int is_on_map(int x_pixels, int y_pixels)
+{
+    view_tile tile;
+    if (!city_view_pixels_to_view_tile(x_pixels, y_pixels, &tile)) {
+        return 0;
+    }
+    int grid_offset = city_view_tile_to_grid_offset(&tile);
+    return grid_offset && map_grid_is_inside(map_grid_offset_to_x(grid_offset), map_grid_offset_to_y(grid_offset), 1);
+}
+
+int e2e_capture(const char *name, int x, int y, int zoom, int dx, int dy, int width, int height)
+{
+    int max_zoom = city_view_get_max_scale();
+    if (zoom < MIN_ZOOM || zoom > max_zoom) {
+        e2e_error("the zoom %d is outside the range %d to %d", zoom, MIN_ZOOM, max_zoom);
+        return E2E_ERROR;
+    }
+    if (!map_grid_is_inside(x, y, 1)) {
+        e2e_error("the camera tile %d %d is outside the map", x, y);
+        return E2E_ERROR;
+    }
+    city_view_set_scale(zoom);
+    city_view_go_to_grid_offset(map_grid_offset(x, y));
+    if (dx || dy) {
+        int camera_x, camera_y;
+        city_view_get_camera_in_pixels(&camera_x, &camera_y);
+        city_view_set_camera_from_pixel_position(camera_x + dx, camera_y + dy);
+    }
+
+    int viewport_x, viewport_y, viewport_width, viewport_height;
+    city_view_get_viewport(&viewport_x, &viewport_y, &viewport_width, &viewport_height);
+    width = width ? width : viewport_width;
+    height = height ? height : viewport_height;
+    // ponytail: a capture is at most the size of the viewport; join several draws when a test needs more
+    if (width <= 0 || height <= 0 || width > viewport_width || height > viewport_height) {
+        e2e_error("the capture size %d x %d is not in the range 1 x 1 to %d x %d (the city viewport)",
+            width, height, viewport_width, viewport_height);
+        return E2E_ERROR;
+    }
+    int left = viewport_x + (viewport_width - width) / 2;
+    int top = viewport_y + (viewport_height - height) / 2;
+    int right = left + width - 1;
+    int bottom = top + height - 1;
+    if (!is_on_map(left, top) || !is_on_map(right, top) || !is_on_map(left, bottom) || !is_on_map(right, bottom)) {
+        e2e_error("the capture %s (%d x %d at camera %d %d, zoom %d) is partly outside the map", name,
+            width, height, x, y, zoom);
+        return E2E_ERROR;
+    }
+
+    capture *c = new_capture(name, width, height);
+    if (!c) {
+        e2e_error("no memory for the capture %s", name);
+        return E2E_ERROR;
+    }
+    window_city_draw_all();
+    if (!graphics_renderer()->save_screen_buffer(c->pixels, left, top, width, height, width)) {
+        e2e_error("the renderer cannot read the pixels of %s", name);
+        return E2E_ERROR;
+    }
+    char filename[FILE_NAME_MAX];
+    snprintf(filename, FILE_NAME_MAX, "%s/%s.png", e2e_out_dir(), name);
+    if (!write_png(filename, c->pixels, width, height)) {
+        e2e_error("cannot write %s", filename);
+        return E2E_ERROR;
+    }
+    e2e_log("capture %s: %d x %d at camera %d %d, zoom %d, offset %d %d", name, width, height, x, y, zoom, dx, dy);
+    return E2E_OK;
+}
+
+const color_t *e2e_capture_pixels(const char *name, int *width, int *height)
+{
+    capture *c = find_capture(name);
+    if (!c) {
+        return 0;
+    }
+    *width = c->width;
+    *height = c->height;
+    return c->pixels;
+}
+
+static int channel_diff(color_t a, color_t b, int shift)
+{
+    return abs((int) COLOR_COMPONENT(a, shift) - (int) COLOR_COMPONENT(b, shift));
+}
+
+static int max_channel_diff_of(color_t a, color_t b)
+{
+    int red = channel_diff(a, b, COLOR_BITSHIFT_RED);
+    int green = channel_diff(a, b, COLOR_BITSHIFT_GREEN);
+    int blue = channel_diff(a, b, COLOR_BITSHIFT_BLUE);
+    int max = red > green ? red : green;
+    return max > blue ? max : blue;
+}
+
+static color_t grey_of(color_t c)
+{
+    int grey = (COLOR_COMPONENT(c, COLOR_BITSHIFT_RED) + COLOR_COMPONENT(c, COLOR_BITSHIFT_GREEN) +
+        COLOR_COMPONENT(c, COLOR_BITSHIFT_BLUE)) / 3;
+    // A light grey, so that the magenta pixels are easy to see
+    grey = 128 + grey / 2;
+    return ALPHA_OPAQUE | (grey << COLOR_BITSHIFT_RED) | (grey << COLOR_BITSHIFT_GREEN) | (grey << COLOR_BITSHIFT_BLUE);
+}
+
+static void get_approved_path(const char *name, char *path)
+{
+    snprintf(path, FILE_NAME_MAX, "%s/images/%s/%s.png", e2e_test_dir(), e2e_test_name(), name);
+}
+
+static int update_approved(const capture *c, const char *path)
+{
+    char folder[FILE_NAME_MAX];
+    snprintf(folder, FILE_NAME_MAX, "%s/images", e2e_test_dir());
+    mkdir(folder, 0755);
+    snprintf(folder, FILE_NAME_MAX, "%s/images/%s", e2e_test_dir(), e2e_test_name());
+    mkdir(folder, 0755);
+    if (!write_png(path, c->pixels, c->width, c->height)) {
+        e2e_error("cannot write the approved image %s", path);
+        return E2E_ERROR;
+    }
+    e2e_log("approved image updated: %s", path);
+    return E2E_OK;
+}
+
+int e2e_check_image(const char *name, int max_channel_diff, int max_pixels)
+{
+    capture *c = find_capture(name);
+    if (!c) {
+        e2e_error("no capture has the name %s", name);
+        return E2E_ERROR;
+    }
+    char approved_path[FILE_NAME_MAX];
+    get_approved_path(name, approved_path);
+    if (e2e_update_images()) {
+        return update_approved(c, approved_path);
+    }
+    int width, height;
+    color_t *approved = read_png(approved_path, &width, &height);
+    if (!approved) {
+        e2e_check_failed("check image %s: no approved image %s: run with --update-images to approve the capture",
+            name, approved_path);
+        return E2E_CHECK_FAILED;
+    }
+    if (width != c->width || height != c->height) {
+        free(approved);
+        e2e_check_failed("check image %s: the capture is %d x %d and the approved image is %d x %d",
+            name, c->width, c->height, width, height);
+        return E2E_CHECK_FAILED;
+    }
+    color_t *diff = malloc(sizeof(color_t) * width * height);
+    int changed = 0;
+    int x_min = width, y_min = height, x_max = -1, y_max = -1;
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int i = y * width + x;
+            if (max_channel_diff_of(c->pixels[i], approved[i]) > max_channel_diff) {
+                changed++;
+                x_min = x < x_min ? x : x_min;
+                y_min = y < y_min ? y : y_min;
+                x_max = x > x_max ? x : x_max;
+                y_max = y > y_max ? y : y_max;
+                if (diff) {
+                    diff[i] = COLOR_DIFF;
+                }
+            } else if (diff) {
+                diff[i] = grey_of(c->pixels[i]);
+            }
+        }
+    }
+    int result = E2E_OK;
+    if (changed > max_pixels) {
+        char filename[FILE_NAME_MAX];
+        snprintf(filename, FILE_NAME_MAX, "%s/%s.actual.png", e2e_out_dir(), name);
+        write_png(filename, c->pixels, width, height);
+        snprintf(filename, FILE_NAME_MAX, "%s/%s.approved.png", e2e_out_dir(), name);
+        write_png(filename, approved, width, height);
+        if (diff) {
+            snprintf(filename, FILE_NAME_MAX, "%s/%s.diff.png", e2e_out_dir(), name);
+            write_png(filename, diff, width, height);
+        }
+        e2e_check_failed("check image %s: %d pixels differ by more than %d (allowed: %d), in the box %d %d to %d %d",
+            name, changed, max_channel_diff, max_pixels, x_min, y_min, x_max, y_max);
+        result = E2E_CHECK_FAILED;
+    } else {
+        e2e_log("ok   check image %s: %d pixels differ by more than %d (allowed: %d)",
+            name, changed, max_channel_diff, max_pixels);
+    }
+    free(diff);
+    free(approved);
+    return result;
+}

@@ -5,6 +5,10 @@
 
 int platform_renderer_init(void *window);
 
+#ifdef E2E_TESTS
+int platform_renderer_is_software(void);
+#endif
+
 int platform_renderer_create_render_texture(int width, int height);
 
 int platform_renderer_lost_render_texture(void);

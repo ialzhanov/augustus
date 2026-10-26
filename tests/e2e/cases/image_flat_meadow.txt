@@ -1,0 +1,6 @@
+# expect: pass
+# A capture of flat meadow is the same as the approved image.
+load flat_meadow.svx
+seed 1
+capture meadow camera 40 40 zoom 100 size 640 480
+check image meadow

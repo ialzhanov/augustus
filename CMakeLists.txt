@@ -494,6 +494,7 @@ set(E2E_FILES "")
 if(E2E_TESTS)
     set(E2E_FILES
         ${PROJECT_SOURCE_DIR}/src/game/e2e.c
+        ${PROJECT_SOURCE_DIR}/src/game/e2e_image.c
         ${PROJECT_SOURCE_DIR}/src/game/e2e_state.c
     )
 endif()

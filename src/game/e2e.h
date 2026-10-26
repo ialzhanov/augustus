@@ -43,6 +43,31 @@ void e2e_log(const char *format, ...);
  */
 void e2e_error(const char *format, ...);
 
+/**
+ * Writes a failed check line with the current line number of the test file.
+ */
+void e2e_check_failed(const char *format, ...);
+
+/**
+ * @return The results folder of the test: <out>/<test name>
+ */
+const char *e2e_out_dir(void);
+
+/**
+ * @return The tests/e2e folder
+ */
+const char *e2e_test_dir(void);
+
+/**
+ * @return The test name: the test file name without the extension
+ */
+const char *e2e_test_name(void);
+
+/**
+ * @return 1 when the run writes each capture as the new approved image
+ */
+int e2e_update_images(void);
+
 #endif // E2E_TESTS
 
 #endif // GAME_E2E_H
