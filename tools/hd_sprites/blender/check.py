@@ -121,7 +121,8 @@ def checks(orig_path, hd_path, has_top=False, top_path=None):
         l = lum(img); band, inner = m & (dd > 0.88) & (yy > h - 30 * n), m & (dd > 0.55) & (dd < 0.82) & (yy > h - 30 * n)
         return l[band].mean() / max(l[inner].mean(), 1e-6) if band.sum() > 10 and inner.sum() > 10 else 1.0
     g_full = np.asarray(hd_img.resize((w, h), Image.LANCZOS), float)
-    rim = band_ratio(g_full, g_full[..., 3] > 250) / band_ratio(o, oa)
+    same = oa & (g_full[..., 3] > 250)        # the same pixels in both (a top part stays opaque where the footprint edge does not)
+    rim = band_ratio(g_full, same) / band_ratio(o, same)
     res['rim'] = (0.9 <= rim <= 1.1, f'tile edge brightness {rim:.2f} x the original ratio (0.9 .. 1.1: no light/dark rim)')
 
     both = oa & (a_hd > 0.5)

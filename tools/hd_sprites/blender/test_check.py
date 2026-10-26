@@ -70,6 +70,13 @@ t[..., 3][back] = 0
 assert back.sum() > 20 and 'seam' in failed(checks(orig(452), save(Image.fromarray(t.astype(np.uint8)), 'crack_gap.png')))
 assert 'seam' not in failed(checks(orig(452), save(upscaled(452), 'crack_same.png')))
 
+# rim: the original itself with its top part measures 1.0 (the band was measured at other pixels in the two images:
+# the top part stays opaque at the tile edge, the footprint does not; 837 measured 1.09, tree 276 0.94)
+for i in (837, 828, 276):
+    up = upscaled(i); top = up.crop((0, 0, up.width, up.height - 30))
+    rim = checks(orig(i), save(up, f'rim_same_{i}.png'), True, save(top, f'rim_same_top_{i}.png'))['rim'][1]
+    assert 0.98 <= float(rim.split()[3]) <= 1.02, (i, rim)
+
 # rim: a grass tile with a light band along its edge fails 'rim'
 t = np.asarray(upscaled(306), float).copy(); hh, ww = t.shape[:2]
 yy, xx = np.mgrid[0:hh, 0:ww]; dd = np.abs(xx + 0.5 - ww / 2) / (ww / 2) + np.abs(yy + 0.5 - hh / 2) / (hh / 2)

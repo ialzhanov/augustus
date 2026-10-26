@@ -14,14 +14,31 @@ import bpy
 import numpy as np
 import c3
 
-ID, SRC = int(sys.argv[-2]), sys.argv[-1]
 HERE = os.path.dirname(os.path.abspath(__file__))
+if sys.argv[-2] == '--':   # make.sh gives only the id (sprites with a top part): the original of C3_CLIMATE
+    ID, clim = int(sys.argv[-1]), os.environ.get('C3_CLIMATE', 'c3')
+    SRC = os.path.join(HERE, '..', 'originals', '' if clim == 'c3' else clim, f'{ID}.png')
+else:
+    ID, SRC = int(sys.argv[-2]), sys.argv[-1]
 TERRAIN_CAL = [float(v) for v in os.environ.get('C3_TERRAIN_CAL', '2.756,2.575,2.208').split(',')]   # terrain render vs its original (edge grass, with the tuft density compensation)
 WATER_CAL = [float(v) for v in os.environ.get('C3_WATER_CAL', '0.519,0.540,0.590').split(',')]   # x TERRAIN_CAL: water colour unchanged by the terrain recalibration
 GAIN = tuple(c3.GAIN[i] * TERRAIN_CAL[i] for i in range(3))
 FRAME = (ID - 364) % 8 if 364 <= ID <= 371 else 0
 PAVED = 591 <= ID <= 639   # cobbled roads: 3D cobbles where the original is not grass
 MOSAIC = 3140 <= ID <= 3147   # plaza: a mosaic of small square stones over the whole tile
+SHORE = 825 <= ID <= 844   # 3D rocks in the water (825-832) and stone embankment walls (833-844), with a top part
+# walls fitted to the original's stone pixels (silhouette, light top, faces in shadow): wall height,
+# boxes (centre x, centre y, length, thickness, rotation in degrees: 0 = length along +x, 45 = screen horizontal).
+# Posts (837) and corners (842) are 0: a 45 degree box shows one shaded front face, the original a lit and a dark face
+WALLS = {833: (0.2, [(0.147, -0.001, 0.97, 0.22, 90)]),   # fit 0.396 thick (shadowed soil counted): as 836 834: (0.167, [(-0.026, -0.047, 0.999, 0.201, 0)]),
+         835: (0.153, [(-0.053, 0.035, 1.03, 0.272, 0), (0.257, -0.268, 0.4, 0.377, 0)]),
+         836: (0.167, [(0.082, -0.023, 0.996, 0.203, 90)]), 837: (0.529, [(0.018, -0.38, 0.279, 0.2, 0)]),
+         838: (0.332, [(0.16, 0.185, 0.229, 0.332, 0), (0.416, -0.072, 0.246, 0.111, 45)]),
+         839: (0.113, [(-0.21, 0.158, 1.0, 0.238, 45)]), 840: (0.153, [(0.162, -0.108, 0.79, 0.229, 45)]),
+         841: (0.143, [(0.182, -0.19, 0.732, 0.21, 45)]),
+         842: (0.451, [(-0.025, -0.156, 0.814, 0.443, 0), (0.186, -0.019, 0.395, 0.449, 0)]),
+         843: (0.204, [(0.231, -0.322, 0.474, 0.336, 0), (0.277, 0.061, 0.394, 0.428, 45)]),
+         844: (0.27, [(-0.068, -0.186, 0.677, 0.207, 0), (0.108, -0.323, 0.542, 0.278, 45)])}
 CRACK = 444 <= ID <= 475   # earthquake chasms: the original's dark pixels sink into the ground (3D walls)
 CRACK_DEPTH = float(os.environ.get('C3_CRACK_DEPTH', '0.15'))   # chasm floor below the ground (units; 35.5 game px = 1)
 COBBLE_CAL = float(os.environ.get('C3_COBBLE_CAL', '1.0'))
@@ -55,8 +72,45 @@ def save_image(name, arr, colour):
     return loaded
 
 
+def components(m):
+    """4-connected components of a boolean mask: list of (ys, xs)"""
+    seen, out = np.zeros_like(m), []
+    for y0, x0 in zip(*np.nonzero(m)):
+        if seen[y0, x0]: continue
+        stack, ys, xs = [(y0, x0)], [], []; seen[y0, x0] = True
+        while stack:
+            y, x = stack.pop(); ys.append(y); xs.append(x)
+            for yy, xx in ((y + 1, x), (y - 1, x), (y, x + 1), (y, x - 1)):
+                if 0 <= yy < m.shape[0] and 0 <= xx < m.shape[1] and m[yy, xx] and not seen[yy, xx]:
+                    seen[yy, xx] = True; stack.append((yy, xx))
+        out.append((np.array(ys), np.array(xs)))
+    return out
+
+
+ROCKS = []   # (ys, xs) of each rock in the water
+
+
+def shore_models():
+    """pixels of the original that show a wall or a rock (stone colour: not water, not grass)"""
+    r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
+    wet = b > np.maximum(r, g) + 0.06
+    stone = (alpha > 0) & ~wet & ~((g > r + 0.02) & (g > b + 0.08))
+    if ID in WALLS:
+        return stone
+    model = np.zeros_like(stone)
+    for ys, xs in components(stone):   # a rock: a stone blob that the water surrounds (beaches stay ground)
+        ring = np.zeros_like(stone); ring[np.clip(ys + 1, 0, H - 1), xs] = True; ring[np.clip(ys - 1, 0, H - 1), xs] = True
+        ring[ys, np.clip(xs + 1, 0, W - 1)] = True; ring[ys, np.clip(xs - 1, 0, W - 1)] = True; ring &= ~stone & (alpha > 0)
+        if ring.any() and wet[ring].mean() >= 0.5:   # single pixels too (else a speck of sand with foam around it)
+            ROCKS.append((ys, xs)); model[ys, xs] = True
+    return model
+
+
 # fill transparent corners with nearby colour, then blur: broad colour layout without the original's pixel detail
-fill = rgb * (alpha[..., None] > 0); known = alpha > 0
+known = alpha > 0
+if SHORE:   # the ground under the walls and rocks continues the water and grass around them
+    known = known & ~shore_models()
+fill = rgb * known[..., None]
 while not known.all():                                    # grow colours into the transparent corners until all are set
     w = box_blur(known.astype(float))
     grown = np.stack([box_blur(fill[..., k] * known) for k in range(3)], -1) / np.maximum(w, 1e-6)[..., None]
@@ -81,7 +135,9 @@ if CRACK:   # chasm = the darkest pixels; 474 and 475 have only grey cracks, so 
 LAYOUT = save_image('layout', np.stack([box_blur(fill[..., k], 0 if PAVED else 2) for k in range(3)], -1), True)
 # distance from the shore (sprite pixels, up to 4) for depth, foam and the wet band
 def grow(m):
-    return m | np.roll(m, 1, 0) | np.roll(m, -1, 0) | np.roll(m, 1, 1) | np.roll(m, -1, 1)
+    """one pixel wider; no wrap at the image edge (np.roll put foam into the tile corners)"""
+    p = np.pad(m, 1)
+    return m | p[:-2, 1:-1] | p[2:, 1:-1] | p[1:-1, :-2] | p[1:-1, 2:]
 land = ~water
 dist_w = np.zeros((H, W)); cur = land.copy()
 for k in range(1, 5):
@@ -427,7 +483,57 @@ else:
     PEBBLE = material('pebble', lambda: m_cobble(per_object=True))
     scatter(dirt & inside, 0.9, pebble)
 
-c3.render(W, H, tiles=NT, samples=64)
+
+
+def m_ashlar(top_srgb):
+    """cut stone blocks (about 6.5 x 3 game px): the original's lit top colour x the brightness of the Rock064 photo
+    (its hue made the stone yellow-green), soft joints"""
+    tint = lin(np.array(top_srgb)) * np.array(c3.GAIN)
+    def joints(col, v):
+        bw = c3.N.nodes.new('ShaderNodeRGBToBW'); c3.link(col, bw.inputs['Color'])
+        col = c3.mix(bw.outputs['Val'], tuple(tint / 0.162), 1.0, 'MULTIPLY')   # 0.162: mean brightness of Rock064
+        br = c3.N.nodes.new('ShaderNodeTexBrick'); br.offset = 0.5; br.squash_frequency = 1
+        br.inputs['Scale'].default_value = 4.0; br.inputs['Mortar Size'].default_value = 0.008
+        br.inputs['Brick Width'].default_value = 0.9; br.inputs['Row Height'].default_value = 0.33
+        br.inputs['Color1'].default_value = (1, 1, 1, 1); br.inputs['Color2'].default_value = (0.9, 0.89, 0.86, 1)
+        br.inputs['Mortar'].default_value = (0.4, 0.38, 0.35, 1)
+        c3.link(v, br.inputs['Vector'])
+        return c3.mix(col, br.outputs['Color'], 1.0, 'MULTIPLY')
+    return c3.m_photo('Rock064', scale=5.0, normal=1.0, extra=joints)
+
+
+def shore():
+    c3.GROUND.update(bpy.data.objects.keys())   # all ground so far: cut out in the top pass
+    r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
+    if ID in WALLS:
+        h, boxes = WALLS[ID]
+        stone = shore_models(); L = rgb @ np.array([0.299, 0.587, 0.114])
+        top = rgb[stone & (L > np.percentile(L[stone], 70))].mean(0)    # the lit top of the wall
+        mat = c3.material('ashlar', m_ashlar(top))
+        for cx, cy, ln, th, rot in boxes:   # body below the water line to the slab layer, then the top slabs
+            c3.box('wall', (cx, cy, (h - 0.045 - 0.06) / 2), (ln, th, h - 0.045 + 0.06), mat, bevel=0.01, rot=math.radians(rot))
+            n = max(1, round(ln / 0.22)); ca, sa = math.cos(math.radians(rot)), math.sin(math.radians(rot))
+            for k in range(n):
+                t = (k + 0.5) / n - 0.5
+                o = c3.box('slab', (cx + ca * t * ln, cy + sa * t * ln, h - 0.025 - random.uniform(0, 0.005)),   # not above h (clip)
+                           (ln / n - 0.012, th, 0.045), mat, bevel=0.008, rot=math.radians(rot))
+                o.rotation_euler.x += random.uniform(-0.02, 0.02); o.rotation_euler.y += random.uniform(-0.02, 0.02)
+    for ys, xs in ROCKS:   # one rock per 12 px of a blob (blobs of several rocks), at a random pixel of the blob
+        n = max(1, round(len(ys) / 12))
+        for k in random.sample(range(len(ys)), n):
+            s = math.sqrt(len(ys) / n) / 50 * random.uniform(0.85, 1.15)   # / 68 and / 57: rocks covered less than the originals
+            x, y = world_of(xs[k] + random.uniform(-0.5, 0.5), ys[k] + random.uniform(-0.5, 0.5))   # rock body over the blob
+            o = c3.rock((x, y, -0.2 * s), s, flat=random.uniform(0.7, 1.0))
+            sub = o.modifiers.new('sub', 'SUBSURF'); sub.levels = 2
+            while o.modifiers[0] != sub: bpy.ops.object.modifier_move_up(modifier='sub')   # displace the finer mesh
+            for f in o.data.polygons: f.use_smooth = True
+            o.data.materials[0] = PEBBLE
+            o.color = (*(lin(rgb[ys, xs]).mean(0) * np.array(c3.GAIN) * random.uniform(1.2, 1.5)), 1)
+
+
+if SHORE:
+    shore()
+c3.render(W, H, tiles=NT, samples=64, edge_fade=ID in WALLS)   # rocks: short shadows (edge_fade lit the edge band: rim)
 
 
 def verge_lock():
