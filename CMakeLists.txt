@@ -495,6 +495,7 @@ if(E2E_TESTS)
     set(E2E_FILES
         ${PROJECT_SOURCE_DIR}/src/game/e2e.c
         ${PROJECT_SOURCE_DIR}/src/game/e2e_image.c
+        ${PROJECT_SOURCE_DIR}/src/game/e2e_logic.c
         ${PROJECT_SOURCE_DIR}/src/game/e2e_state.c
     )
 endif()
@@ -1186,4 +1187,12 @@ else()
         install(DIRECTORY "${ASSETS_DIR}/" DESTINATION "share/augustus-game/assets")
     endif()
 
+endif()
+
+if(E2E_TESTS)
+    # Unit tests of the end-to-end test logic. Run: build-e2e/e2e_logic_test
+    add_executable(e2e_logic_test
+        ${PROJECT_SOURCE_DIR}/tests/e2e/unit/e2e_logic_test.c
+        ${PROJECT_SOURCE_DIR}/src/game/e2e_logic.c
+    )
 endif()

@@ -9,6 +9,7 @@
 #include "core/time.h"
 #include "game/animation.h"
 #include "game/e2e_image.h"
+#include "game/e2e_logic.h"
 #include "game/e2e_state.h"
 #include "game/file.h"
 #include "game/file_io.h"
@@ -35,7 +36,7 @@
 #define MAX_MARKS 64
 // A run command stops after 200 years
 #define MAX_RUN_TICKS (GAME_TIME_TICKS_PER_DAY * GAME_TIME_DAYS_PER_MONTH * GAME_TIME_MONTHS_PER_YEAR * 200)
-#define MAX_ARGS 32
+#define MAX_ARGS E2E_MAX_ARGS
 #define MAX_MESSAGE 1024
 #define DEFAULT_OUT_DIR "e2e-results"
 #define DEFAULT_SEED 0
@@ -50,17 +51,6 @@ typedef struct {
     e2e_command_fn run;
 } e2e_command;
 
-typedef enum {
-    OP_EQ,
-    OP_NE,
-    OP_LE,
-    OP_GE,
-    OP_LT,
-    OP_GT,
-    OP_NONE
-} compare_op;
-
-static const char *OP_NAMES[] = { "==", "!=", "<=", ">=", "<", ">" };
 
 typedef struct {
     char query[MAX_LINE];
@@ -195,40 +185,6 @@ static void join_args(int argc, char **argv, char *text, int length)
     }
 }
 
-static int parse_int(const char *text, int *value)
-{
-    char *end;
-    long result = strtol(text, &end, 10);
-    if (!*text || *end) {
-        return 0;
-    }
-    *value = (int) result;
-    return 1;
-}
-
-static compare_op parse_op(const char *text)
-{
-    for (int i = 0; i < OP_NONE; i++) {
-        if (strcmp(text, OP_NAMES[i]) == 0) {
-            return i;
-        }
-    }
-    return OP_NONE;
-}
-
-static int compare(int actual, compare_op op, int expected)
-{
-    switch (op) {
-        case OP_EQ: return actual == expected;
-        case OP_NE: return actual != expected;
-        case OP_LE: return actual <= expected;
-        case OP_GE: return actual >= expected;
-        case OP_LT: return actual < expected;
-        case OP_GT: return actual > expected;
-        default: return 0;
-    }
-}
-
 // The test clock replaces the real clock, so the animation frames are the same in each run
 static void advance_clock(void)
 {
@@ -318,7 +274,7 @@ static int command_new_map(int argc, char **argv)
     static const char *CLIMATE_NAMES[] = { "central", "northern", "desert" };
     int size;
     int size_index = -1;
-    if ((argc == 2 || argc == 3) && parse_int(argv[1], &size)) {
+    if ((argc == 2 || argc == 3) && e2e_parse_int(argv[1], &size)) {
         for (unsigned int i = 0; i < NUM_MAP_SIZES; i++) {
             if (MAP_SIZES[i] == size) {
                 size_index = i;
@@ -419,11 +375,11 @@ static int command_events(int argc, char **argv)
 static int command_capture(int argc, char **argv)
 {
     int camera[2], zoom = 0, offset[2] = { 0, 0 }, size[2] = { 0, 0 };
-    int ok = argc >= 7 && strcmp(argv[2], "camera") == 0 && parse_int(argv[3], &camera[0]) &&
-        parse_int(argv[4], &camera[1]) && strcmp(argv[5], "zoom") == 0 && parse_int(argv[6], &zoom);
+    int ok = argc >= 7 && strcmp(argv[2], "camera") == 0 && e2e_parse_int(argv[3], &camera[0]) &&
+        e2e_parse_int(argv[4], &camera[1]) && strcmp(argv[5], "zoom") == 0 && e2e_parse_int(argv[6], &zoom);
     for (int i = 7; ok && i < argc; i += 3) {
         int *target = strcmp(argv[i], "offset") == 0 ? offset : strcmp(argv[i], "size") == 0 ? size : 0;
-        ok = target && i + 2 < argc && parse_int(argv[i + 1], &target[0]) && parse_int(argv[i + 2], &target[1]);
+        ok = target && i + 2 < argc && e2e_parse_int(argv[i + 1], &target[0]) && e2e_parse_int(argv[i + 2], &target[1]);
     }
     if (!ok) {
         e2e_error("capture needs: capture <name> camera x y zoom z [offset dx dy] [size w h]");
@@ -435,7 +391,7 @@ static int command_capture(int argc, char **argv)
 static int command_seed(int argc, char **argv)
 {
     int seed;
-    if (argc != 2 || !parse_int(argv[1], &seed)) {
+    if (argc != 2 || !e2e_parse_int(argv[1], &seed)) {
         e2e_error("seed needs: seed <n>");
         return E2E_ERROR;
     }
@@ -491,7 +447,7 @@ static int command_run(int argc, char **argv)
         return E2E_OK;
     }
     if (argc == 4 && strcmp(argv[1], "until") == 0 &&
-        parse_int(argv[2], &until_year) && parse_int(argv[3], &until_month)) {
+        e2e_parse_int(argv[2], &until_year) && e2e_parse_int(argv[3], &until_month)) {
         until_year += scenario_property_start_year();
         if (!run_until(is_until_date)) {
             e2e_error("the date was not reached");
@@ -499,7 +455,7 @@ static int command_run(int argc, char **argv)
         }
         return E2E_OK;
     }
-    if (argc != 3 || !parse_int(argv[2], &count) || count < 0) {
+    if (argc != 3 || !e2e_parse_int(argv[2], &count) || count < 0) {
         e2e_error("run needs: run ticks|days|months <n>, run month_end or run until <year offset> <month>");
         return E2E_ERROR;
     }
@@ -520,18 +476,16 @@ static int command_run(int argc, char **argv)
 }
 
 // Finds the first comparison word. Returns its index, or 0.
-static int find_op(int argc, char **argv, compare_op *op)
+static int find_op(int argc, char **argv, e2e_op *op)
 {
     for (int i = 1; i < argc; i++) {
-        *op = parse_op(argv[i]);
-        if (*op != OP_NONE) {
+        *op = e2e_parse_op(argv[i]);
+        if (*op != E2E_OP_NONE) {
             return i;
         }
     }
     return 0;
 }
-
-static int split_line(char *line, char **argv);
 
 // Stores the value of each query that a later check compares with "mark", up to the next mark.
 static int command_mark(int argc, char **argv)
@@ -545,11 +499,11 @@ static int command_mark(int argc, char **argv)
         char line[MAX_LINE];
         char *words[MAX_ARGS];
         snprintf(line, MAX_LINE, "%s", data.lines[i]);
-        int count = split_line(line, words);
+        int count = e2e_split_line(line, words);
         if (count > 0 && strcmp(words[0], "mark") == 0) {
             break;
         }
-        compare_op op;
+        e2e_op op;
         int op_index = count > 0 && strcmp(words[0], "check") == 0 ? find_op(count, words, &op) : 0;
         if (op_index < 2 || op_index + 1 >= count || strcmp(words[op_index + 1], "mark") != 0) {
             continue;
@@ -567,29 +521,16 @@ static int command_mark(int argc, char **argv)
 // Reads the value of a check: a number, a name, "mark", "mark + n" or "mark - n"
 static int parse_value(int argc, char **argv, const char *query, int *value)
 {
-    if (argc == 1 && (parse_int(argv[0], value) || e2e_lookup_value_name(argv[0], value))) {
+    if (argc == 1 && (e2e_parse_int(argv[0], value) || e2e_lookup_value_name(argv[0], value))) {
         return 1;
     }
     if (strcmp(argv[0], "mark") != 0) {
         return 0;
     }
-    int found = 0;
     for (int i = 0; i < data.num_marks; i++) {
         if (strcmp(data.marks[i].query, query) == 0) {
-            *value = data.marks[i].value;
-            found = 1;
+            return e2e_apply_mark(argc, argv, data.marks[i].value, value);
         }
-    }
-    int change;
-    if (!found) {
-        return 0;
-    }
-    if (argc == 1) {
-        return 1;
-    }
-    if (argc == 3 && parse_int(argv[2], &change) && (strcmp(argv[1], "+") == 0 || strcmp(argv[1], "-") == 0)) {
-        *value += argv[1][0] == '+' ? change : -change;
-        return 1;
     }
     return 0;
 }
@@ -608,8 +549,8 @@ static int check_hd(int argc, char **argv)
 static int check_image(int argc, char **argv)
 {
     int limits[2] = { 0, 0 };
-    if (argc < 3 || argc > 5 || (argc > 3 && !parse_int(argv[3], &limits[0])) ||
-        (argc > 4 && !parse_int(argv[4], &limits[1]))) {
+    if (argc < 3 || argc > 5 || (argc > 3 && !e2e_parse_int(argv[3], &limits[0])) ||
+        (argc > 4 && !e2e_parse_int(argv[4], &limits[1]))) {
         e2e_error("check image needs: check image <capture> [max channel difference [max pixels]]");
         return E2E_ERROR;
     }
@@ -626,14 +567,14 @@ static int command_check(int argc, char **argv)
     }
     if (argc >= 2 && strcmp(argv[1], "seams") == 0) {
         int region[4];
-        if (argc != 8 || strcmp(argv[3], "region") != 0 || !parse_int(argv[4], &region[0]) ||
-            !parse_int(argv[5], &region[1]) || !parse_int(argv[6], &region[2]) || !parse_int(argv[7], &region[3])) {
+        if (argc != 8 || strcmp(argv[3], "region") != 0 || !e2e_parse_int(argv[4], &region[0]) ||
+            !e2e_parse_int(argv[5], &region[1]) || !e2e_parse_int(argv[6], &region[2]) || !e2e_parse_int(argv[7], &region[3])) {
             e2e_error("check seams needs: check seams <capture> region x1 y1 x2 y2");
             return E2E_ERROR;
         }
         return e2e_check_seams(argv[2], region[0], region[1], region[2], region[3]);
     }
-    compare_op op = OP_NONE;
+    e2e_op op = E2E_OP_NONE;
     int op_index = find_op(argc, argv, &op);
     if (op_index < 2 || op_index == argc - 1) {
         e2e_error("check needs: check <query> <op> <value>");
@@ -653,7 +594,7 @@ static int command_check(int argc, char **argv)
         e2e_error("the value of '%s' is not a number, a known name or a mark expression", text);
         return E2E_ERROR;
     }
-    if (compare(actual, op, expected)) {
+    if (e2e_compare(actual, op, expected)) {
         e2e_log("ok   line %d: check %s: actual %d", data.line, text, actual);
         return E2E_OK;
     }
@@ -693,23 +634,6 @@ static const e2e_command *find_command(const char *name)
         }
     }
     return 0;
-}
-
-// Removes the comment and splits the line on spaces. Returns -1 for too many words.
-static int split_line(char *line, char **argv)
-{
-    char *comment = strchr(line, '#');
-    if (comment) {
-        *comment = 0;
-    }
-    int argc = 0;
-    for (char *word = strtok(line, " \t\r\n"); word; word = strtok(0, " \t\r\n")) {
-        if (argc == MAX_ARGS) {
-            return -1;
-        }
-        argv[argc++] = word;
-    }
-    return argc;
 }
 
 // The test file is in tests/e2e/cases/, so the test folder is two levels up
@@ -764,7 +688,7 @@ static int run_line(const char *text)
     char line[MAX_LINE];
     char *argv[MAX_ARGS];
     snprintf(line, MAX_LINE, "%s", text);
-    int argc = split_line(line, argv);
+    int argc = e2e_split_line(line, argv);
     if (argc == 0) {
         return E2E_OK;
     }
@@ -780,37 +704,14 @@ static int run_line(const char *text)
     return command->run(argc, argv);
 }
 
-// Replaces each {zoom}, {dx} and {dy} in the text
-static void substitute(const char *text, int zoom, int dx, int dy, char *result)
-{
-    static const char *NAMES[] = { "{zoom}", "{dx}", "{dy}" };
-    int values[] = { zoom, dx, dy };
-    int length = 0;
-    while (*text && length < MAX_LINE - 12) {
-        int replaced = 0;
-        for (int i = 0; i < 3 && !replaced; i++) {
-            size_t name_length = strlen(NAMES[i]);
-            if (strncmp(text, NAMES[i], name_length) == 0) {
-                length += snprintf(result + length, MAX_LINE - length, "%d", values[i]);
-                text += name_length;
-                replaced = 1;
-            }
-        }
-        if (!replaced) {
-            result[length++] = *text++;
-        }
-    }
-    result[length] = 0;
-}
-
 // repeat zoom <from> <to> <step> offsets <dx,dy> ... runs the lines up to "end" for each zoom and offset
 static int run_repeat(int argc, char **argv)
 {
     int zoom[3];
     int offsets[MAX_ARGS][2];
     int num_offsets = 0;
-    int ok = argc >= 7 && strcmp(argv[1], "zoom") == 0 && parse_int(argv[2], &zoom[0]) &&
-        parse_int(argv[3], &zoom[1]) && parse_int(argv[4], &zoom[2]) && zoom[2] > 0 && zoom[0] <= zoom[1] &&
+    int ok = argc >= 7 && strcmp(argv[1], "zoom") == 0 && e2e_parse_int(argv[2], &zoom[0]) &&
+        e2e_parse_int(argv[3], &zoom[1]) && e2e_parse_int(argv[4], &zoom[2]) && zoom[2] > 0 && zoom[0] <= zoom[1] &&
         strcmp(argv[5], "offsets") == 0;
     for (int i = 6; ok && i < argc; i++) {
         ok = sscanf(argv[i], "%d,%d", &offsets[num_offsets][0], &offsets[num_offsets][1]) == 2;
@@ -826,7 +727,7 @@ static int run_repeat(int argc, char **argv)
         char line[MAX_LINE];
         char *words[MAX_ARGS];
         snprintf(line, MAX_LINE, "%s", data.lines[end_line]);
-        int count = split_line(line, words);
+        int count = e2e_split_line(line, words);
         if (count > 0 && strcmp(words[0], "end") == 0) {
             break;
         }
@@ -845,7 +746,7 @@ static int run_repeat(int argc, char **argv)
         for (int o = 0; o < num_offsets; o++) {
             for (int i = first_line; i < end_line; i++) {
                 char line[MAX_LINE];
-                substitute(data.lines[i], z, offsets[o][0], offsets[o][1], line);
+                e2e_substitute(data.lines[i], z, offsets[o][0], offsets[o][1], line, MAX_LINE);
                 data.line = i + 1;
                 int line_result = run_line(line);
                 if (line_result == E2E_ERROR) {
@@ -869,7 +770,7 @@ static int run_lines(void)
         char *argv[MAX_ARGS];
         snprintf(line, MAX_LINE, "%s", data.lines[data.line]);
         data.line++;
-        int argc = split_line(line, argv);
+        int argc = e2e_split_line(line, argv);
         int line_result = argc > 0 && strcmp(argv[0], "repeat") == 0 ?
             run_repeat(argc, argv) : run_line(data.lines[data.line - 1]);
         if (line_result == E2E_ERROR) {

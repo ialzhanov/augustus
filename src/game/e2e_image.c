@@ -5,6 +5,7 @@
 #include "core/image.h"
 #include "core/image_group.h"
 #include "game/e2e.h"
+#include "game/e2e_logic.h"
 #include "graphics/renderer.h"
 #include "map/grid.h"
 #include "platform/renderer.h"
@@ -20,15 +21,6 @@
 #define MAX_CAPTURES 128
 #define MAX_NAME 128
 #define MIN_ZOOM 50
-#define COLOR_DIFF (ALPHA_OPAQUE | 0x00ff00ff)
-
-// The seam check compares the mean luminance (0 to 255) of each line of slope +1/2 or -1/2
-// (the tile edges) with the parallel lines 1.5 to 3 pixels away
-#define SEAM_NEAR 3 // in half pixels
-#define SEAM_FAR 6 // in half pixels
-#define SEAM_MIN_LINE_PIXELS 64
-// Measured on flat HD grass, zoom 50 to 200: at most 10.5 on 2b6e0ca02, 26 to 35 at most zooms without it
-#define SEAM_THRESHOLD 16.0
 #define SEAM_CROP_SIZE 32
 #define SEAM_CROP_SCALE 8
 
@@ -246,17 +238,13 @@ const color_t *e2e_capture_pixels(const char *name, int *width, int *height)
     return c->pixels;
 }
 
-// The images of a group are from its first image to the first image of the next group
 static void get_group_range(int group, int *first, int *end)
 {
-    *first = image_group(group);
-    *end = IMAGE_MAIN_ENTRIES;
-    for (int other = 0; other < IMAGE_MAX_GROUPS; other++) {
-        int start = image_group(other);
-        if (start > *first && start < *end) {
-            *end = start;
-        }
+    int starts[IMAGE_MAX_GROUPS];
+    for (int i = 0; i < IMAGE_MAX_GROUPS; i++) {
+        starts[i] = image_group(i);
     }
+    e2e_group_range(starts, IMAGE_MAX_GROUPS, group, IMAGE_MAIN_ENTRIES, first, end);
 }
 
 int e2e_check_hd(const char *name, const char *group)
@@ -300,12 +288,6 @@ int e2e_check_hd(const char *name, const char *group)
     return E2E_OK;
 }
 
-static double luminance(color_t c)
-{
-    return (COLOR_COMPONENT(c, COLOR_BITSHIFT_RED) * 299 + COLOR_COMPONENT(c, COLOR_BITSHIFT_GREEN) * 587 +
-        COLOR_COMPONENT(c, COLOR_BITSHIFT_BLUE) * 114) / 1000.0;
-}
-
 // Marks the pixels of the capture that show a tile in the region
 static uint8_t *region_mask(const capture *c, int x1, int y1, int x2, int y2)
 {
@@ -328,20 +310,6 @@ static uint8_t *region_mask(const capture *c, int x1, int y1, int x2, int y2)
         }
     }
     return mask;
-}
-
-static double side_mean(const double *sum, const int *count, int line, int direction, int num_lines)
-{
-    double total = 0;
-    int lines = 0;
-    for (int d = SEAM_NEAR; d <= SEAM_FAR; d++) {
-        int k = line + d * direction;
-        if (k >= 0 && k < num_lines && count[k] >= SEAM_MIN_LINE_PIXELS) {
-            total += sum[k] / count[k];
-            lines++;
-        }
-    }
-    return lines ? total / lines : -1;
 }
 
 static void write_seam_crop(const capture *c, int center_x, int center_y, int number)
@@ -373,104 +341,27 @@ int e2e_check_seams(const char *name, int x1, int y1, int x2, int y2)
         return E2E_ERROR;
     }
     uint8_t *mask = region_mask(c, x1, y1, x2, y2);
-    // A pixel x y is on line k = 2y - slope * x + width of the line family with the slope +1/2 or -1/2
-    int num_lines = 2 * c->height + 2 * c->width + 1;
-    double *sum = calloc(num_lines, sizeof(double));
-    int *count = calloc(num_lines, sizeof(int));
-    int *min_x = calloc(num_lines, sizeof(int));
-    if (!mask || !sum || !count || !min_x) {
-        free(mask);
-        free(sum);
-        free(count);
-        free(min_x);
+    e2e_seam_result result;
+    int has_memory = mask && e2e_find_seams(c->pixels, mask, c->width, c->height, E2E_SEAM_THRESHOLD, &result);
+    free(mask);
+    if (!has_memory) {
         e2e_error("no memory for the seam check");
         return E2E_ERROR;
     }
-    double worst = 0;
-    int worst_slope = 0, worst_line = 0, worst_x = 0, pixels = 0, seams = 0;
-    for (int slope = -1; slope <= 1; slope += 2) {
-        memset(sum, 0, num_lines * sizeof(double));
-        memset(count, 0, num_lines * sizeof(int));
-        for (int y = 0; y < c->height; y++) {
-            for (int x = 0; x < c->width; x++) {
-                if (mask[y * c->width + x]) {
-                    int k = 2 * y - slope * x + c->width;
-                    sum[k] += luminance(c->pixels[y * c->width + x]);
-                    if (!count[k] || x < min_x[k]) {
-                        min_x[k] = x;
-                    }
-                    count[k]++;
-                }
-            }
-        }
-        for (int k = 0; k < num_lines; k++) {
-            if (count[k] < SEAM_MIN_LINE_PIXELS) {
-                continue;
-            }
-            pixels += count[k];
-            double before = side_mean(sum, count, k, -1, num_lines);
-            double after = side_mean(sum, count, k, 1, num_lines);
-            if (before < 0 || after < 0) {
-                continue;
-            }
-            double mean = sum[k] / count[k];
-            double darker = (before < after ? before : after) - mean;
-            double lighter = mean - (before > after ? before : after);
-            double dip = darker > lighter ? darker : lighter;
-            if (dip > SEAM_THRESHOLD) {
-                seams++;
-            }
-            if (dip > worst) {
-                worst = dip;
-                worst_slope = slope;
-                worst_line = k;
-                // The middle of the line: count[k] pixels, one in each second column
-                worst_x = min_x[k] + count[k] - 1;
-            }
-        }
-    }
-    free(mask);
-    free(sum);
-    free(count);
-    free(min_x);
-    if (!pixels) {
+    if (!result.pixels) {
         e2e_error("the capture %s shows no tile of the region %d %d to %d %d", name, x1, y1, x2, y2);
         return E2E_ERROR;
     }
-    int worst_y = (worst_line - c->width + worst_slope * worst_x) / 2;
-    if (seams) {
-        write_seam_crop(c, worst_x, worst_y, 1);
+    if (result.seams) {
+        write_seam_crop(c, result.worst_x, result.worst_y, 1);
         e2e_check_failed("check seams %s: %d seam lines (zoom %d), the worst line is %.1f darker or lighter "
             "than its neighbours (limit %.1f) at pixel %d %d; see %s.seam_1.png",
-            name, seams, c->zoom, worst, SEAM_THRESHOLD, worst_x, worst_y, name);
+            name, result.seams, c->zoom, result.worst, E2E_SEAM_THRESHOLD, result.worst_x, result.worst_y, name);
         return E2E_CHECK_FAILED;
     }
     e2e_log("ok   check seams %s: no seam line (zoom %d), the worst line differs by %.1f (limit %.1f)",
-        name, c->zoom, worst, SEAM_THRESHOLD);
+        name, c->zoom, result.worst, E2E_SEAM_THRESHOLD);
     return E2E_OK;
-}
-
-static int channel_diff(color_t a, color_t b, int shift)
-{
-    return abs((int) COLOR_COMPONENT(a, shift) - (int) COLOR_COMPONENT(b, shift));
-}
-
-static int max_channel_diff_of(color_t a, color_t b)
-{
-    int red = channel_diff(a, b, COLOR_BITSHIFT_RED);
-    int green = channel_diff(a, b, COLOR_BITSHIFT_GREEN);
-    int blue = channel_diff(a, b, COLOR_BITSHIFT_BLUE);
-    int max = red > green ? red : green;
-    return max > blue ? max : blue;
-}
-
-static color_t grey_of(color_t c)
-{
-    int grey = (COLOR_COMPONENT(c, COLOR_BITSHIFT_RED) + COLOR_COMPONENT(c, COLOR_BITSHIFT_GREEN) +
-        COLOR_COMPONENT(c, COLOR_BITSHIFT_BLUE)) / 3;
-    // A light grey, so that the magenta pixels are easy to see
-    grey = 128 + grey / 2;
-    return ALPHA_OPAQUE | (grey << COLOR_BITSHIFT_RED) | (grey << COLOR_BITSHIFT_GREEN) | (grey << COLOR_BITSHIFT_BLUE);
 }
 
 static void get_approved_path(const char *name, char *path)
@@ -519,25 +410,9 @@ int e2e_check_image(const char *name, int max_channel_diff, int max_pixels)
         return E2E_CHECK_FAILED;
     }
     color_t *diff = malloc(sizeof(color_t) * width * height);
-    int changed = 0;
-    int x_min = width, y_min = height, x_max = -1, y_max = -1;
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            int i = y * width + x;
-            if (max_channel_diff_of(c->pixels[i], approved[i]) > max_channel_diff) {
-                changed++;
-                x_min = x < x_min ? x : x_min;
-                y_min = y < y_min ? y : y_min;
-                x_max = x > x_max ? x : x_max;
-                y_max = y > y_max ? y : y_max;
-                if (diff) {
-                    diff[i] = COLOR_DIFF;
-                }
-            } else if (diff) {
-                diff[i] = grey_of(c->pixels[i]);
-            }
-        }
-    }
+    e2e_image_diff changes;
+    e2e_diff_images(c->pixels, approved, width, height, max_channel_diff, diff, &changes);
+    int changed = changes.changed;
     int result = E2E_OK;
     if (changed > max_pixels) {
         char filename[FILE_NAME_MAX];
@@ -550,7 +425,7 @@ int e2e_check_image(const char *name, int max_channel_diff, int max_pixels)
             write_png(filename, diff, width, height);
         }
         e2e_check_failed("check image %s: %d pixels differ by more than %d (allowed: %d), in the box %d %d to %d %d",
-            name, changed, max_channel_diff, max_pixels, x_min, y_min, x_max, y_max);
+            name, changed, max_channel_diff, max_pixels, changes.x_min, changes.y_min, changes.x_max, changes.y_max);
         result = E2E_CHECK_FAILED;
     } else {
         e2e_log("ok   check image %s: %d pixels differ by more than %d (allowed: %d)",
