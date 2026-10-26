@@ -91,7 +91,11 @@ Add a test to `test_check.py` for every new fault class, then a check. Never loo
 - `edge` compares our image and the original at the SAME pixels (where the original is green, else ours). It once skipped verges that had lost their green (<= 10 green px): never let a check pass by finding nothing to measure.
 - Flat single-colour sprites (245 black, 733) keep their originals: nothing to remake.
 - Earthquake cracks (444-475) use `terrain.py` crack mode: the darkest pixels (limit per tile, 474/475 have only grey cracks) sink into a height-field ground mesh with rock ribs on the walls. The mesh goes past the tile edge by more than the floor sinks on screen, else a chasm at a back edge leaves a transparent gap (`seam`). Lit 3D walls are lighter than the painted dark walls: 473 failed `rim`.
-- zsh does not split an unquoted variable into words: `./terrain_make.sh $ids` gives one argument. Use `${=ids}`.
+- Shore tiles (825-844) use `terrain.py` shore mode through `make.sh terrain.py ID` (it has a top pass): rocks from stone blobs in the water, walls from `WALLS` (boxes fitted to the stone pixels, one height per tile). The layout under the models is filled from the pixels around them. A 45 degree box shows one shaded front face; posts and corners are 0 degree boxes (lit left face, dark right face).
+- `edge_fade` removes the shadows near the tile edge, so the edge band gets lighter: rocks failed `rim` with it.
+- `rim` once measured the two images on different pixels: a top part stays opaque at the tile edge, the footprint does not. The original itself measured 1.09. It now uses the same pixels in both (test in `test_check.py`).
+- `make.sh` keeps the Blender log of each pass in `out/<id>_blender*.log`: some renders fail with no "rror:" line.
+- - zsh does not split an unquoted variable into words: `./terrain_make.sh $ids` gives one argument. Use `${=ids}`.
 
 ## Parallel work
 

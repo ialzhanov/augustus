@@ -8,6 +8,7 @@
     {"from": 591, "to": 657, "script": "terrain"},
     {"from": 246, "to": 253, "script": "terrain"},
     {"from": 3140, "to": 3147, "script": "terrain"},
-    {"from": 444, "to": 475, "script": "terrain"}
+    {"from": 444, "to": 475, "script": "terrain"},
+    {"from": 825, "to": 844, "script": "terrain.py"}
   ]
 }
