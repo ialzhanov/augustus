@@ -13,6 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import bpy
 import numpy as np
 import c3
+import foliage
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 if sys.argv[-2] == '--':   # make.sh gives only the id (sprites with a top part): the original of C3_CLIMATE
@@ -21,6 +22,7 @@ if sys.argv[-2] == '--':   # make.sh gives only the id (sprites with a top part)
 else:
     ID, SRC = int(sys.argv[-2]), sys.argv[-1]
 TERRAIN_CAL = [float(v) for v in os.environ.get('C3_TERRAIN_CAL', '2.756,2.575,2.208').split(',')]   # terrain render vs its original (edge grass, with the tuft density compensation)
+LEAF_CAL = [float(v) for v in os.environ.get('C3_LEAF_CAL', '1.3,1.28,1.0').split(',')]   # x GAIN: leaf clusters shade each other (edge, 274-286; 1.4 made 274 too light)
 WATER_CAL = [float(v) for v in os.environ.get('C3_WATER_CAL', '0.519,0.540,0.590').split(',')]   # x TERRAIN_CAL: water colour unchanged by the terrain recalibration
 GAIN = tuple(c3.GAIN[i] * TERRAIN_CAL[i] for i in range(3))
 FRAME = (ID - 364) % 8 if 364 <= ID <= 371 else 0
@@ -39,6 +41,10 @@ WALLS = {833: (0.2, [(0.147, -0.001, 0.97, 0.22, 90)]),   # fit 0.396 thick (sha
          842: (0.451, [(-0.025, -0.156, 0.814, 0.443, 0), (0.186, -0.019, 0.395, 0.449, 0)]),
          843: (0.204, [(0.231, -0.322, 0.474, 0.336, 0), (0.277, 0.061, 0.394, 0.428, 45)]),
          844: (0.27, [(-0.068, -0.186, 0.677, 0.207, 0), (0.108, -0.323, 0.542, 0.278, 45)])}
+TREE = 254 <= ID <= 261 or 274 <= ID <= 305   # shrubs (cypresses) and trees: crowns of leaf clusters (foliage.py)
+OPEN_GROUND = set(range(254, 262)) | {276, 278, 280}   # single trees on grass: no undergrowth (the colour rule takes their
+                                                       # shadow for foliage; lit clusters there gave 1.7 x the contrast)
+MEADOW = 262 <= ID <= 273   # tall dry grass stalks (light yellow vertical runs) on grass, some above the tile
 CRACK = 444 <= ID <= 475   # earthquake chasms: the original's dark pixels sink into the ground (3D walls)
 CRACK_DEPTH = float(os.environ.get('C3_CRACK_DEPTH', '0.15'))   # chasm floor below the ground (units; 35.5 game px = 1)
 COBBLE_CAL = float(os.environ.get('C3_COBBLE_CAL', '1.0'))
@@ -110,6 +116,10 @@ def shore_models():
 known = alpha > 0
 if SHORE:   # the ground under the walls and rocks continues the water and grass around them
     known = known & ~shore_models()
+if TREE:   # tree tiles: the ground is undergrowth in the original's colours (no fill under the canopy)
+    CANOPY, CROWNS = foliage.crowns(rgb, alpha)
+    TRUNK = (alpha > 0) & (rgb[..., 0] >= rgb[..., 1] - 0.01) & (foliage.foliage_diff(rgb, alpha) > foliage.T)   # brown or grey, not grass
+    print(f'tree {ID}: {len(CROWNS)} crowns')
 fill = rgb * known[..., None]
 while not known.all():                                    # grow colours into the transparent corners until all are set
     w = box_blur(known.astype(float))
@@ -121,6 +131,8 @@ r, g, b = fill[..., 0], fill[..., 1], fill[..., 2]
 water = b > np.maximum(r, g) + 0.06
 grassy = (g > r + 0.02) & (g > b + 0.08) & ~water
 dirt = ~water & ~grassy
+if TREE:   # all ground under trees is vegetation: dark foliage pixels are not dirt (sand photo, pebbles, half the light)
+    grassy, dirt = ~water, np.zeros_like(dirt)
 if MOSAIC:   # the blue and green mosaic stones are not water or grass
     water, grassy, dirt = np.zeros_like(water), np.zeros_like(grassy), np.ones_like(dirt)
 inside = alpha > 0
@@ -131,6 +143,13 @@ if CRACK:   # chasm = the darkest pixels; 474 and 475 have only grey cracks, so 
     DEPTH_FIELD = box_blur(dark * (0.5 + 0.5 * np.clip((limit - lum) / 0.12, 0, 1)))   # darker = deeper
     grassy, dirt = grassy & ~dark, dirt | dark   # no grass tufts over the chasm, soil on its floor
     print(f'crack {ID}: {int((dark & inside).sum())} chasm px')
+if TREE or MEADOW:   # leaf colours: the original with its canopy (LAYOUT has grass there), corners grown from the nearby colours
+    full = rgb * (alpha[..., None] > 0); k = alpha > 0
+    while not k.all():
+        wk = box_blur(k.astype(float))
+        gr = np.stack([box_blur(full[..., j] * k) for j in range(3)], -1) / np.maximum(wk, 1e-6)[..., None]
+        nw = ~k & (wk > 0); full[nw] = gr[nw]; k = k | nw
+    FOLIAGE = save_image('foliage', np.stack([box_blur(full[..., j], 1) for j in range(3)], -1), True)
 # paved roads: the sharp layout (a blur mixes the light stones into the 1 px green verges)
 LAYOUT = save_image('layout', np.stack([box_blur(fill[..., k], 0 if PAVED else 2) for k in range(3)], -1), True)
 # distance from the shore (sprite pixels, up to 4) for depth, foam and the wet band
@@ -531,8 +550,140 @@ def shore():
             o.color = (*(lin(rgb[ys, xs]).mean(0) * np.array(c3.GAIN) * random.uniform(1.2, 1.5)), 1)
 
 
+def ico_template():
+    """vertices and triangles of a unit icosphere (one subdivision): the shape of a leaf cluster"""
+    me = bpy.data.meshes.new('ico'); import bmesh
+    bm = bmesh.new(); bmesh.ops.create_icosphere(bm, subdivisions=1, radius=1.0); bm.to_mesh(me); bm.free()
+    v = np.array([p.co[:] for p in me.vertices]); f = np.array([p.vertices[:] for p in me.polygons])
+    bpy.data.meshes.remove(me)
+    return v, f
+
+
+def instances(name, centres, sizes, mat, rng, squash=0.55, heights=None, boost=None):
+    """one mesh of many small flattened, randomly turned icospheres; attribute 'rnd' (0..1) per cluster.
+    heights: upright blades instead (radius = size, z from 0 to height, a small tilt). boost: attribute 'boost' per cluster"""
+    v, f = ico_template(); n = len(centres)
+    a = rng.uniform(0, 2 * np.pi, (n, 3)); ca, sa = np.cos(a), np.sin(a)
+    if heights is not None:
+        a[:, 1] = rng.normal(0, 0.18, n); ca[:, 1], sa[:, 1] = np.cos(a[:, 1]), np.sin(a[:, 1])
+    rot = np.zeros((n, 3, 3))                                 # rotation about z, then x
+    rot[:, 0, 0], rot[:, 0, 1], rot[:, 1, 0], rot[:, 1, 1], rot[:, 2, 2] = ca[:, 0], -sa[:, 0], sa[:, 0], ca[:, 0], 1
+    rx = np.zeros((n, 3, 3)); rx[:, 0, 0] = 1; rx[:, 1, 1], rx[:, 1, 2], rx[:, 2, 1], rx[:, 2, 2] = ca[:, 1], -sa[:, 1], sa[:, 1], ca[:, 1]
+    shape = np.broadcast_to(v * [1, 1, squash], (n,) + v.shape) * sizes[:, None, None]
+    if heights is not None:                                   # unit sphere z -1..1 -> 0..height
+        shape = shape.copy(); shape[..., 2] = (v[None, :, 2] + 1) / 2 * heights[:, None]
+    verts = np.einsum('nij,njk,nvk->nvi', rot, rx, shape) + centres[:, None, :]
+    faces = f[None] + (np.arange(n) * len(v))[:, None, None]
+    me = bpy.data.meshes.new(name)
+    me.from_pydata(verts.reshape(-1, 3).tolist(), [], faces.reshape(-1, 3).tolist())
+    att = me.attributes.new('rnd', 'FLOAT', 'POINT'); att.data.foreach_set('value', np.repeat(rng.uniform(0, 1, n), len(v)).astype(np.float32))
+    if boost is not None:
+        att = me.attributes.new('boost', 'FLOAT', 'POINT'); att.data.foreach_set('value', np.repeat(boost, len(v)).astype(np.float32))
+    for p in me.polygons: p.use_smooth = True
+    me.materials.append(mat)
+    o = bpy.data.objects.new(name, me); c3.sc.collection.objects.link(o)
+    return o
+
+
+def m_leaves(dark=1.0, spread=1.0, cal=None):
+    """the original's broad colour at the leaf's screen position, varied per cluster (spread 1: x 0.72..1.2),
+    darker inside the crown"""
+    def f():
+        lay = window_tex(FOLIAGE)
+        rnd = c3.N.nodes.new('ShaderNodeAttribute'); rnd.attribute_name = 'rnd'
+        lo, hi = np.array([0.72, 0.74, 0.66]), np.array([1.2, 1.2, 1.05])
+        mid = (lo + hi) / 2; lo, hi = mid + (lo - mid) * spread, mid + (hi - mid) * spread
+        var = c3.ramp(rnd.outputs['Fac'], (0.0, tuple(lo * dark)), (1.0, tuple(hi * dark)))
+        col = c3.mix(c3.mix(lay.outputs['Color'], tuple(GAIN[i] * (cal or LEAF_CAL)[i] for i in range(3)), 1.0, 'MULTIPLY'), var, 1.0, 'MULTIPLY')
+        if cal:   # undergrowth: x the attribute 'boost' (dense clusters shade each other)
+            bo = c3.N.nodes.new('ShaderNodeAttribute'); bo.attribute_name = 'boost'
+            col = c3.mix(col, bo.outputs['Fac'], 1.0, 'MULTIPLY')
+        return col, None, 0.7
+    return f
+
+
+def trees():
+    """crowns: leaf clusters on a shell (0.7..1 R) and a dark inner core; trunks under crowns above the ground"""
+    c3.GROUND.update(bpy.data.objects.keys())
+    rng = np.random.default_rng(int(os.environ.get('C3_SEED', ID)))
+    leaves, core, bark = material('leaves', m_leaves()), material('core', m_leaves(0.65)), material('bark', m_mapped(1.0))
+    cs, ss = [], []
+    score = np.clip((foliage.foliage_diff(rgb, alpha) - 4) / 14, 0, 1)   # 0 = edge grass, 1 = clearly foliage
+    for x, y, r, z, g_row in CROWNS:
+        R = r / foliage.PX_PER_UNIT
+        gx, gy = world_of(x, g_row)
+        n = int(np.clip(8 * R * R / 0.016 ** 2, 60, 4000))
+        d = rng.normal(size=(n, 3)); d /= np.linalg.norm(d, axis=1)[:, None]
+        size = rng.uniform(0.010, 0.022, n) * min(1.0, R / 0.06 + 0.4)
+        outer = (r - 0.25) / foliage.PX_PER_UNIT - size       # a circle reaches the centre of the first pixel outside
+        flat = 0.65 if z < 1.2 * R else 0.9                 # low bushes: flatter undergrowth
+        cs.append(np.array([gx, gy, z]) + d * (np.maximum(outer, 0.2 * R) * rng.uniform(0.6, 1.0, n))[:, None] * [1, 1, flat])
+        ss.append(size)
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.65 * R, location=(gx, gy, z))
+        bpy.context.object.data.materials.append(core)
+        cols = slice(max(int(x - r / 3), 0), int(x + r / 3) + 1)
+        gap = TRUNK[int(y + r):int(g_row) + 1, cols]          # between the crown's lower edge and its ground point
+        below = score[int(y + r):int(g_row) + 1, max(int(x - r / 2), 0):int(x + r / 2) + 1]
+        if z - R > 0.02 and below.size and (below > 0.6).mean() > 0.6:   # foliage down to the ground: a column of leaves
+            m_ = int(np.clip(4 * R * z / 0.016 ** 2, 30, 4000))
+            th = rng.uniform(0, 2 * np.pi, m_); rho = R * rng.uniform(0.6, 0.95, m_)
+            cs.append(np.stack([gx + rho * np.cos(th), gy + rho * np.sin(th), rng.uniform(0, z, m_)], 1))
+            ss.append(rng.uniform(0.010, 0.022, m_))
+            bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.65 * R, depth=z, location=(gx, gy, z / 2))
+            bpy.context.object.data.materials.append(core)
+            continue
+        lowest = not any(abs(x2 - x) < 0.4 * (r + r2) and y2 > y for x2, y2, r2, *_ in CROWNS)   # one trunk per tree
+        if z - R > 0.02 and lowest and gap.any(1).sum() >= 2:
+            h = z - 0.3 * R
+            bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.008 + 0.06 * R, depth=h, location=(gx, gy, h / 2))
+            bpy.context.object.data.materials.append(bark)
+    # undergrowth: leaf clusters on every ground pixel, more and higher where the colour differs more from the grass
+    dia, _ = foliage.diamond(H, W)
+    ys, xs = np.nonzero((alpha > 0) & dia)
+    k = rng.poisson(5 * np.clip((score[ys, xs] - 0.35) / 0.65, 0, 1))   # only on foliage: clusters on open grass doubled its contrast (254)
+    ys, xs, sc = np.repeat(ys, k), np.repeat(xs, k), np.repeat(score[ys, xs], k)
+    gx, gy = world_of(xs + rng.uniform(-0.5, 0.5, len(xs)), ys + rng.uniform(-0.5, 0.5, len(ys)))
+    keep = (np.abs(gx) < LIMIT) & (np.abs(gy) < LIMIT)
+    hgt = rng.uniform(0, 1, len(xs)) * (0.008 + 0.07 * sc)
+    instances('leaves', np.concatenate(cs), np.concatenate(ss), leaves, rng)
+    keep &= ID not in OPEN_GROUND
+    if keep.any():   # lighter only where dense (LEAF_CAL on single clusters on open grass: ground contrast 1.65 x on 254)
+        instances('undergrowth', np.stack([gx, gy, hgt], 1)[keep], rng.uniform(0.009, 0.018, len(xs))[keep] * (0.7 + 0.5 * sc[keep]),
+                  material('undergrowth', m_leaves(spread=0.6, cal=(1, 1, 1))), rng, boost=1 + 0.4 * sc[keep])
+
+
+def meadow():
+    """tall grass: a clump of upright blades at the foot of each light yellow vertical run of pixels (its height)"""
+    c3.GROUND.update(bpy.data.objects.keys())
+    rng = np.random.default_rng(int(os.environ.get('C3_SEED', ID)))
+    L = rgb @ np.array([0.299, 0.587, 0.114])
+    dia, _ = foliage.diamond(H, W)
+    ref = np.median(L[(alpha > 0) & dia])
+    stalk = (alpha > 0) & (L > ref * 1.12) & (rgb[..., 0] > rgb[..., 1] - 0.06)
+    cs, ss, hs = [], [], []
+    for x in range(W):
+        y = H - 1
+        while y >= 0:
+            if not stalk[y, x]:
+                y -= 1; continue
+            y1 = y
+            while y1 >= 0 and stalk[y1, x]: y1 -= 1
+            run = y - y1                                       # stalk pixels y1+1 .. y, foot at y
+            for _ in range(rng.integers(3, 7)):
+                gx, gy = world_of(x + rng.uniform(-0.6, 0.6), y + 0.5 + rng.uniform(0, 1.0))
+                if abs(gx) < LIMIT and abs(gy) < LIMIT:
+                    cs.append((gx, gy, 0)); hs.append((run + 0.5 + rng.uniform(0, 1)) / 35.5); ss.append(rng.uniform(0.004, 0.007))
+            y = y1
+    instances('stalks', np.array(cs), np.array(ss), material('straw', m_leaves()), rng, heights=np.array(hs))
+    print(f'meadow {ID}: {len(cs)} blades')
+
+
 if SHORE:
     shore()
+if TREE:
+    trees()
+if MEADOW:
+    meadow()
 c3.render(W, H, tiles=NT, samples=64, edge_fade=ID in WALLS)   # rocks: short shadows (edge_fade lit the edge band: rim)
 
 

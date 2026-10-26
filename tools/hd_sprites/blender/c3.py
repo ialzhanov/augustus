@@ -387,6 +387,8 @@ def render(W, H, tiles=1, samples=128, edge_fade=False):
     co.location = Vector((7.07, -7.07, 5.77))
     foot_h = 15 * tiles                                   # half the footprint height: tile centre above the bottom
     cam.ortho_scale = math.sqrt(2) * tiles * W / (60 * tiles - 2)   # footprint (n tiles) fills 60 n - 2 px
+    if H > W:   # Blender fits ortho_scale to the larger side: a tree sprite (58 x 67) rendered 15% too large
+        cam.ortho_scale *= H / W
     if W >= H:
         px = cam.ortho_scale / W
     else:
