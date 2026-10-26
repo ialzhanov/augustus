@@ -45,6 +45,13 @@ int e2e_check_image(const char *name, int max_channel_diff, int max_pixels);
  */
 int e2e_check_hd(const char *name, const char *group);
 
+/**
+ * Looks for seams in a capture of flat terrain: a tile edge line that is darker or lighter
+ * than the parallel lines near it. Only the pixels of the tiles in the region count.
+ * @return E2E_OK, E2E_CHECK_FAILED or E2E_ERROR
+ */
+int e2e_check_seams(const char *name, int x1, int y1, int x2, int y2);
+
 #endif // E2E_TESTS
 
 #endif // GAME_E2E_IMAGE_H

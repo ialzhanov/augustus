@@ -615,6 +615,15 @@ static int command_check(int argc, char **argv)
     if (argc >= 2 && strcmp(argv[1], "hd") == 0) {
         return check_hd(argc, argv);
     }
+    if (argc >= 2 && strcmp(argv[1], "seams") == 0) {
+        int region[4];
+        if (argc != 8 || strcmp(argv[3], "region") != 0 || !parse_int(argv[4], &region[0]) ||
+            !parse_int(argv[5], &region[1]) || !parse_int(argv[6], &region[2]) || !parse_int(argv[7], &region[3])) {
+            e2e_error("check seams needs: check seams <capture> region x1 y1 x2 y2");
+            return E2E_ERROR;
+        }
+        return e2e_check_seams(argv[2], region[0], region[1], region[2], region[3]);
+    }
     compare_op op = OP_NONE;
     int op_index = find_op(argc, argv, &op);
     if (op_index < 2 || op_index == argc - 1) {
@@ -740,33 +749,125 @@ static int read_file(FILE *fp)
     return 1;
 }
 
+// Runs one line of the test file. An empty line or a comment returns E2E_OK.
+static int run_line(const char *text)
+{
+    char line[MAX_LINE];
+    char *argv[MAX_ARGS];
+    snprintf(line, MAX_LINE, "%s", text);
+    int argc = split_line(line, argv);
+    if (argc == 0) {
+        return E2E_OK;
+    }
+    if (argc < 0) {
+        e2e_error("the line has more than %d words", MAX_ARGS);
+        return E2E_ERROR;
+    }
+    const e2e_command *command = find_command(argv[0]);
+    if (!command) {
+        e2e_error("unknown command '%s'", argv[0]);
+        return E2E_ERROR;
+    }
+    return command->run(argc, argv);
+}
+
+// Replaces each {zoom}, {dx} and {dy} in the text
+static void substitute(const char *text, int zoom, int dx, int dy, char *result)
+{
+    static const char *NAMES[] = { "{zoom}", "{dx}", "{dy}" };
+    int values[] = { zoom, dx, dy };
+    int length = 0;
+    while (*text && length < MAX_LINE - 12) {
+        int replaced = 0;
+        for (int i = 0; i < 3 && !replaced; i++) {
+            size_t name_length = strlen(NAMES[i]);
+            if (strncmp(text, NAMES[i], name_length) == 0) {
+                length += snprintf(result + length, MAX_LINE - length, "%d", values[i]);
+                text += name_length;
+                replaced = 1;
+            }
+        }
+        if (!replaced) {
+            result[length++] = *text++;
+        }
+    }
+    result[length] = 0;
+}
+
+// repeat zoom <from> <to> <step> offsets <dx,dy> ... runs the lines up to "end" for each zoom and offset
+static int run_repeat(int argc, char **argv)
+{
+    int zoom[3];
+    int offsets[MAX_ARGS][2];
+    int num_offsets = 0;
+    int ok = argc >= 7 && strcmp(argv[1], "zoom") == 0 && parse_int(argv[2], &zoom[0]) &&
+        parse_int(argv[3], &zoom[1]) && parse_int(argv[4], &zoom[2]) && zoom[2] > 0 &&
+        strcmp(argv[5], "offsets") == 0;
+    for (int i = 6; ok && i < argc; i++) {
+        ok = sscanf(argv[i], "%d,%d", &offsets[num_offsets][0], &offsets[num_offsets][1]) == 2;
+        num_offsets++;
+    }
+    if (!ok) {
+        e2e_error("repeat needs: repeat zoom <from> <to> <step> offsets <dx,dy> ...");
+        return E2E_ERROR;
+    }
+    int first_line = data.line;
+    int end_line = first_line;
+    while (end_line < data.num_lines) {
+        char line[MAX_LINE];
+        char *words[MAX_ARGS];
+        snprintf(line, MAX_LINE, "%s", data.lines[end_line]);
+        int count = split_line(line, words);
+        if (count > 0 && strcmp(words[0], "end") == 0) {
+            break;
+        }
+        if (count > 0 && strcmp(words[0], "repeat") == 0) {
+            e2e_error("a repeat block cannot have a repeat block in it");
+            return E2E_ERROR;
+        }
+        end_line++;
+    }
+    if (end_line == data.num_lines) {
+        e2e_error("the repeat block has no end line");
+        return E2E_ERROR;
+    }
+    int result = E2E_OK;
+    for (int z = zoom[0]; z <= zoom[1]; z += zoom[2]) {
+        for (int o = 0; o < num_offsets; o++) {
+            for (int i = first_line; i < end_line; i++) {
+                char line[MAX_LINE];
+                substitute(data.lines[i], z, offsets[o][0], offsets[o][1], line);
+                data.line = i + 1;
+                int line_result = run_line(line);
+                if (line_result == E2E_ERROR) {
+                    return E2E_ERROR;
+                }
+                if (line_result > result) {
+                    result = line_result;
+                }
+            }
+        }
+    }
+    data.line = end_line + 1;
+    return result;
+}
+
 static int run_lines(void)
 {
     int result = E2E_OK;
-    char line[MAX_LINE];
-    char *argv[MAX_ARGS];
     while (data.line < data.num_lines) {
+        char line[MAX_LINE];
+        char *argv[MAX_ARGS];
         snprintf(line, MAX_LINE, "%s", data.lines[data.line]);
         data.line++;
         int argc = split_line(line, argv);
-        if (argc == 0) {
-            continue;
-        }
-        if (argc < 0) {
-            e2e_error("the line has more than %d words", MAX_ARGS);
+        int line_result = argc > 0 && strcmp(argv[0], "repeat") == 0 ?
+            run_repeat(argc, argv) : run_line(data.lines[data.line - 1]);
+        if (line_result == E2E_ERROR) {
             return E2E_ERROR;
         }
-        const e2e_command *command = find_command(argv[0]);
-        if (!command) {
-            e2e_error("unknown command '%s'", argv[0]);
-            return E2E_ERROR;
-        }
-        int command_result = command->run(argc, argv);
-        if (command_result == E2E_ERROR) {
-            return E2E_ERROR;
-        }
-        if (command_result > result) {
-            result = command_result;
+        if (line_result > result) {
+            result = line_result;
         }
     }
     return result;

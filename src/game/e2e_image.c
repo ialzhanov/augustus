@@ -22,12 +22,28 @@
 #define MIN_ZOOM 50
 #define COLOR_DIFF (ALPHA_OPAQUE | 0x00ff00ff)
 
+// The seam check compares the mean luminance (0 to 255) of each line of slope +1/2 or -1/2
+// (the tile edges) with the parallel lines 1.5 to 3 pixels away
+#define SEAM_NEAR 3 // in half pixels
+#define SEAM_FAR 6 // in half pixels
+#define SEAM_MIN_LINE_PIXELS 64
+// Measured on flat HD grass, zoom 50 to 200: at most 10.5 on 2b6e0ca02, 26 to 35 at most zooms without it
+#define SEAM_THRESHOLD 16.0
+#define SEAM_CROP_SIZE 32
+#define SEAM_CROP_SCALE 8
+
 typedef struct {
     char name[MAX_NAME];
     int width;
     int height;
     color_t *pixels;
     int draws[IMAGE_MAIN_ENTRIES][2]; // the draws of each main image without and with an HD texture
+    // The view of the capture, for the seam check
+    int zoom;
+    int camera_x;
+    int camera_y;
+    int left;
+    int top;
 } capture;
 
 typedef struct {
@@ -195,6 +211,10 @@ int e2e_capture(const char *name, int x, int y, int zoom, int dx, int dy, int wi
         e2e_error("no memory for the capture %s", name);
         return E2E_ERROR;
     }
+    c->zoom = zoom;
+    city_view_get_camera_in_pixels(&c->camera_x, &c->camera_y);
+    c->left = left;
+    c->top = top;
     platform_renderer_e2e_reset_counts();
     window_city_draw_all();
     for (int id = 0; id < IMAGE_MAIN_ENTRIES; id++) {
@@ -277,6 +297,156 @@ int e2e_check_hd(const char *name, const char *group)
         return E2E_CHECK_FAILED;
     }
     e2e_log("ok   check hd %s %s: %d draws with HD, %d draws without HD", name, what, hd, original);
+    return E2E_OK;
+}
+
+static double luminance(color_t c)
+{
+    return (COLOR_COMPONENT(c, COLOR_BITSHIFT_RED) * 299 + COLOR_COMPONENT(c, COLOR_BITSHIFT_GREEN) * 587 +
+        COLOR_COMPONENT(c, COLOR_BITSHIFT_BLUE) * 114) / 1000.0;
+}
+
+// Marks the pixels of the capture that show a tile in the region
+static uint8_t *region_mask(const capture *c, int x1, int y1, int x2, int y2)
+{
+    uint8_t *mask = calloc((size_t) c->width * c->height, 1);
+    if (!mask) {
+        return 0;
+    }
+    city_view_set_scale(c->zoom);
+    city_view_set_camera_from_pixel_position(c->camera_x, c->camera_y);
+    for (int y = 0; y < c->height; y++) {
+        for (int x = 0; x < c->width; x++) {
+            view_tile tile;
+            if (!city_view_pixels_to_view_tile(c->left + x, c->top + y, &tile)) {
+                continue;
+            }
+            int grid_offset = city_view_tile_to_grid_offset(&tile);
+            int tile_x = map_grid_offset_to_x(grid_offset);
+            int tile_y = map_grid_offset_to_y(grid_offset);
+            mask[y * c->width + x] = grid_offset && tile_x >= x1 && tile_x <= x2 && tile_y >= y1 && tile_y <= y2;
+        }
+    }
+    return mask;
+}
+
+static double side_mean(const double *sum, const int *count, int line, int direction, int num_lines)
+{
+    double total = 0;
+    int lines = 0;
+    for (int d = SEAM_NEAR; d <= SEAM_FAR; d++) {
+        int k = line + d * direction;
+        if (k >= 0 && k < num_lines && count[k] >= SEAM_MIN_LINE_PIXELS) {
+            total += sum[k] / count[k];
+            lines++;
+        }
+    }
+    return lines ? total / lines : -1;
+}
+
+static void write_seam_crop(const capture *c, int center_x, int center_y, int number)
+{
+    int size = SEAM_CROP_SIZE * SEAM_CROP_SCALE;
+    color_t *crop = malloc(sizeof(color_t) * size * size);
+    if (!crop) {
+        return;
+    }
+    for (int y = 0; y < size; y++) {
+        for (int x = 0; x < size; x++) {
+            int source_x = center_x - SEAM_CROP_SIZE / 2 + x / SEAM_CROP_SCALE;
+            int source_y = center_y - SEAM_CROP_SIZE / 2 + y / SEAM_CROP_SCALE;
+            int inside = source_x >= 0 && source_x < c->width && source_y >= 0 && source_y < c->height;
+            crop[y * size + x] = inside ? c->pixels[source_y * c->width + source_x] : ALPHA_OPAQUE;
+        }
+    }
+    char filename[FILE_NAME_MAX];
+    snprintf(filename, FILE_NAME_MAX, "%s/%s.seam_%d.png", e2e_out_dir(), c->name, number);
+    write_png(filename, crop, size, size);
+    free(crop);
+}
+
+int e2e_check_seams(const char *name, int x1, int y1, int x2, int y2)
+{
+    capture *c = find_capture(name);
+    if (!c) {
+        e2e_error("no capture has the name %s", name);
+        return E2E_ERROR;
+    }
+    uint8_t *mask = region_mask(c, x1, y1, x2, y2);
+    // A pixel x y is on line k = 2y - slope * x + width of the line family with the slope +1/2 or -1/2
+    int num_lines = 2 * c->height + 2 * c->width + 1;
+    double *sum = calloc(num_lines, sizeof(double));
+    int *count = calloc(num_lines, sizeof(int));
+    int *min_x = calloc(num_lines, sizeof(int));
+    if (!mask || !sum || !count || !min_x) {
+        free(mask);
+        free(sum);
+        free(count);
+        free(min_x);
+        e2e_error("no memory for the seam check");
+        return E2E_ERROR;
+    }
+    double worst = 0;
+    int worst_slope = 0, worst_line = 0, worst_x = 0, pixels = 0, seams = 0;
+    for (int slope = -1; slope <= 1; slope += 2) {
+        memset(sum, 0, num_lines * sizeof(double));
+        memset(count, 0, num_lines * sizeof(int));
+        for (int y = 0; y < c->height; y++) {
+            for (int x = 0; x < c->width; x++) {
+                if (mask[y * c->width + x]) {
+                    int k = 2 * y - slope * x + c->width;
+                    sum[k] += luminance(c->pixels[y * c->width + x]);
+                    if (!count[k] || x < min_x[k]) {
+                        min_x[k] = x;
+                    }
+                    count[k]++;
+                }
+            }
+        }
+        for (int k = 0; k < num_lines; k++) {
+            if (count[k] < SEAM_MIN_LINE_PIXELS) {
+                continue;
+            }
+            pixels += count[k];
+            double before = side_mean(sum, count, k, -1, num_lines);
+            double after = side_mean(sum, count, k, 1, num_lines);
+            if (before < 0 || after < 0) {
+                continue;
+            }
+            double mean = sum[k] / count[k];
+            double darker = (before < after ? before : after) - mean;
+            double lighter = mean - (before > after ? before : after);
+            double dip = darker > lighter ? darker : lighter;
+            if (dip > SEAM_THRESHOLD) {
+                seams++;
+            }
+            if (dip > worst) {
+                worst = dip;
+                worst_slope = slope;
+                worst_line = k;
+                // The middle of the line: count[k] pixels, one in each second column
+                worst_x = min_x[k] + count[k] - 1;
+            }
+        }
+    }
+    free(mask);
+    free(sum);
+    free(count);
+    free(min_x);
+    if (!pixels) {
+        e2e_error("the capture %s shows no tile of the region %d %d to %d %d", name, x1, y1, x2, y2);
+        return E2E_ERROR;
+    }
+    int worst_y = (worst_line - c->width + worst_slope * worst_x) / 2;
+    if (seams) {
+        write_seam_crop(c, worst_x, worst_y, 1);
+        e2e_check_failed("check seams %s: %d seam lines (zoom %d), the worst line is %.1f darker or lighter "
+            "than its neighbours (limit %.1f) at pixel %d %d; see %s.seam_1.png",
+            name, seams, c->zoom, worst, SEAM_THRESHOLD, worst_x, worst_y, name);
+        return E2E_CHECK_FAILED;
+    }
+    e2e_log("ok   check seams %s: no seam line (zoom %d), the worst line differs by %.1f (limit %.1f)",
+        name, c->zoom, worst, SEAM_THRESHOLD);
     return E2E_OK;
 }
 

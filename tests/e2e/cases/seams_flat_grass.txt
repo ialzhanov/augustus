@@ -1,0 +1,9 @@
+# expect: pass
+# A1: no seams between flat HD grass tiles at any zoom from 50% to 200%, with two
+# camera offsets. The seam bug was fixed in 2b6e0ca02 (dark lines at 80-150%).
+load flat_grass.svx
+repeat zoom 50 200 5 offsets 0,0 7,3
+capture seam_{zoom}_{dx}_{dy} camera 40 40 zoom {zoom} offset {dx} {dy} size 640 480
+check hd seam_{zoom}_{dx}_{dy} terrain_grass_1
+check seams seam_{zoom}_{dx}_{dy} region 30 30 50 50
+end
