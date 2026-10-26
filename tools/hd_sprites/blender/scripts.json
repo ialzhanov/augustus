@@ -9,6 +9,8 @@
     {"from": 246, "to": 253, "script": "terrain"},
     {"from": 3140, "to": 3147, "script": "terrain"},
     {"from": 444, "to": 475, "script": "terrain"},
-    {"from": 825, "to": 844, "script": "terrain.py"}
+    {"from": 825, "to": 844, "script": "terrain.py"},
+    {"from": 254, "to": 261, "script": "terrain.py"},
+    {"from": 274, "to": 305, "script": "terrain.py"}
   ]
 }

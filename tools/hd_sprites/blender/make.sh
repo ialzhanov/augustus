@@ -16,9 +16,11 @@ O=out/$SUB; mkdir -p $O
 [ -f "$ORIG" ] || { echo "no original $ORIG (run export_originals.py)"; exit 1; }
 rm -f $O/${ID}_8.png $O/${ID}.png $O/${ID}_8top.png $O/${ID}_top.png   # a failed render must not leave an old image to check
 # the full Blender log of each pass stays in $O/${ID}_blender*.log (a failed render printed no "rror:" line)
-$B -b -P $S -- $PWD/$O/${ID}_8.png 8 -- $ID > $O/${ID}_blender.log 2>&1; grep -E "rror:" $O/${ID}_blender.log
+# Blender sometimes stops with no output (exit code in the log); one more try then
+render() { for try in 1 2; do $B -b -P $S -- "$@" > $LOG 2>&1; echo "exit $? (try $try)" >> $LOG; [ -f "$1" ] && break; done; grep -E "rror:" $LOG; }
+LOG=$O/${ID}_blender.log; render $PWD/$O/${ID}_8.png 8 -- $ID
 [ -f $O/${ID}_8.png ] || { echo "render of $ID failed (no $O/${ID}_8.png): no attempt saved"; tail -5 $O/${ID}_blender.log; exit 1; }
-if [ "$TOP" != 0 ]; then $B -b -P $S -- $PWD/$O/${ID}_8top.png 8 top -- $ID > $O/${ID}_blender_top.log 2>&1; grep -E "rror:" $O/${ID}_blender_top.log
+if [ "$TOP" != 0 ]; then LOG=$O/${ID}_blender_top.log; render $PWD/$O/${ID}_8top.png 8 top -- $ID
   [ -f $O/${ID}_8top.png ] || { echo "render of the top part of $ID failed: no attempt saved"; tail -5 $O/${ID}_blender_top.log; exit 1; }; fi
 $P -c "
 from PIL import Image; import os
