@@ -38,7 +38,7 @@ MallocPreScribble=1 MallocScribble=1 build-e2e/augustus.app/Contents/MacOS/augus
     --test tests/e2e/cases/monthly_food.txt --out /tmp/results ~/caesar3
 ```
 
-The exit code is 0 when all checks pass, 1 when a check fails and 2 when the test file or the setup has an error. `run.sh` sets `MallocPreScribble` and `MallocScribble`: some save functions do not write all bytes of their buffers, and these variables make the bytes the same in each run.
+The exit code is 0 when all checks pass, 1 when a check fails and 2 when the test file or the setup has an error. A crash gives another exit code, and no message box opens. At the first failed check, the test also writes `state_failure.json` and `state_failure.svx`. `run.sh` sets `MallocPreScribble` and `MallocScribble`: some save functions do not write all bytes of their buffers, and these variables make the bytes the same in each run.
 
 ## Results
 

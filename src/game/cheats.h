@@ -22,6 +22,17 @@ void game_cheat_console(void);
 
 void game_cheat_parse_command(uint8_t *command);
 
+#ifdef E2E_TESTS
+/**
+ * Checks a cheat command for the end-to-end tests. The command is valid when its
+ * first word is a cheat and each word is shorter than the buffers of the parser.
+ * @param words The words of the command
+ * @param num_words The number of words
+ * @return 1 when the command is valid, 0 otherwise
+ */
+int game_cheat_command_is_valid(char **words, int num_words);
+#endif
+
 int game_cheat_extra_legions(void);
 
 int game_cheat_disabled_legions_consumption(void);

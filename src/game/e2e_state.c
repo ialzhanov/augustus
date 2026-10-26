@@ -161,7 +161,7 @@ static int get_stock(building *b, int resource)
 
 static int query_building(int argc, char **argv, int *value)
 {
-    building *b = get_building(argv[1]);
+    building *b = argc == 3 ? get_building(argv[1]) : 0;
     if (argc != 3 || !b) {
         return 0;
     }
@@ -177,7 +177,7 @@ static int query_building(int argc, char **argv, int *value)
 
 static int query_house(int argc, char **argv, int *value)
 {
-    building *b = get_house(argv[1]);
+    building *b = argc == 3 ? get_house(argv[1]) : 0;
     int resource;
     if (argc != 3 || !b) {
         return 0;
@@ -397,9 +397,9 @@ static int set_stock(building *b, int resource, int amount)
 
 static int set_house(int argc, char **argv)
 {
-    building *b = get_house(argv[2]);
+    building *b = argc == 5 ? get_house(argv[2]) : 0;
     int value;
-    if (argc != 5 || !b) {
+    if (!b) {
         e2e_error("set house needs: set house <house id> level|population|<resource> <value>");
         return E2E_ERROR;
     }
@@ -511,8 +511,8 @@ int e2e_command_config(int argc, char **argv)
 
 int e2e_command_cheat(int argc, char **argv)
 {
-    if (argc < 2) {
-        e2e_error("cheat needs: cheat <cheat command>");
+    if (argc < 2 || !game_cheat_command_is_valid(argv + 1, argc - 1)) {
+        e2e_error("cheat needs: cheat <cheat command>, with a cheat of src/game/cheats.c and short words");
         return E2E_ERROR;
     }
     char text[MAX_TEXT] = { 0 };

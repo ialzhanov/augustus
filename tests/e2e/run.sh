@@ -24,6 +24,11 @@ for arg in "$@"; do
         *) CASES="$CASES $arg" ;;
     esac
 done
+if [ -n "$UPDATE" ] && [ -z "$CASES" ]; then
+    # A run of all cases would approve the captures of the cases that expect a failure
+    echo "--update-images needs the names of the cases to approve"
+    exit 2
+fi
 if [ -z "$CASES" ]; then
     for f in "$ROOT"/tests/e2e/cases/*.txt; do
         CASES="$CASES $(basename "$f" .txt)"

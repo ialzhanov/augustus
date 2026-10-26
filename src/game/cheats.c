@@ -422,6 +422,26 @@ void game_cheat_parse_command(uint8_t *command)
         }
     }
 }
+#ifdef E2E_TESTS
+int game_cheat_command_is_valid(char **words, int num_words)
+{
+    if (num_words < 1) {
+        return 0;
+    }
+    for (int i = 0; i < num_words; i++) {
+        if (strlen(words[i]) >= MAX_COMMAND_SIZE) {
+            return 0;
+        }
+    }
+    for (unsigned int i = 0; i < NUMBER_OF_COMMANDS; i++) {
+        if (strcmp(words[0], commands[i]) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+#endif
+
 int game_cheat_extra_legions(void)
 {
     return data.extra_legions_unlocked;

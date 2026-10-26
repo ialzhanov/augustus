@@ -1,0 +1,4 @@
+# expect: error
+# "set house" with missing words is an error.
+load small_city.svx
+set house

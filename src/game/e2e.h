@@ -11,7 +11,8 @@
 typedef enum {
     E2E_OK = 0,
     E2E_CHECK_FAILED = 1,
-    E2E_ERROR = 2
+    E2E_ERROR = 2,
+    E2E_CRASHED = 3
 } e2e_result;
 
 /**

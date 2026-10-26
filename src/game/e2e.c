@@ -142,6 +142,8 @@ void e2e_error(const char *format, ...)
     remember_problem(text);
 }
 
+static int command_dump(int argc, char **argv);
+
 void e2e_check_failed(const char *format, ...)
 {
     char message[MAX_MESSAGE];
@@ -152,6 +154,13 @@ void e2e_check_failed(const char *format, ...)
     char text[MAX_MESSAGE + 32];
     snprintf(text, sizeof(text), "FAIL line %d: %s", data.line, message);
     write_line(text);
+    if (!data.first_problem[0]) {
+        // Keep the state at the first failure for the debugging
+        char command[] = "dump";
+        char name[] = "failure";
+        char *words[] = { command, name };
+        command_dump(2, words);
+    }
     remember_problem(text);
 }
 
@@ -801,14 +810,14 @@ static int run_repeat(int argc, char **argv)
     int offsets[MAX_ARGS][2];
     int num_offsets = 0;
     int ok = argc >= 7 && strcmp(argv[1], "zoom") == 0 && parse_int(argv[2], &zoom[0]) &&
-        parse_int(argv[3], &zoom[1]) && parse_int(argv[4], &zoom[2]) && zoom[2] > 0 &&
+        parse_int(argv[3], &zoom[1]) && parse_int(argv[4], &zoom[2]) && zoom[2] > 0 && zoom[0] <= zoom[1] &&
         strcmp(argv[5], "offsets") == 0;
     for (int i = 6; ok && i < argc; i++) {
         ok = sscanf(argv[i], "%d,%d", &offsets[num_offsets][0], &offsets[num_offsets][1]) == 2;
         num_offsets++;
     }
     if (!ok) {
-        e2e_error("repeat needs: repeat zoom <from> <to> <step> offsets <dx,dy> ...");
+        e2e_error("repeat needs: repeat zoom <from> <to> <step> offsets <dx,dy> ..., with from <= to and step > 0");
         return E2E_ERROR;
     }
     int first_line = data.line;

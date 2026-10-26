@@ -40,6 +40,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef E2E_TESTS
+#include <unistd.h>
+#endif
+
 #ifdef _MSC_VER
 #include <windows.h>
 #endif
@@ -527,6 +531,16 @@ static const char *ask_for_data_dir(int again)
 
 static int pre_init(const char *custom_data_dir)
 {
+#ifdef E2E_TESTS
+    if (e2e_is_active()) {
+        // No message box and no folder dialog: they wait for a person
+        if (!custom_data_dir || !platform_file_manager_set_base_path(custom_data_dir)) {
+            SDL_Log("The test mode needs the Caesar 3 data folder as the last argument");
+            return 0;
+        }
+        return game_pre_init();
+    }
+#endif
     if (custom_data_dir) {
         SDL_Log("Loading game from %s", custom_data_dir);
         if (!platform_file_manager_set_base_path(custom_data_dir)) {
@@ -619,6 +633,17 @@ static void use_test_defaults(void)
 static int setup_error_status(int status)
 {
     return e2e_is_active() ? E2E_ERROR : status;
+}
+
+// setup() changes the working folder to the data folder, so the test paths must be absolute
+static const char *make_absolute(const char *path, char *result)
+{
+    char folder[FILE_NAME_MAX];
+    if (path[0] == '/' || !getcwd(folder, FILE_NAME_MAX)) {
+        return path;
+    }
+    snprintf(result, FILE_NAME_MAX, "%s/%s", folder, path);
+    return result;
 }
 #else
 #define setup_error_status(status) (status)
@@ -746,6 +771,15 @@ int main(int argc, char **argv)
         exit_with_status(1);
 #endif
     }
+
+#ifdef E2E_TESTS
+    static char test_file[FILE_NAME_MAX];
+    static char test_out_dir[FILE_NAME_MAX];
+    if (args.test_file) {
+        args.test_file = make_absolute(args.test_file, test_file);
+        args.test_out_dir = make_absolute(args.test_out_dir ? args.test_out_dir : "e2e-results", test_out_dir);
+    }
+#endif
 
     setup(&args);
 

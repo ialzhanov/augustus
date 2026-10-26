@@ -367,6 +367,13 @@ void platform_screen_recreate_texture(void)
 
 void system_show_error_message_box(const char *title, const char *message)
 {
+#ifdef E2E_TESTS
+    if (e2e_is_active()) {
+        // A message box waits for a person
+        SDL_Log("%s: %s", title, message);
+        return;
+    }
+#endif
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, SDL.window);
 }
 
