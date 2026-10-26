@@ -11,6 +11,11 @@ typedef struct {
     int use_software_cursor;
     int force_fullscreen;
     int display_id;
+#ifdef E2E_TESTS
+    const char *test_file;
+    const char *test_out_dir;
+    int test_update_images;
+#endif
 } augustus_args;
 
 int platform_parse_arguments(int argc, char **argv, augustus_args *output_args);

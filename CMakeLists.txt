@@ -15,6 +15,7 @@ option(DRAW_HIGHWAY_TERRAIN "Draw highway debug information." OFF)
 option(DRAW_ROAD_NETWORK_IDS "Draw road network IDs for debugging." OFF)
 option(DRAW_TILE_COORDS "Draw tile coordinates." OFF)
 option(AV1_VIDEO_SUPPORT "Enable AV1 video support." OFF)
+option(E2E_TESTS "Build the end-to-end test mode." OFF)
 
 if(${TARGET_PLATFORM} STREQUAL "vita" AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     if(DEFINED ENV{VITASDK})
@@ -219,6 +220,9 @@ if(DRAW_TILE_COORDS)
 endif()
 if(DRAW_ROAD_NETWORK_IDS)
     add_definitions(-DDRAW_ROAD_NETWORK_IDS)
+endif()
+if(E2E_TESTS)
+    add_definitions(-DE2E_TESTS)
 endif()
 
 set(ASSETS_DIR ${PROJECT_SOURCE_DIR}/res/assets)
@@ -486,6 +490,13 @@ set(GAME_FILES
     ${PROJECT_SOURCE_DIR}/src/game/tutorial.c
     ${PROJECT_SOURCE_DIR}/src/game/undo.c
 )
+set(E2E_FILES "")
+if(E2E_TESTS)
+    set(E2E_FILES
+        ${PROJECT_SOURCE_DIR}/src/game/e2e.c
+        ${PROJECT_SOURCE_DIR}/src/game/e2e_state.c
+    )
+endif()
 set(INPUT_FILES
     ${PROJECT_SOURCE_DIR}/src/input/cursor.c
     ${PROJECT_SOURCE_DIR}/src/input/hotkey.c
@@ -834,6 +845,7 @@ set(SOURCE_FILES
     ${FIGURE_FILES}
     ${FIGURETYPE_FILES}
     ${GAME_FILES}
+    ${E2E_FILES}
     ${INPUT_FILES}
     ${MAP_FILES}
     ${ASSETS_FILES}

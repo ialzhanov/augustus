@@ -9,6 +9,10 @@
 #define WINDOWED_AND_FULLSCREEN_ERROR_MESSAGE "Option --windowed and --fullscreen cannot both be specified"
 #define DISPLAY_ID_ERROR_MESSAGE "Option --display must be followed by a number indicating the display, starting from 0"
 #define UNKNOWN_OPTION_ERROR_MESSAGE "Option %s not recognized"
+#ifdef E2E_TESTS
+#define TEST_FILE_ERROR_MESSAGE "Option --test must be followed by a test file"
+#define TEST_OUT_ERROR_MESSAGE "Option --out must be followed by a folder"
+#endif
 
 static void print_log(const char *message)
 {
@@ -74,6 +78,11 @@ int platform_parse_arguments(int argc, char **argv, augustus_args *output_args)
     output_args->use_software_cursor = 0;
     output_args->force_fullscreen = 0;
     output_args->display_id = 0;
+#ifdef E2E_TESTS
+    output_args->test_file = 0;
+    output_args->test_out_dir = 0;
+    output_args->test_update_images = 0;
+#endif
 
     for (int i = 1; i < argc; i++) {
         // we ignore "-psn" arguments, this is needed to launch the app
@@ -128,6 +137,26 @@ int platform_parse_arguments(int argc, char **argv, augustus_args *output_args)
             output_args->use_software_cursor = 1;
         } else if (strcmp(argv[i], "--fullscreen") == 0) {
             output_args->force_fullscreen = 1;
+#ifdef E2E_TESTS
+        } else if (strcmp(argv[i], "--test") == 0) {
+            if (i + 1 < argc) {
+                output_args->test_file = argv[i + 1];
+                i++;
+            } else {
+                print_log(TEST_FILE_ERROR_MESSAGE);
+                ok = 0;
+            }
+        } else if (strcmp(argv[i], "--out") == 0) {
+            if (i + 1 < argc) {
+                output_args->test_out_dir = argv[i + 1];
+                i++;
+            } else {
+                print_log(TEST_OUT_ERROR_MESSAGE);
+                ok = 0;
+            }
+        } else if (strcmp(argv[i], "--update-images") == 0) {
+            output_args->test_update_images = 1;
+#endif
         } else if (strcmp(argv[i], "--help") == 0) {
             add_blank_line = 0;
             ok = 0;
@@ -165,6 +194,14 @@ int platform_parse_arguments(int argc, char **argv, augustus_args *output_args)
         print_log("          Enables joystick support");
         print_log("--software-cursor");
         print_log("          Uses a software cursor instead of the default hardware cursor");
+#ifdef E2E_TESTS
+        print_log("--test FILE");
+        print_log("          Runs the end-to-end test FILE, writes the results and exits");
+        print_log("--out DIR");
+        print_log("          Writes the test results to DIR (default: e2e-results)");
+        print_log("--update-images");
+        print_log("          Writes each test capture as the new approved image");
+#endif
         print_log("The last argument, if present, is interpreted as data directory for the Caesar 3 installation");
     }
     return ok;

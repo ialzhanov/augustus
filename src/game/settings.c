@@ -10,6 +10,8 @@
 #include "game/speed.h"
 #include "sound/device.h"
 
+#include <string.h>
+
 #define INF_SIZE 560
 #define MAX_PERSONAL_SAVINGS 100
 #define MAX_PLAYER_NAME 32
@@ -152,6 +154,15 @@ void settings_load(void)
         data.last_advisor = ADVISOR_LABOR;
     }
 }
+
+#ifdef E2E_TESTS
+void settings_load_defaults(void)
+{
+    load_default_settings();
+    data.monthly_autosave = 0;
+    memset(data.player_name, 0, sizeof(data.player_name));
+}
+#endif
 
 void settings_save(void)
 {

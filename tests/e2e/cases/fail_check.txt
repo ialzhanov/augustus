@@ -1,0 +1,4 @@
+# expect: fail
+# A check that cannot pass gives exit code 1 and the actual value.
+load_map Caesarea
+check money == -1
