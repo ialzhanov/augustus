@@ -3,6 +3,8 @@
 
 #ifdef E2E_TESTS
 
+#include <stdio.h>
+
 /**
  * Gets the value of a state query, for example "money" or "tick".
  * @param argc The number of words in the query
@@ -11,6 +13,12 @@
  * @return 1 when the query is known and its arguments are valid, 0 otherwise
  */
 int e2e_query(int argc, char **argv, int *value);
+
+/**
+ * Writes the value of each query that has no arguments as JSON members.
+ * @param fp The file to write to
+ */
+void e2e_state_write_queries(FILE *fp);
 
 #endif // E2E_TESTS
 

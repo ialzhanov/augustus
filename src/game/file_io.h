@@ -53,6 +53,17 @@ int game_file_io_read_saved_game_info_from_buffer(buffer *buf, saved_game_info *
 
 int game_file_io_write_saved_game(const char *filename);
 
+#ifdef E2E_TESTS
+/**
+ * Hashes each piece of the uncompressed savegame state. The end-to-end tests
+ * compare these hashes between two runs.
+ * @param hashes The hash of each piece, in the save order
+ * @param max_hashes The size of the hashes array
+ * @return The number of pieces
+ */
+int game_file_io_hash_saved_game(uint32_t *hashes, int max_hashes);
+#endif
+
 int game_file_io_delete_saved_game(const char *filename);
 
 #endif // GAME_FILE_IO_H

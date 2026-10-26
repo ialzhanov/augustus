@@ -33,3 +33,10 @@ int e2e_query(int argc, char **argv, int *value)
     }
     return 0;
 }
+
+void e2e_state_write_queries(FILE *fp)
+{
+    for (unsigned int i = 0; i < NUM_SIMPLE_QUERIES; i++) {
+        fprintf(fp, "  \"%s\": %d,\n", SIMPLE_QUERIES[i].name, SIMPLE_QUERIES[i].get());
+    }
+}

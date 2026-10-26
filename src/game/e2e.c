@@ -3,8 +3,12 @@
 #include "core/encoding.h"
 #include "core/file.h"
 #include "core/lang.h"
+#include "core/random.h"
+#include "core/time.h"
+#include "game/animation.h"
 #include "game/e2e_state.h"
 #include "game/file.h"
+#include "game/file_io.h"
 #include "game/game.h"
 #include "game/tick.h"
 #include "scenario/event/controller.h"
@@ -21,6 +25,10 @@
 #define MAX_ARGS 32
 #define MAX_MESSAGE 1024
 #define DEFAULT_OUT_DIR "e2e-results"
+#define DEFAULT_SEED 0
+#define MAX_SAVE_PIECES 200
+// The animation timers advance 20 ms for each test tick
+#define MILLIS_PER_TICK 20
 
 typedef int (*e2e_command_fn)(int argc, char **argv);
 
@@ -45,6 +53,7 @@ static struct {
     int active;
     int line;
     int update_images;
+    time_millis clock;
     FILE *log;
     char test_name[FILE_NAME_MAX];
     char out_dir[FILE_NAME_MAX];
@@ -146,9 +155,18 @@ static int compare(int actual, compare_op op, int expected)
     }
 }
 
+// The test clock replaces the real clock, so the animation frames are the same in each run
+static void advance_clock(void)
+{
+    data.clock += MILLIS_PER_TICK;
+    time_set_millis(data.clock);
+    game_animation_update();
+}
+
 static void run_ticks(int ticks)
 {
     for (int i = 0; i < ticks; i++) {
+        advance_clock();
         game_tick_run();
     }
     game_draw();
@@ -174,6 +192,52 @@ static int command_load_map(int argc, char **argv)
     window_city_show();
     scenario_events_process_all();
     e2e_log("loaded map %s", name_utf8);
+    return E2E_OK;
+}
+
+static int command_seed(int argc, char **argv)
+{
+    int seed;
+    if (argc != 2 || !parse_int(argv[1], &seed)) {
+        e2e_error("seed needs: seed <n>");
+        return E2E_ERROR;
+    }
+    random_set_test_seed((uint32_t) seed);
+    return E2E_OK;
+}
+
+// Writes state_<name>.json with the queries and a hash of each savegame piece.
+// The savegame is kept as state_<name>.svx, so a failed test can be loaded in the game.
+static int command_dump(int argc, char **argv)
+{
+    if (argc != 2) {
+        e2e_error("dump needs: dump <name>");
+        return E2E_ERROR;
+    }
+    char save_file[FILE_NAME_MAX];
+    snprintf(save_file, FILE_NAME_MAX, "%s/state_%s.svx", data.out_dir, argv[1]);
+    if (!game_file_write_saved_game(save_file)) {
+        e2e_error("cannot write %s", save_file);
+        return E2E_ERROR;
+    }
+    char json_file[FILE_NAME_MAX];
+    snprintf(json_file, FILE_NAME_MAX, "%s/state_%s.json", data.out_dir, argv[1]);
+    FILE *fp = fopen(json_file, "w");
+    if (!fp) {
+        e2e_error("cannot write %s", json_file);
+        return E2E_ERROR;
+    }
+    uint32_t hashes[MAX_SAVE_PIECES];
+    int num_pieces = game_file_io_hash_saved_game(hashes, MAX_SAVE_PIECES);
+    fprintf(fp, "{\n");
+    e2e_state_write_queries(fp);
+    fprintf(fp, "  \"save_piece_hashes\": [");
+    for (int i = 0; i < num_pieces; i++) {
+        fprintf(fp, "%s\"%08x\"", i ? ", " : "", hashes[i]);
+    }
+    fprintf(fp, "]\n}\n");
+    fclose(fp);
+    e2e_log("dump %s: %s", argv[1], json_file);
     return E2E_OK;
 }
 
@@ -234,6 +298,8 @@ static int command_check(int argc, char **argv)
 
 static const e2e_command COMMANDS[] = {
     { "load_map", command_load_map },
+    { "seed", command_seed },
+    { "dump", command_dump },
     { "run", command_run },
     { "check", command_check },
 };
@@ -325,6 +391,8 @@ int e2e_run(const char *test_file, const char *out_dir, int update_images)
     set_test_name(test_file);
     open_log(out_dir ? out_dir : DEFAULT_OUT_DIR);
     e2e_log("test %s", test_file);
+    // Without a seed command, the tests also use a fixed seed
+    random_set_test_seed(DEFAULT_SEED);
 
     int result;
     FILE *fp = fopen(test_file, "r");
