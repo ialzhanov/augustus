@@ -327,6 +327,18 @@ void config_load(void)
     }
 }
 
+#ifdef E2E_TESTS
+int config_key_from_name(const char *name)
+{
+    for (int i = 0; i < CONFIG_MAX_ENTRIES; i++) {
+        if (ini_keys[i] && strcmp(ini_keys[i], name) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+#endif
+
 int config_must_configure_user_directory(void)
 {
     return needs_user_directory_setup;

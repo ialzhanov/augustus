@@ -27,6 +27,16 @@ int game_file_start_scenario_from_buffer(uint8_t *data, int length, int is_save_
  */
 int game_file_start_scenario_by_name(const uint8_t *scenario_name);
 
+#ifdef E2E_TESTS
+/**
+ * Starts a scenario from a file at any path. The end-to-end tests use this.
+ * @param scenario_name Name of the scenario
+ * @param path Full path of the .map or .mapx file
+ * @return Boolean true on success, false on failure
+ */
+int game_file_start_scenario_from_path(const uint8_t *scenario_name, const char *path);
+#endif
+
 /**
  * Load saved game
  * @param filename File to load

@@ -1,0 +1,17 @@
+# expect: pass
+# Monthly food use of a house (src/city/resource.c, house_consume_food()):
+# a house eats population x 50 / 100 of each food type that it has, divided by
+# the number of food types. A tent eats nothing (food_types 0), so the case
+# uses a small shack (food_types 1, max_people 9). The house is full, so no
+# migrants come.
+load small_city.svx
+seed 1
+date 0 0 15                      # the last day of the first month
+set house 1 level small_shack
+set house 1 population 9
+set house 1 wheat 200
+run month_end                    # the food use is in advance_month()
+check month == 1
+check house 1 level == small_shack   # the house devolves only after 2 days (DEVOLVE_DELAY)
+check house 1 population == 9
+check house 1 wheat == 196       # 9 x 50 / 100 = 4 (integer division)

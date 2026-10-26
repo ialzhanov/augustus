@@ -10,8 +10,13 @@
 #include "game/file.h"
 #include "game/file_io.h"
 #include "game/game.h"
+#include "game/file_editor.h"
 #include "game/tick.h"
+#include "game/time.h"
+#include "scenario/allowed_building.h"
+#include "scenario/editor_map.h"
 #include "scenario/event/controller.h"
+#include "scenario/event/import_xml.h"
 #include "scenario/property.h"
 #include "window/city.h"
 
@@ -22,6 +27,10 @@
 #include <sys/stat.h>
 
 #define MAX_LINE 1024
+#define MAX_LINES 2000
+#define MAX_MARKS 64
+// A run command stops after 200 years
+#define MAX_RUN_TICKS (GAME_TIME_TICKS_PER_DAY * GAME_TIME_DAYS_PER_MONTH * GAME_TIME_MONTHS_PER_YEAR * 200)
 #define MAX_ARGS 32
 #define MAX_MESSAGE 1024
 #define DEFAULT_OUT_DIR "e2e-results"
@@ -49,9 +58,22 @@ typedef enum {
 
 static const char *OP_NAMES[] = { "==", "!=", "<=", ">=", "<", ">" };
 
+typedef struct {
+    char query[MAX_LINE];
+    int value;
+} mark_value;
+
+static const int MAP_SIZES[] = { 40, 60, 80, 100, 120, 160 };
+#define NUM_MAP_SIZES (sizeof(MAP_SIZES) / sizeof(int))
+
 static struct {
     int active;
     int line;
+    int num_lines;
+    char lines[MAX_LINES][MAX_LINE];
+    mark_value marks[MAX_MARKS];
+    int num_marks;
+    char test_dir[FILE_NAME_MAX];
     int update_images;
     time_millis clock;
     FILE *log;
@@ -172,6 +194,50 @@ static void run_ticks(int ticks)
     game_draw();
 }
 
+// Runs ticks until the function returns 1. Returns 0 when the limit is reached first.
+static int run_until(int (*is_done)(void))
+{
+    for (int i = 0; i < MAX_RUN_TICKS; i++) {
+        if (is_done()) {
+            game_draw();
+            return 1;
+        }
+        advance_clock();
+        game_tick_run();
+    }
+    return 0;
+}
+
+static int start_month;
+static int until_year;
+static int until_month;
+
+static int is_new_month(void)
+{
+    return game_time_month() != start_month;
+}
+
+static int is_until_date(void)
+{
+    return game_time_year() == until_year && game_time_month() == until_month;
+}
+
+// Gives the path of a file in tests/e2e/<folder>/, or the name itself when it has a folder
+static void get_test_path(const char *folder, const char *name, char *path)
+{
+    if (strchr(name, '/')) {
+        snprintf(path, FILE_NAME_MAX, "%s", name);
+    } else {
+        snprintf(path, FILE_NAME_MAX, "%s/%s/%s", data.test_dir, folder, name);
+    }
+}
+
+static void show_city(void)
+{
+    window_city_show();
+    scenario_events_process_all();
+}
+
 static int command_load_map(int argc, char **argv)
 {
     if (argc < 2) {
@@ -189,9 +255,107 @@ static int command_load_map(int argc, char **argv)
         e2e_error("cannot load the scenario map '%s'", name_utf8);
         return E2E_ERROR;
     }
-    window_city_show();
-    scenario_events_process_all();
+    show_city();
     e2e_log("loaded map %s", name_utf8);
+    return E2E_OK;
+}
+
+// Makes an empty map in the same way as the map editor, then starts it as a game
+static int command_new_map(int argc, char **argv)
+{
+    static const char *CLIMATE_NAMES[] = { "central", "northern", "desert" };
+    int size;
+    int size_index = -1;
+    if ((argc == 2 || argc == 3) && parse_int(argv[1], &size)) {
+        for (unsigned int i = 0; i < NUM_MAP_SIZES; i++) {
+            if (MAP_SIZES[i] == size) {
+                size_index = i;
+            }
+        }
+    }
+    int climate = argc == 3 ? -1 : CLIMATE_CENTRAL;
+    for (int i = 0; argc == 3 && i < 3; i++) {
+        if (strcmp(argv[2], CLIMATE_NAMES[i]) == 0) {
+            climate = i;
+        }
+    }
+    if (size_index < 0 || climate < 0) {
+        e2e_error("new_map needs: new_map 40|60|80|100|120|160 [central|northern|desert]");
+        return E2E_ERROR;
+    }
+    game_file_editor_create_scenario(size_index);
+    scenario_change_climate(climate);
+    scenario_editor_set_entry_point(0, size / 2);
+    scenario_editor_set_exit_point(size - 1, size / 2);
+    for (building_type type = BUILDING_ANY; type < BUILDING_TYPE_MAX; type++) {
+        scenario_allowed_building_set(type, 1);
+    }
+    char map_file[FILE_NAME_MAX];
+    snprintf(map_file, FILE_NAME_MAX, "%s/new_map.mapx", data.out_dir);
+    if (!game_file_editor_write_scenario(map_file)) {
+        e2e_error("cannot write %s", map_file);
+        return E2E_ERROR;
+    }
+    uint8_t name[FILE_NAME_MAX];
+    encoding_from_utf8("new_map", name, FILE_NAME_MAX);
+    scenario_set_name(name);
+    scenario_set_custom(2);
+    scenario_set_player_name(lang_get_string(9, 5));
+    if (!game_file_start_scenario_from_path(name, map_file)) {
+        e2e_error("cannot start the new map %s", map_file);
+        return E2E_ERROR;
+    }
+    show_city();
+    e2e_log("new map %d x %d, %s", size, size, CLIMATE_NAMES[climate]);
+    return E2E_OK;
+}
+
+static int command_load(int argc, char **argv)
+{
+    if (argc != 2) {
+        e2e_error("load needs: load <savegame>");
+        return E2E_ERROR;
+    }
+    char path[FILE_NAME_MAX];
+    get_test_path("saves", argv[1], path);
+    if (game_file_load_saved_game(path) != 1) {
+        e2e_error("cannot load the savegame %s", path);
+        return E2E_ERROR;
+    }
+    show_city();
+    e2e_log("loaded %s", path);
+    return E2E_OK;
+}
+
+static int command_save(int argc, char **argv)
+{
+    if (argc != 2) {
+        e2e_error("save needs: save <savegame>");
+        return E2E_ERROR;
+    }
+    char path[FILE_NAME_MAX];
+    get_test_path("saves", argv[1], path);
+    if (!game_file_write_saved_game(path)) {
+        e2e_error("cannot write the savegame %s", path);
+        return E2E_ERROR;
+    }
+    e2e_log("saved %s", path);
+    return E2E_OK;
+}
+
+static int command_events(int argc, char **argv)
+{
+    if (argc != 2) {
+        e2e_error("events needs: events <xml file>");
+        return E2E_ERROR;
+    }
+    char path[FILE_NAME_MAX];
+    get_test_path("events", argv[1], path);
+    if (!scenario_events_xml_parse_file(path)) {
+        e2e_error("cannot import the events in %s", path);
+        return E2E_ERROR;
+    }
+    e2e_log("imported events %s", path);
     return E2E_OK;
 }
 
@@ -244,45 +408,139 @@ static int command_dump(int argc, char **argv)
 static int command_run(int argc, char **argv)
 {
     int count;
+    if (argc == 2 && strcmp(argv[1], "month_end") == 0) {
+        start_month = game_time_month();
+        if (!run_until(is_new_month)) {
+            e2e_error("the month did not end");
+            return E2E_ERROR;
+        }
+        run_ticks(1);
+        return E2E_OK;
+    }
+    if (argc == 4 && strcmp(argv[1], "until") == 0 &&
+        parse_int(argv[2], &until_year) && parse_int(argv[3], &until_month)) {
+        until_year += scenario_property_start_year();
+        if (!run_until(is_until_date)) {
+            e2e_error("the date was not reached");
+            return E2E_ERROR;
+        }
+        return E2E_OK;
+    }
     if (argc != 3 || !parse_int(argv[2], &count) || count < 0) {
-        e2e_error("run needs: run ticks <n>");
+        e2e_error("run needs: run ticks|days|months <n>, run month_end or run until <year offset> <month>");
         return E2E_ERROR;
     }
     if (strcmp(argv[1], "ticks") == 0) {
         run_ticks(count);
-        return E2E_OK;
+    } else if (strcmp(argv[1], "days") == 0) {
+        run_ticks(count * GAME_TIME_TICKS_PER_DAY);
+    } else if (strcmp(argv[1], "months") == 0) {
+        for (int i = 0; i < count; i++) {
+            start_month = game_time_month();
+            run_until(is_new_month);
+        }
+    } else {
+        e2e_error("unknown run mode '%s'", argv[1]);
+        return E2E_ERROR;
     }
-    e2e_error("unknown run mode '%s'", argv[1]);
-    return E2E_ERROR;
+    return E2E_OK;
+}
+
+// Finds the first comparison word. Returns its index, or 0.
+static int find_op(int argc, char **argv, compare_op *op)
+{
+    for (int i = 1; i < argc; i++) {
+        *op = parse_op(argv[i]);
+        if (*op != OP_NONE) {
+            return i;
+        }
+    }
+    return 0;
+}
+
+static int split_line(char *line, char **argv);
+
+// Stores the value of each query that a later check compares with "mark", up to the next mark.
+static int command_mark(int argc, char **argv)
+{
+    if (argc != 1) {
+        e2e_error("mark has no arguments, not '%s'", argv[1]);
+        return E2E_ERROR;
+    }
+    data.num_marks = 0;
+    for (int i = data.line; i < data.num_lines; i++) {
+        char line[MAX_LINE];
+        char *words[MAX_ARGS];
+        snprintf(line, MAX_LINE, "%s", data.lines[i]);
+        int count = split_line(line, words);
+        if (count > 0 && strcmp(words[0], "mark") == 0) {
+            break;
+        }
+        compare_op op;
+        int op_index = count > 0 && strcmp(words[0], "check") == 0 ? find_op(count, words, &op) : 0;
+        if (op_index < 2 || op_index + 1 >= count || strcmp(words[op_index + 1], "mark") != 0) {
+            continue;
+        }
+        int value;
+        if (data.num_marks < MAX_MARKS && e2e_query(op_index - 1, words + 1, &value)) {
+            mark_value *mark = &data.marks[data.num_marks++];
+            join_args(op_index - 1, words + 1, mark->query, MAX_LINE);
+            mark->value = value;
+        }
+    }
+    return E2E_OK;
+}
+
+// Reads the value of a check: a number, a name, "mark", "mark + n" or "mark - n"
+static int parse_value(int argc, char **argv, const char *query, int *value)
+{
+    if (argc == 1 && (parse_int(argv[0], value) || e2e_lookup_value_name(argv[0], value))) {
+        return 1;
+    }
+    if (strcmp(argv[0], "mark") != 0) {
+        return 0;
+    }
+    int found = 0;
+    for (int i = 0; i < data.num_marks; i++) {
+        if (strcmp(data.marks[i].query, query) == 0) {
+            *value = data.marks[i].value;
+            found = 1;
+        }
+    }
+    int change;
+    if (!found) {
+        return 0;
+    }
+    if (argc == 1) {
+        return 1;
+    }
+    if (argc == 3 && parse_int(argv[2], &change) && (strcmp(argv[1], "+") == 0 || strcmp(argv[1], "-") == 0)) {
+        *value += argv[1][0] == '+' ? change : -change;
+        return 1;
+    }
+    return 0;
 }
 
 static int command_check(int argc, char **argv)
 {
-    int op_index = 0;
     compare_op op = OP_NONE;
-    for (int i = 1; i < argc; i++) {
-        op = parse_op(argv[i]);
-        if (op != OP_NONE) {
-            op_index = i;
-            break;
-        }
-    }
-    if (op_index < 2 || op_index != argc - 2) {
+    int op_index = find_op(argc, argv, &op);
+    if (op_index < 2 || op_index == argc - 1) {
         e2e_error("check needs: check <query> <op> <value>");
         return E2E_ERROR;
     }
     char text[MAX_MESSAGE];
     join_args(argc - 1, argv + 1, text, MAX_MESSAGE);
+    char query[MAX_MESSAGE];
+    join_args(op_index - 1, argv + 1, query, MAX_MESSAGE);
     int actual;
     if (!e2e_query(op_index - 1, argv + 1, &actual)) {
-        char query[MAX_MESSAGE];
-        join_args(op_index - 1, argv + 1, query, MAX_MESSAGE);
         e2e_error("unknown query or wrong arguments: '%s'", query);
         return E2E_ERROR;
     }
     int expected;
-    if (!parse_int(argv[argc - 1], &expected)) {
-        e2e_error("the value '%s' is not a number", argv[argc - 1]);
+    if (!parse_value(argc - op_index - 1, argv + op_index + 1, query, &expected)) {
+        e2e_error("the value of '%s' is not a number, a known name or a mark expression", text);
         return E2E_ERROR;
     }
     if (compare(actual, op, expected)) {
@@ -290,14 +548,28 @@ static int command_check(int argc, char **argv)
         return E2E_OK;
     }
     char message[MAX_MESSAGE * 2];
-    snprintf(message, sizeof(message), "FAIL line %d: check %s: actual %d", data.line, text, actual);
+    snprintf(message, sizeof(message), "FAIL line %d: check %s: actual %d, expected %d",
+        data.line, text, actual, expected);
     write_line(message);
     remember_problem(message);
     return E2E_CHECK_FAILED;
 }
 
 static const e2e_command COMMANDS[] = {
+    { "new_map", command_new_map },
+    { "load", command_load },
     { "load_map", command_load_map },
+    { "save", command_save },
+    { "events", command_events },
+    { "place", e2e_command_place },
+    { "clear", e2e_command_clear },
+    { "terrain", e2e_command_terrain },
+    { "set", e2e_command_set },
+    { "date", e2e_command_date },
+    { "variable", e2e_command_variable },
+    { "config", e2e_command_config },
+    { "cheat", e2e_command_cheat },
+    { "mark", command_mark },
     { "seed", command_seed },
     { "dump", command_dump },
     { "run", command_run },
@@ -333,6 +605,20 @@ static int split_line(char *line, char **argv)
     return argc;
 }
 
+// The test file is in tests/e2e/cases/, so the test folder is two levels up
+static void set_test_dir(const char *test_file)
+{
+    snprintf(data.test_dir, FILE_NAME_MAX, "%s", test_file);
+    for (int i = 0; i < 2; i++) {
+        char *slash = strrchr(data.test_dir, '/');
+        if (slash) {
+            *slash = 0;
+        } else {
+            snprintf(data.test_dir, FILE_NAME_MAX, "%s", i ? "." : "..");
+        }
+    }
+}
+
 static void set_test_name(const char *test_file)
 {
     const char *name = strrchr(test_file, '/');
@@ -354,12 +640,24 @@ static void open_log(const char *out_dir)
     data.log = fopen(log_file, "w");
 }
 
-static int run_file(FILE *fp)
+static int read_file(FILE *fp)
+{
+    while (fgets(data.lines[data.num_lines], MAX_LINE, fp)) {
+        if (++data.num_lines == MAX_LINES) {
+            e2e_error("the test file has more than %d lines", MAX_LINES);
+            return 0;
+        }
+    }
+    return 1;
+}
+
+static int run_lines(void)
 {
     int result = E2E_OK;
     char line[MAX_LINE];
     char *argv[MAX_ARGS];
-    while (fgets(line, MAX_LINE, fp)) {
+    while (data.line < data.num_lines) {
+        snprintf(line, MAX_LINE, "%s", data.lines[data.line]);
         data.line++;
         int argc = split_line(line, argv);
         if (argc == 0) {
@@ -389,6 +687,7 @@ int e2e_run(const char *test_file, const char *out_dir, int update_images)
 {
     data.update_images = update_images;
     set_test_name(test_file);
+    set_test_dir(test_file);
     open_log(out_dir ? out_dir : DEFAULT_OUT_DIR);
     e2e_log("test %s", test_file);
     // Without a seed command, the tests also use a fixed seed
@@ -397,8 +696,9 @@ int e2e_run(const char *test_file, const char *out_dir, int update_images)
     int result;
     FILE *fp = fopen(test_file, "r");
     if (fp) {
-        result = run_file(fp);
+        int has_read = read_file(fp);
         fclose(fp);
+        result = has_read ? run_lines() : E2E_ERROR;
     } else {
         e2e_error("cannot open the test file %s", test_file);
         result = E2E_ERROR;

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE events>
+<events version="2">
+    <event id="0">
+        <conditions>
+            <money check="gte" value="5000"/>
+        </conditions>
+        <actions>
+            <money_add formula="1000"/>
+        </actions>
+    </event>
+</events>

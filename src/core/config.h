@@ -181,6 +181,15 @@ void config_set_string(config_string_key key, const char *value);
  */
 int config_get_default_value(config_key key);
 
+#ifdef E2E_TESTS
+/**
+ * Gets the config key for its name in augustus.ini
+ * @param name The name, for example "gameplay_change_yearly_autosave"
+ * @return The key, or -1 when no key has the name
+ */
+int config_key_from_name(const char *name);
+#endif
+
 /**
  * Get a string default config value
  * @param key String key

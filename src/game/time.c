@@ -19,6 +19,16 @@ void game_time_init(int year)
     data.year = year;
 }
 
+#ifdef E2E_TESTS
+void game_time_set_date(int year, int month, int day)
+{
+    data.tick = 0;
+    data.day = day;
+    data.month = month;
+    data.year = year;
+}
+#endif
+
 int game_time_tick(void)
 {
     return data.tick;
