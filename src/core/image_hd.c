@@ -55,7 +55,10 @@ static void mark_footprint_tile(uint8_t *mask, int width, int x_offset, int y_of
 }
 
 // Keeps only the pixels of the original footprint shape (same tile layout as the .555 footprint data),
-// so that high-resolution terrain tiles meet their neighbours without gaps
+// grown by one original pixel. High-resolution images are drawn with linear filtering: at a zoom that is not
+// a whole number the filter makes the outermost pixels partly transparent. The extra pixel puts that soft edge
+// over the opaque pixels of the neighbour tile, so no dark line shows between tiles.
+// Removed pixels keep their colour (only the alpha becomes 0), so the filter does not blend black into the edge.
 static void mask_footprint(color_t *pixels, int width, int height, int density)
 {
     int w = width / density;
@@ -76,14 +79,48 @@ static void mask_footprint(color_t *pixels, int width, int height, int density)
             mark_footprint_tile(mask, w, -30 * i + x_start + 60 * j, FOOTPRINT_HALF_HEIGHT * (num_tiles * 2 - i - 2));
         }
     }
+    uint8_t *grown = calloc(w * h, 1);
+    if (!grown) {
+        free(mask);
+        return;
+    }
+    for (int y = 0; y < h; y++) {
+        for (int x = 0; x < w; x++) {
+            grown[y * w + x] = mask[y * w + x] ||
+                (x > 0 && mask[y * w + x - 1]) || (x < w - 1 && mask[y * w + x + 1]) ||
+                (y > 0 && mask[(y - 1) * w + x]) || (y < h - 1 && mask[(y + 1) * w + x]);
+        }
+    }
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            if (!mask[(y / density) * w + x / density]) {
-                pixels[y * width + x] = ALPHA_TRANSPARENT;
+            if (!grown[(y / density) * w + x / density]) {
+                pixels[y * width + x] &= ~COLOR_CHANNEL_ALPHA;
             }
         }
     }
+    free(grown);
     free(mask);
+}
+
+// Space around each image in the atlas, filled with copies of the image's edge pixels: linear filtering
+// reads half a texel past the source rectangle, which would otherwise be the next image in the atlas
+#define ATLAS_PADDING 2
+
+static void extend_edges(color_t *buffer, int buffer_width, int x, int y, int width, int height)
+{
+    for (int row = 0; row < height; row++) {
+        color_t *line = &buffer[(y + row) * buffer_width];
+        for (int p = 1; p <= ATLAS_PADDING; p++) {
+            line[x - p] = line[x];
+            line[x + width - 1 + p] = line[x + width - 1];
+        }
+    }
+    for (int p = 1; p <= ATLAS_PADDING; p++) {
+        memcpy(&buffer[(y - p) * buffer_width + x - ATLAS_PADDING], &buffer[y * buffer_width + x - ATLAS_PADDING],
+            sizeof(color_t) * (width + 2 * ATLAS_PADDING));
+        memcpy(&buffer[(y + height - 1 + p) * buffer_width + x - ATLAS_PADDING],
+            &buffer[(y + height - 1) * buffer_width + x - ATLAS_PADDING], sizeof(color_t) * (width + 2 * ATLAS_PADDING));
+    }
 }
 
 static color_t *copy_rows(const color_t *src, int width, int y_start, int rows)
@@ -205,8 +242,8 @@ void image_hd_load(image *images, int num_images, const char *sg2_filename)
     packer.options.reduce_image_size = 1;
     packer.options.sort_by = IMAGE_PACKER_SORT_BY_AREA;
     for (int i = 0; i < num_parts; i++) {
-        packer.rects[i].input.width = parts[i].width;
-        packer.rects[i].input.height = parts[i].height;
+        packer.rects[i].input.width = parts[i].width + 2 * ATLAS_PADDING;
+        packer.rects[i].input.height = parts[i].height + 2 * ATLAS_PADDING;
     }
     image_packer_pack(&packer);
 
@@ -216,18 +253,20 @@ void image_hd_load(image *images, int num_images, const char *sg2_filename)
         if (atlas_data && packer.rects[i].output.packed) {
             int index = packer.rects[i].output.image_index;
             int dst_width = atlas_data->image_widths[index];
+            int x = packer.rects[i].output.x + ATLAS_PADDING;
+            int y = packer.rects[i].output.y + ATLAS_PADDING;
             image_copy_info copy = {
                 .src = { 0, 0, parts[i].width, parts[i].height, parts[i].pixels },
-                .dst = { packer.rects[i].output.x, packer.rects[i].output.y, dst_width,
-                    atlas_data->image_heights[index], atlas_data->buffers[index] },
+                .dst = { x, y, dst_width, atlas_data->image_heights[index], atlas_data->buffers[index] },
                 .rect = { 0, 0, parts[i].width, parts[i].height }
             };
             image_copy(&copy);
+            extend_edges(atlas_data->buffers[index], dst_width, x, y, parts[i].width, parts[i].height);
             image *target = parts[i].target;
             target->hd.density = parts[i].density;
             target->hd.atlas_id = index; // index only: ATLAS_HD << 28 does not fit in a signed int
-            target->hd.x_offset = packer.rects[i].output.x;
-            target->hd.y_offset = packer.rects[i].output.y;
+            target->hd.x_offset = x;
+            target->hd.y_offset = y;
         }
         free(parts[i].pixels);
     }
