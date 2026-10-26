@@ -63,6 +63,13 @@ t = np.asarray(upscaled(306), float).copy(); a = t[..., 3]
 edge = (a > 0) & ((np.roll(a, 1, 1) == 0) | (np.roll(a, -1, 1) == 0)); t[..., 3][edge] = 128
 assert 'seam' in failed(checks(orig(306), save(Image.fromarray(t.astype(np.uint8)), 'seam.png')))
 
+# seams: a crack tile whose sunken floor left a transparent gap along the back edges (mesh only 1.12 wide) fails 'seam'
+t = np.asarray(upscaled(452), float).copy(); a = t[..., 3]; hh = a.shape[0]
+back = (a > 0) & (np.roll(a, 2, 0) == 0) & (np.mgrid[0:hh, 0:1][0] < hh // 2)
+t[..., 3][back] = 0
+assert back.sum() > 20 and 'seam' in failed(checks(orig(452), save(Image.fromarray(t.astype(np.uint8)), 'crack_gap.png')))
+assert 'seam' not in failed(checks(orig(452), save(upscaled(452), 'crack_same.png')))
+
 # rim: a grass tile with a light band along its edge fails 'rim'
 t = np.asarray(upscaled(306), float).copy(); hh, ww = t.shape[:2]
 yy, xx = np.mgrid[0:hh, 0:ww]; dd = np.abs(xx + 0.5 - ww / 2) / (ww / 2) + np.abs(yy + 0.5 - hh / 2) / (hh / 2)

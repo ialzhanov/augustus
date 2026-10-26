@@ -90,6 +90,8 @@ Add a test to `test_check.py` for every new fault class, then a check. Never loo
 - Roads (591-639) use `terrain.py` paved mode: one Voronoi mesh of laid stones, colour per stone from the original. Plaza (3140-3147) uses mosaic mode (square grid, ~0.75 px stones). 1-2 px grass verges render too light; `verge_lock()` sets each verge pixel's 8x8 block mean to the original colour.
 - `edge` compares our image and the original at the SAME pixels (where the original is green, else ours). It once skipped verges that had lost their green (<= 10 green px): never let a check pass by finding nothing to measure.
 - Flat single-colour sprites (245 black, 733) keep their originals: nothing to remake.
+- Earthquake cracks (444-475) use `terrain.py` crack mode: the darkest pixels (limit per tile, 474/475 have only grey cracks) sink into a height-field ground mesh with rock ribs on the walls. The mesh goes past the tile edge by more than the floor sinks on screen, else a chasm at a back edge leaves a transparent gap (`seam`). Lit 3D walls are lighter than the painted dark walls: 473 failed `rim`.
+- zsh does not split an unquoted variable into words: `./terrain_make.sh $ids` gives one argument. Use `${=ids}`.
 
 ## Parallel work
 

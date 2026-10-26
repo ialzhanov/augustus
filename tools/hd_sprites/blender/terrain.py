@@ -22,9 +22,11 @@ GAIN = tuple(c3.GAIN[i] * TERRAIN_CAL[i] for i in range(3))
 FRAME = (ID - 364) % 8 if 364 <= ID <= 371 else 0
 PAVED = 591 <= ID <= 639   # cobbled roads: 3D cobbles where the original is not grass
 MOSAIC = 3140 <= ID <= 3147   # plaza: a mosaic of small square stones over the whole tile
+CRACK = 444 <= ID <= 475   # earthquake chasms: the original's dark pixels sink into the ground (3D walls)
+CRACK_DEPTH = float(os.environ.get('C3_CRACK_DEPTH', '0.15'))   # chasm floor below the ground (units; 35.5 game px = 1)
 COBBLE_CAL = float(os.environ.get('C3_COBBLE_CAL', '1.0'))
 PHOTO = {'grass': ('Grass004', (0.119, 0.152, 0.030)), 'meadow': ('Ground037', (0.317, 0.292, 0.099)),
-         'sand': ('Ground054', (0.331, 0.257, 0.155))}       # id, linear mean colour
+         'sand': ('Ground054', (0.331, 0.257, 0.155)), 'rock': ('Rock064', (0.188, 0.163, 0.076))}       # id, linear mean colour
 
 c3.setup(seed=ID)
 img = bpy.data.images.load(SRC); img.colorspace_settings.name = 'sRGB'
@@ -68,6 +70,13 @@ dirt = ~water & ~grassy
 if MOSAIC:   # the blue and green mosaic stones are not water or grass
     water, grassy, dirt = np.zeros_like(water), np.zeros_like(grassy), np.ones_like(dirt)
 inside = alpha > 0
+if CRACK:   # chasm = the darkest pixels; 474 and 475 have only grey cracks, so the limit follows the tile
+    lum = fill @ np.array([0.299, 0.587, 0.114])
+    limit = max(0.2, np.percentile(lum[inside & ~grassy], 10))
+    dark = lum < limit
+    DEPTH_FIELD = box_blur(dark * (0.5 + 0.5 * np.clip((limit - lum) / 0.12, 0, 1)))   # darker = deeper
+    grassy, dirt = grassy & ~dark, dirt | dark   # no grass tufts over the chasm, soil on its floor
+    print(f'crack {ID}: {int((dark & inside).sum())} chasm px')
 # paved roads: the sharp layout (a blur mixes the light stones into the 1 px green verges)
 LAYOUT = save_image('layout', np.stack([box_blur(fill[..., k], 0 if PAVED else 2) for k in range(3)], -1), True)
 # distance from the shore (sprite pixels, up to 4) for depth, foam and the wet band
@@ -151,6 +160,10 @@ def m_terrain():
     green = c3.mix(gcol, mcol, vmask)
     scol, snrm = photo('sand', v, 3.0)
     detail = c3.mix(green, scol, channel(masks, 'Green'))
+    if CRACK:   # chasm walls: rock photo on the steep faces
+        rcol, _ = photo('rock', v, 4.0)
+        nz = N.nodes.new('ShaderNodeSeparateXYZ'); c3.link(N.nodes.new('ShaderNodeNewGeometry').outputs['Normal'], nz.inputs['Vector'])
+        detail = c3.mix(detail, rcol, c3.ramp(nz.outputs['Z'], (0.35, (1, 1, 1)), (0.8, (0, 0, 0))))
     wet = c3.ramp(channel(shore, 'Red'), (0.0, (1, 1, 1)), (1.0, (0.62, 0.58, 0.55)))   # wet band on the shore
     land_col = c3.mix(c3.mix(base, detail, 1.0, 'MULTIPLY'), wet, 1.0, 'MULTIPLY')
     shade = c3.node('ShaderNodeMath'); shade.operation = 'MULTIPLY_ADD'                   # 1 - TUFT_SHADE * density
@@ -217,7 +230,8 @@ def material(name, fn):
 
 
 TERRAIN, MAPPED = material('terrain', m_terrain), material('mapped', m_mapped())
-c3.box('ground', (0, 0, -0.001), (NT + 0.12, NT + 0.12, 0.002), TERRAIN)   # larger than the tile (the 2 px steps of the tile shape stick out ~2 px)
+if not CRACK:   # crack tiles: a height-field mesh (crack_ground), the same size
+    c3.box('ground', (0, 0, -0.001), (NT + 0.12, NT + 0.12, 0.002), TERRAIN)   # larger than the tile (the 2 px steps of the tile shape stick out ~2 px)
 
 c = H - 15 * NT                 # tile centre row
 
@@ -268,7 +282,8 @@ scatter(grassy & inside, 0.08, flower)
 def pebble(x, y):
     """stone on sand and dirt: the original's colour at its position, varied size, some sunk into the ground"""
     sz = random.uniform(0.003, 0.012)
-    o = c3.rock((x, y, sz * random.uniform(-0.1, 0.3)), sz, flat=random.uniform(0.35, 0.6))
+    z0 = float(crack_z(np.array(x), np.array(y))) if CRACK else 0.0   # rubble on the chasm floor and walls
+    o = c3.rock((x, y, z0 + sz * random.uniform(-0.1, 0.3)), sz, flat=random.uniform(0.35, 0.6))
     o.data.materials[0] = PEBBLE
     px, py = min(max(int(W / 2 + 29 * (x + y)), 0), W - 1), min(max(int(c + 15 * (x - y)), 0), H - 1)
     o.color = (*(lin(fill[py, px]) * np.array(c3.GAIN) * random.uniform(0.75, 1.25)), 1)
@@ -302,6 +317,22 @@ def lin(c):
     return np.where(c > 0.04045, ((c + 0.055) / 1.055) ** 2.4, c / 12.92)
 
 
+def grid_mesh(name, vx, vy, z, keep):
+    """quad grid mesh over the vertex grid vx, vy (m x m) at height z; keep: (m-1) x (m-1) quads to keep"""
+    m = vx.shape[0]
+    verts = np.stack([vx, vy, z], -1).reshape(-1, 3)
+    idx = np.arange(m * m).reshape(m, m)
+    quads = np.stack([idx[:-1, :-1], idx[:-1, 1:], idx[1:, 1:], idx[1:, :-1]], -1).reshape(-1, 4)[keep.reshape(-1)]
+    me = bpy.data.meshes.new(name)
+    me.vertices.add(len(verts)); me.vertices.foreach_set('co', verts.astype(np.float32).ravel())
+    me.loops.add(quads.size); me.loops.foreach_set('vertex_index', quads.ravel().astype(np.int32))
+    me.polygons.add(len(quads)); me.polygons.foreach_set('loop_start', np.arange(0, quads.size, 4, dtype=np.int32))
+    me.polygons.foreach_set('loop_total', np.full(len(quads), 4, np.int32))
+    me.update(calc_edges=True)
+    for f in me.polygons: f.use_smooth = True
+    return me, quads
+
+
 def paving(step=0.042, res=0.004, height=0.010, square=False, jitter=0.38, wear=0.16, joint_w=0.10, tilt_sd=0.12):
     """One mesh of laid stones: Voronoi cells of a jittered grid (one cell = one stone), raised inside the cell
     with worn edges, a small tilt per stone, sunk joints at the cell borders. Cells on grass pixels are left out."""
@@ -333,30 +364,61 @@ def paving(step=0.042, res=0.004, height=0.010, square=False, jitter=0.38, wear=
     rel_x, rel_y = vx - cx[ki, kj], vy - cy[ki, kj]
     z = height * prof * (lift[ki, kj] + (rel_x * tilt[ki, kj, 0] + rel_y * tilt[ki, kj, 1]) / step)
     joint = 1 - np.clip(edge / joint_w, 0, 1)
-    verts = np.stack([vx, vy, np.maximum(z, 0)], -1).reshape(-1, 3)
-    idx = np.arange(m * m).reshape(m, m)
-    quads = np.stack([idx[:-1, :-1], idx[:-1, 1:], idx[1:, 1:], idx[1:, :-1]], -1).reshape(-1, 4)
     qx, qy = vx[:-1, :-1] + res / 2, vy[:-1, :-1] + res / 2
     qpx = np.clip((W / 2 + 29 * (qx + qy)).astype(int), 0, W - 1); qpy = np.clip((c + 15 * (qx - qy)).astype(int), 0, H - 1)
     # a quad belongs to the stone of its first corner; no stone on grass pixels (thin verges stay green)
-    keep = (paved[ki[:-1, :-1], kj[:-1, :-1]] & ~grassy[qpy, qpx]).reshape(-1)
-    quads = quads[keep]
-    me = bpy.data.meshes.new('paving')
-    me.vertices.add(len(verts)); me.vertices.foreach_set('co', verts.astype(np.float32).ravel())
-    me.loops.add(quads.size); me.loops.foreach_set('vertex_index', quads.ravel().astype(np.int32))
-    me.polygons.add(len(quads)); me.polygons.foreach_set('loop_start', np.arange(0, quads.size, 4, dtype=np.int32))
-    me.polygons.foreach_set('loop_total', np.full(len(quads), 4, np.int32))
-    me.update(calc_edges=True)
+    keep = paved[ki[:-1, :-1], kj[:-1, :-1]] & ~grassy[qpy, qpx]
+    me, quads = grid_mesh('paving', vx, vy, np.maximum(z, 0), keep)
     stone = colour[ki, kj].reshape(-1, 3)[quads.ravel()]       # per face corner: the stone of the quad's first corner
     stone = np.repeat(stone.reshape(-1, 4, 3)[:, :1], 4, 1).reshape(-1, 3)
     a = me.color_attributes.new('stone', 'FLOAT_COLOR', 'CORNER')
     a.data.foreach_set('color', np.concatenate([stone, np.ones((len(stone), 1))], 1).astype(np.float32).ravel())
     j = me.attributes.new('joint', 'FLOAT', 'POINT'); j.data.foreach_set('value', joint.reshape(-1).astype(np.float32))
-    for f in me.polygons: f.use_smooth = True
     me.materials.append(material('cobble', m_cobble))
     o = bpy.data.objects.new('paving', me); c3.sc.collection.objects.link(o); o.location.z = 0.0005
 
 
+def bilinear(a, x, y):
+    """a (H x W) at the pixels of world points x, y on the ground (z = 0)"""
+    px = np.clip(W / 2 + 29 * (x + y) - 0.5, 0, W - 1); py = np.clip(c + 15 * (x - y) - 0.5, 0, H - 1)
+    x0, y0 = np.minimum(px.astype(int), W - 2), np.minimum(py.astype(int), H - 2); fx, fy = px - x0, py - y0
+    return (a[y0, x0] * (1 - fx) + a[y0, x0 + 1] * fx) * (1 - fy) + (a[y0 + 1, x0] * (1 - fx) + a[y0 + 1, x0 + 1] * fx) * fy
+
+
+def crack_z(x, y):
+    """chasm: steep walls where the depth field rises (the opening stays at the original's dark pixels), uneven floor"""
+    g = bilinear(DEPTH_FIELD, x, y)
+    wall = np.clip((g - 0.12) / 0.18, 0, 1)
+    rough = rock_noise(x, y) * 4 * wall * (1 - wall)   # jagged rock ribs, only on the walls (rim and floor stay)
+    return -CRACK_DEPTH * (0.6 * wall * wall * (3 - 2 * wall) + 0.4 * g + 0.35 * rough)
+
+
+def rock_noise(x, y, cell=0.012):
+    """value noise, -1..1, two octaves (cell and cell / 2.5), stable per seed"""
+    rng = np.random.default_rng(int(os.environ.get('C3_SEED', ID)))
+    out = 0
+    for f, amp in ((1, 0.7), (2.5, 0.3)):
+        k = int(4 / (cell / f)) + 2
+        gr = rng.uniform(-1, 1, (k, k))
+        u, v = (x + 2) / (cell / f), (y + 2) / (cell / f)
+        i, j = np.clip(u.astype(int), 0, k - 2), np.clip(v.astype(int), 0, k - 2); fu, fv = u - i, v - j
+        out = out + amp * ((gr[i, j] * (1 - fu) + gr[i + 1, j] * fu) * (1 - fv) + (gr[i, j + 1] * (1 - fu) + gr[i + 1, j + 1] * fu) * fv)
+    return out
+
+
+def crack_ground(res=0.004):
+    """past the tile edge by more than the floor sinks on screen (35.5 px per unit down, 15 px per unit across):
+    else a chasm at a back edge leaves a transparent gap there (seam check)"""
+    lim = LIMIT + CRACK_DEPTH * 35.5 / 15 + 0.05
+    m = int(2 * lim / res) + 1
+    vx, vy = np.meshgrid(np.linspace(-lim, lim, m), np.linspace(-lim, lim, m))
+    me, _ = grid_mesh('ground', vx, vy, crack_z(vx, vy), np.ones((m - 1, m - 1), bool))
+    me.materials.append(TERRAIN)
+    o = bpy.data.objects.new('ground', me); c3.sc.collection.objects.link(o)
+
+
+if CRACK:
+    crack_ground()
 if PAVED:
     paving()
 elif MOSAIC:   # tesserae about 1 game px, set in straight rows, smooth tops, thin grout
