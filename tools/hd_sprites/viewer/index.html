@@ -10,7 +10,7 @@
 :root {
   --umber: #26231e; --tufa: #302c25; --tufa-2: #3a352d; --line: #4a4338; --marble: #f0e9dc; --dim: #b3a893;
   --purple: #a56bd0; --purple-bg: #3b2a47;
-  --installed: #4fb39a; --pass: #6e9fe0; --fail: #e5604f; --stale: #d9a843; --none: #7d7464;
+  --installed: #4fb39a; --pass: #6e9fe0; --fail: #e5604f; --stale: #d9a843; --none: #7d7464; --render: #c58ae0;
   --c3: #8db255; --c3_north: #a8cbe0; --c3_south: #e0bd72;
   --ground: #1d1b17; --thumb: 168px;
   --font: "Alegreya Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -34,8 +34,8 @@ header { grid-area: top; display: flex; align-items: center; gap: 20px; padding:
 .progress { display: flex; align-items: center; gap: 12px; margin-left: auto; font-size: 13px; color: var(--dim); }
 .bar { display: flex; height: 6px; width: 180px; border-radius: 3px; overflow: hidden; background: var(--tufa-2); }
 .bar i { display: block; height: 100%; }
-.jobs { display: flex; align-items: center; gap: 6px; color: var(--stale); font-size: 13px; }
-.spin { width: 10px; height: 10px; border: 2px solid var(--stale); border-right-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; }
+.jobs { display: flex; align-items: center; gap: 6px; color: var(--render); font-size: 13px; white-space: nowrap; }
+.spin { width: 10px; height: 10px; border: 2px solid var(--render); border-right-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .mode { font-size: 12px; color: var(--dim); }
 
@@ -110,7 +110,13 @@ select { background: var(--tufa); border: 1px solid var(--line); border-radius: 
 
 /* status and climate colours */
 .s-installed { background: var(--installed); } .s-pass { background: var(--pass); } .s-fail { background: var(--fail); }
-.s-stale { background: var(--stale); } .s-none { background: var(--none); }
+.s-stale { background: var(--stale); } .s-none { background: var(--none); } .s-rendering { background: var(--render); }
+.pip.s-rendering { animation: blink 1.2s ease-in-out infinite; } @keyframes blink { 50% { opacity: .3; } }
+.sumst { display: flex; gap: 4px; flex-wrap: wrap; }
+.sumst button { display: flex; align-items: center; gap: 6px; padding: 3px 9px; border: 1px solid var(--line); border-radius: 12px; font-size: 13px; color: var(--dim); background: none; cursor: pointer; }
+.sumst button.on { border-color: currentColor; color: inherit; }
+.sumst .pip { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.auto { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--dim); cursor: pointer; white-space: nowrap; }
 .c-c3 { background: var(--c3); } .c-c3_north { background: var(--c3_north); } .c-c3_south { background: var(--c3_south); }
 .bg-dark { --ground: #1d1b17; } .bg-grass { --ground: #4f6b22; } .bg-sand { --ground: #b49863; }
 .bg-check { --ground: repeating-conic-gradient(#3a352d 0 25%, #2b2722 0 50%) 0 0 / 14px 14px; }
@@ -181,7 +187,7 @@ code { font-size: 12px; color: var(--dim); }
   #railtoggle { display: inline-block; }
   main { padding: 0 12px 60px; }
 }
-@media (prefers-reduced-motion: reduce) { #detail, #rail, #shade, #toast { transition: none; } .spin { animation: none; } }
+@media (prefers-reduced-motion: reduce) { #detail, #rail, #shade, #toast { transition: none; } .spin, .pip.s-rendering { animation: none; } }
 </style>
 </head>
 <body>
@@ -193,6 +199,7 @@ code { font-size: 12px; color: var(--dim); }
     <input type="search" id="q" placeholder="Search: 2779, 2779-2790, tent 1x1 north, failing" aria-label="Search sprites by id, range or tag" autocomplete="off">
   </label>
   <div class="jobs" id="jobs" aria-live="polite"></div>
+  <label class="auto" id="autowrap" hidden><input type="checkbox" id="auto"> Auto-refresh</label>
   <div class="progress" id="progress"></div>
 </header>
 <nav id="rail" aria-label="Filters"></nav>
@@ -210,7 +217,7 @@ code { font-size: 12px; color: var(--dim); }
 const LIVE = location.protocol.startsWith('http');
 let D = window.C3DATA || { built: '-', groups: [], sprites: [] };
 const CLIMATE = { c3: 'Central', c3_north: 'North', c3_south: 'South' };
-const STATUS = { installed: 'Installed', pass: 'Passing', fail: 'Failing', stale: 'Old in game', none: 'Not started' };
+const STATUS = { rendering: 'Rendering', installed: 'Installed', pass: 'Passing', fail: 'Failing', stale: 'Old in game', none: 'Not started' };
 const CATS = ['Terrain', 'Housing', 'Buildings', 'Walkers', 'Empire map', 'Minimap', 'Interface', 'Ungrouped'];
 const HAS = { top: 'Top part', script: 'Build script', attempts: 'Attempts', variant: 'Own climate image', shared: 'Same in all climates' };
 const PREFIX = /^(BUILDING_|TERRAIN_|FIGURE_|EMPIRE_|MINIMAP_)/;
@@ -237,7 +244,7 @@ function writeHash() {
 }
 
 // ---- data preparation ----
-let groups = new Map(), byKey = new Map(), byId = new Map();
+let groups = new Map(), byKey = new Map(), byId = new Map(), renderingKeys = new Set();   // keys of sprites with a running or queued render
 const sub = cl => cl === 'c3' ? '' : cl + '/';
 const origSrc = s => `../originals/${sub(s.cl)}${s.id}.png`;
 const keyOf = s => `${s.cl}:${s.id}`;
@@ -245,6 +252,7 @@ const prettyGroup = g => g ? g.name.replace(PREFIX, '').toLowerCase().replace(/_
 const fpLabel = n => +n ? `${n}×${n}` : 'Flat';
 
 function status(s) {
+  if (renderingKeys.has(keyOf(s))) return 'rendering';
   const inst = s.installed_attempt && (s.attempts || []).find(a => a.stamp === s.installed_attempt);
   if (inst) return inst.ok ? 'installed' : 'fail';
   if (s.installed && !s.installed_current) return 'stale';
@@ -379,8 +387,11 @@ function seg(name, opts) {
 function renderToolbar() {
   const tags = FKEYS.flatMap(k => [...st.f[k]].map(v => `<span class="tag" data-k="${k}" data-v="${esc(v)}" role="button" tabindex="0"><b>${{ status: 'Status', cl: 'Climate', fp: 'Size', cat: 'Category', has: 'Has', g: 'Group' }[k]}</b>${esc(tagLabel(k, v))}</span>`));
   if (st.q) tags.push(`<span class="tag" data-q="1" role="button" tabindex="0"><b>Search</b>${esc(st.q)}</span>`);
+  const sc = counts.status;   // like the rail: the status selection itself is ignored, so every status stays visible
+  const sum = `<div class="sumst" role="group" aria-label="Status of the shown sprites">${Object.keys(STATUS).filter(k => sc[k] || st.f.status.has(k)).map(k =>
+    `<button data-status="${k}" class="${st.f.status.has(k) ? 'on' : ''}" aria-pressed="${st.f.status.has(k)}" title="show only: ${STATUS[k]}"><span class="pip s-${k}"></span><b class="num">${(sc[k] || 0).toLocaleString()}</b> ${STATUS[k].toLowerCase()}</button>`).join('')}</div>`;
   $('toolbar').innerHTML = `<div class="count num">${current.length.toLocaleString()} <span>of ${D.sprites.length.toLocaleString()} sprites</span></div>
-    ${tags.join('')}${tags.length > 1 ? '<button class="clear" id="clearall">Clear all</button>' : ''}
+    ${sum}${tags.join('')}${tags.length > 1 ? '<button class="clear" id="clearall">Clear all</button>' : ''}
     <div class="tools">
       ${seg('show', [['new', 'New', 'show the new version; hover shows the original'], ['orig', 'Original', 'show the original; hover shows the new version'], ['split', 'Split', 'left half original, right half new']])}
       ${seg('size', [['s', 'S'], ['m', 'M'], ['l', 'L']])}
@@ -391,6 +402,8 @@ function renderToolbar() {
   $('sort').onchange = e => { st.sort = e.target.value; update(); };
 }
 $('toolbar').addEventListener('click', e => {
+  const sb = e.target.closest('[data-status]');
+  if (sb) { const f = st.f.status; f.has(sb.dataset.status) ? f.delete(sb.dataset.status) : f.add(sb.dataset.status); return update(); }
   const t = e.target.closest('.tag');
   if (t) { if (t.dataset.q) { st.q = ''; $('q').value = ''; } else st.f[t.dataset.k].delete(t.dataset.v); return update(); }
   if (e.target.id === 'clearall') { FKEYS.forEach(k => st.f[k].clear()); st.q = ''; $('q').value = ''; return update(); }
@@ -402,8 +415,8 @@ $('toolbar').addEventListener('keydown', e => { if (e.key === 'Enter' && e.targe
 function renderProgress() {
   const c = {}; D.sprites.forEach(s => c[s.status] = (c[s.status] || 0) + 1);
   const t = D.sprites.length || 1;
-  $('progress').innerHTML = `<div class="bar" aria-hidden="true">${['installed', 'pass', 'fail', 'stale'].map(k => `<i class="s-${k}" style="width:${100 * (c[k] || 0) / t}%"></i>`).join('')}</div>
-    <span class="num"><b style="color:var(--installed)">${c.installed || 0}</b> installed · <b style="color:var(--pass)">${c.pass || 0}</b> passing · <b style="color:var(--fail)">${c.fail || 0}</b> failing${c.stale ? ` · <b style="color:var(--stale)">${c.stale}</b> old in game` : ''}</span>
+  $('progress').innerHTML = `<div class="bar" aria-hidden="true">${['installed', 'pass', 'fail', 'stale', 'rendering'].map(k => `<i class="s-${k}" style="width:${100 * (c[k] || 0) / t}%"></i>`).join('')}</div>
+    <span class="num"><b style="color:var(--installed)">${c.installed || 0}</b> installed · <b style="color:var(--pass)">${c.pass || 0}</b> passing · <b style="color:var(--fail)">${c.fail || 0}</b> failing${c.stale ? ` · <b style="color:var(--stale)">${c.stale}</b> old in game` : ''}${c.rendering ? ` · <b style="color:var(--render)">${c.rendering}</b> rendering` : ''}</span>
     <span class="mode" title="${LIVE ? 'served by viewer/server: install and generate work' : 'opened from disk: start viewer/server for actions'}">${LIVE ? '' : 'read-only · '}data ${esc(D.built)}</span>`;
 }
 
@@ -468,8 +481,10 @@ $('grid').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.c
 const q = $('q');
 q.oninput = () => { st.q = q.value.trim(); update(); };
 
-function update() {
+function update(keep) {
+  const top = $('main').scrollTop, want = shown;
   applyFilters(); renderRail(); renderToolbar(); renderGrid(); writeHash();
+  if (keep) { while (shown < want && shown < current.length) more(); $('main').scrollTop = top; }
 }
 
 // ---- detail drawer ----
@@ -609,36 +624,64 @@ async function act(kind, body, okMsg) {
   } catch (e) { toast(String(e), true); }
 }
 function renderJobs() {
+  // server jobs and renders started from the command line (external); returns which rendering sprites ended or started
   const active = jobs.filter(j => j.status === 'queued' || j.status === 'running');
-  $('jobs').innerHTML = active.length ? `<span class="spin"></span>${active.filter(j => j.status === 'running').length} rendering · ${active.filter(j => j.status === 'queued').length} queued` : '';
-  $('jobs').title = jobs.slice(0, 12).map(j => `${j.sprite} ${CLIMATE[j.climate || 'c3']} seed ${j.seed}: ${j.status}`).join('\n');
+  const run = active.filter(j => j.status === 'running').length, qd = active.length - run;
+  $('jobs').innerHTML = active.length ? `<span class="spin"></span>${run} rendering${qd ? ` · ${qd} queued` : ''}` : '';
+  $('jobs').title = active.map(j => `${j.sprite} ${CLIMATE[j.climate || 'c3']} ${j.script}${j.external ? ' (command line)' : ` seed ${j.seed}`}: ${j.status}`).join('\n');
+  const keys = new Set(active.map(j => `${j.climate || 'c3'}:${j.sprite}`));
+  const gone = [...renderingKeys].some(k => !keys.has(k)), added = [...keys].some(k => !renderingKeys.has(k));
+  renderingKeys = keys;
+  return { gone, added };
 }
 async function pollJobs() {
   if (!LIVE) return;
   const before = new Map(jobs.map(j => [j.id, j.status]));
   try { jobs = await (await fetch('/api/jobs')).json(); } catch (e) { return; }
-  renderJobs();
-  const finished = jobs.filter(j => (j.status === 'done' || j.status === 'failed') && before.get(j.id) && before.get(j.id) !== j.status);
+  const { gone, added } = renderJobs();
+  const finished = jobs.filter(j => !j.external && (j.status === 'done' || j.status === 'failed') && before.get(j.id) && before.get(j.id) !== j.status);
   for (const j of finished) toast(j.status === 'done' ? `${j.sprite}: a new attempt is ready (seed ${j.seed})` : `${j.sprite}: the render failed. ${j.log.split('\n').slice(-3).join(' ')}`, j.status !== 'done');
-  if (finished.length) await refresh();
-  else if (st.open && jobs.some(j => `${j.climate || 'c3'}:${j.sprite}` === st.open && before.get(j.id) !== j.status)) openDetail(st.open, true);
+  if (finished.length || gone) await refresh(true);          // a render ended: its attempt is in the data now
+  else if (added) { prepare(); renderProgress(); update(true); if (st.open) openDetail(st.open, true); }
   clearTimeout(polling);
-  if (jobs.some(j => j.status === 'queued' || j.status === 'running')) polling = setTimeout(pollJobs, 2000);
+  if (auto || jobs.some(j => !j.external && (j.status === 'queued' || j.status === 'running'))) polling = setTimeout(pollJobs, 3000);
 }
-async function refresh() {
+let lastData = '';
+async function refresh(keep) {
+  // keep: an automatic refresh; it keeps the scroll position and redraws only when the data changed
   if (LIVE) {
-    try { const r = await fetch('/api/data'); if (r.ok) D = await r.json(); else toast((await r.json()).error, true); }
-    catch (e) { toast(String(e), true); }
+    try {
+      const r = await fetch('/api/data'), text = await r.text();
+      if (!r.ok) { if (!keep) toast(JSON.parse(text).error, true); return; }
+      if (keep && text === lastData) return;
+      lastData = text; D = JSON.parse(text);
+    } catch (e) { if (!keep) toast(String(e), true); return; }
   }
+  const openBefore = st.open && byKey.get(st.open) ? JSON.stringify(byKey.get(st.open)) : null;
   prepare(); catBars = Object.fromEntries(CATS.map(c => [c, catProgress(c)]));
-  renderProgress(); update();
-  if (st.open) openDetail(st.open, true);
+  renderProgress(); update(keep);
+  if (st.open && (!keep || JSON.stringify(byKey.get(st.open)) !== openBefore)) openDetail(st.open, true);
+}
+// auto-refresh: jobs every 3 s, data every 10 s (the server builds the data at most every 2 s)
+let auto = false, autoTimer = null;
+function setAuto(on) {
+  auto = on; $('auto').checked = on;
+  try { localStorage.setItem('c3hd-auto', on ? '1' : '0'); } catch (e) {}
+  clearInterval(autoTimer);
+  if (on) { autoTimer = setInterval(() => { if (document.activeElement?.id !== 'groupfind') refresh(true); }, 10000); pollJobs(); }
+}
+if (LIVE) {
+  $('autowrap').hidden = false;
+  $('auto').onchange = e => setAuto(e.target.checked);
 }
 readHash(); q.value = st.q;
 window.addEventListener('hashchange', () => { readHash(); q.value = st.q; update(); st.open ? openDetail(st.open, true) : closeDetail(); });
 prepare(); catBars = Object.fromEntries(CATS.map(c => [c, catProgress(c)]));
 renderProgress(); update(); if (st.open) openDetail(st.open, true);
-if (LIVE) refresh().then(pollJobs);
+if (LIVE) {
+  let saved = null; try { saved = localStorage.getItem('c3hd-auto'); } catch (e) {}
+  refresh().then(() => { setAuto(saved !== '0'); if (!auto) pollJobs(); });
+}
 </script>
 </body>
 </html>
