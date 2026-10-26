@@ -8,6 +8,7 @@ BL = os.path.join(TEX, 'blender')
 sys.path.insert(0, TEX); sys.path.insert(0, BL)
 from sg import SG
 from check import checks
+import attempt
 
 GAME = os.path.expanduser('~/caesar3')
 HD = os.path.join(GAME, 'hd', 'c3')
@@ -31,7 +32,8 @@ def md5(path):
         return hashlib.md5(f.read()).hexdigest()
 
 
-def main():
+def build():
+    """all sprite data for the viewer (also served live by server.py)"""
     sg = SG(GAME, 'C3')
     names = {}
     for line in open(GROUP_H):
@@ -75,12 +77,29 @@ def main():
             if os.path.exists(top):
                 sp['hdtop'] = f'../blender/out/{i}_top.png'
             sp['rendered'] = int(os.path.getmtime(hd))
+        script = attempt.script_for(i)
+        if script:
+            sp['script'] = script
+        atts = attempt.attempts(i)
+        if atts:
+            sp['attempts'] = [dict(stamp=a['stamp'], seed=a.get('seed'), ok=a['pass'],
+                                   fails=[k for k, (ok, _) in a.get('checks', {}).items() if not ok],
+                                   checks=a.get('checks', {}), files=a['files']) for a in atts]
         if os.path.exists(inst):
             sp['installed'] = True
             sp['installed_current'] = os.path.exists(hd) and md5(inst) == md5(hd)
+            h = md5(inst)
+            for a in atts:
+                f = os.path.join(attempt.ATTEMPTS, str(i), a['stamp'], f'{i}.png')
+                if os.path.exists(f) and md5(f) == h:
+                    sp['installed_attempt'] = a['stamp']; break
         sprites.append(sp)
     json.dump(cache, open(cache_path, 'w'))
-    data = dict(built=time.strftime('%Y-%m-%d %H:%M'), groups=groups, sprites=sprites)
+    return dict(built=time.strftime('%Y-%m-%d %H:%M'), groups=groups, sprites=sprites)
+
+
+def main():
+    data = build(); sprites = data['sprites']
     with open(os.path.join(HERE, 'data.js'), 'w') as f:
         f.write('window.C3DATA = ' + json.dumps(data, separators=(',', ':')) + ';\n')
     n_r = sum('hd' in s for s in sprites); n_i = sum(s.get('installed', False) for s in sprites)

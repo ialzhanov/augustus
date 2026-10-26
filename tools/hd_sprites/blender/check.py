@@ -16,7 +16,7 @@ Each check covers a fault we already had:
   contrast   local contrast at game size is near the original: not flat/bland, not noisy
   clip       nothing cut off at the top edge (roof peak above the frame)
 """
-import sys
+import json, os, sys
 import numpy as np
 from PIL import Image, ImageFilter
 
@@ -171,4 +171,6 @@ if __name__ == '__main__':
     for k, (ok, msg) in r.items():
         print(f"  {'ok  ' if ok else 'FAIL'} {k:9} {msg}")
     print('PASS' if not bad else 'FAIL: ' + ', '.join(bad))
+    if os.environ.get('CHECK_JSON'):
+        json.dump({k: [bool(ok), msg] for k, (ok, msg) in r.items()}, open(os.environ['CHECK_JSON'], 'w'))
     sys.exit(1 if bad else 0)

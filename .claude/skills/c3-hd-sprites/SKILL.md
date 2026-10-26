@@ -23,7 +23,9 @@ Remake an original Caesar III sprite as an HD (2x) image that the patched August
 | Checks | `blender/check.py ORIG HD HAS_TOP [TOP]`; regression tests `blender/test_check.py` (run first by both build scripts) |
 | Originals (PNG) | `originals/<id>.png` (all 8,698; gitignored, made by `export_originals.py`) |
 | CC0 photo textures | `tex/<ambientCG id>/` (gitignored, `fetch_textures.sh`) (Fabric061, Ground108, Ground054, Ground037, Grass004, Grass001, Planks037A, RoofingTiles006, Plaster007, Rock064, Gravel023) |
-| Progress viewer | `viewer/index.html` (open from disk); `viewer/build_viewer.py` rebuilds `data.js` |
+| Progress viewer | `cd viewer/server && go run .` then http://127.0.0.1:8642 — attempts, install, uninstall, generate (new seed); `viewer/index.html` from disk is read-only |
+| Attempts | every build is saved in `blender/out/attempts/<id>/<time>/` (`blender/attempt.py`); `C3_SEED=n` gives a new variation |
+| Script registry | `blender/scripts.json`: add every new sprite script with its id range, else the viewer cannot generate it |
 | Group names | `src/core/image_group.h` (repo root) (`GROUP_BUILDING_HOUSE_TENT = 26`, ...) |
 | Python with PIL/numpy | `~/.local/share/uv/tools/mflux/bin/python` (system python3 has no PIL) |
 | Blender | `/Applications/Blender.app/Contents/MacOS/Blender -b -P script.py -- OUT.png SCALE [top] -- ARGS` |
@@ -52,7 +54,7 @@ World: 1 tile = 1 x 1 units, tile centre at origin, +z up. Orthographic 2:1 came
 4. **Orientation**: decide which way fronts/doors face from the original (screen lower-left = -y, lower-right = +x). The `mirror` check fails a mirrored layout.
 5. **Build**: `blender/make.sh myscript.py ID`. Read the check output and `blender/out/ID_cmp.png` (original | game size | 8x).
 6. **Iterate** until all checks pass AND it looks rich in the 8x view. Fix the cause, not the threshold.
-7. **Install**: `make.sh myscript.py ID install` (copies only when all checks pass). Reload the viewer.
+7. **Register** the script in `blender/scripts.json`. **Install** from the viewer (pick the best attempt) or with `make.sh myscript.py ID install` (copies only when all checks pass).
 
 ## Checks (`check.py`) and the fault each one caught
 

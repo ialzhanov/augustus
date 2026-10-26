@@ -23,7 +23,7 @@ sc = None
 
 def setup(seed=29, orig=None):
     global sc
-    random.seed(seed)
+    random.seed(int(os.environ.get('C3_SEED', seed)))   # C3_SEED: a new variation (viewer 'Generate')
     bpy.ops.wm.read_factory_settings(use_empty=True)
     sc = bpy.context.scene
     M.update({k: material(k, f) for k, f in MATERIALS.items()})

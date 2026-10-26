@@ -1,6 +1,6 @@
 # generated or downloaded: rebuild with export_originals.py, fetch_textures.sh and the build scripts
-originals/
-tex/
+originals
+tex
 blender/out/
 viewer/data.js
 viewer/checks_cache.json
