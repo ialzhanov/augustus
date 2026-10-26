@@ -24,6 +24,17 @@ The `c3-hd-sprites` skill (`.claude/skills/c3-hd-sprites/SKILL.md`) describes th
 | `blender/terrain_make.sh [install] ID...` | The same for terrain tiles (central climate) |
 | `blender/check.py`, `blender/test_check.py` | Checks for an HD sprite, and their regression tests |
 | `blender/calibrate.sh` | Calibrates the light gain and the grass colour |
-| `viewer/index.html` | Progress viewer (open from disk); `viewer/build_viewer.py` rebuilds its data |
+| `blender/attempt.py` | Saves each build as an attempt (`blender/out/attempts/<id>/<time>/`); install / uninstall from the command line |
+| `blender/scripts.json` | Which script builds which sprite ids (read by `attempt.py` and the viewer server) |
+| `viewer/index.html` | Progress viewer; `viewer/build_viewer.py` rebuilds its data |
+| `viewer/server/` | Go server for the viewer: live data, attempts, install, uninstall, generation jobs |
 
-The build scripts install into `~/caesar3/hd/<sg2 name>/`. Restart the game after an install.
+## Viewer
+
+    cd tools/hd_sprites/viewer/server && go run .      # then open http://127.0.0.1:8642
+
+The server listens on 127.0.0.1 only. In the sprite panel you can compare attempts with the original, install an attempt
+(refused when its checks fail, unless you allow it), uninstall, and generate a new attempt with a new seed.
+At most 2 renders run at a time (`-workers`). Opened from disk, `viewer/index.html` is read-only.
+
+The build scripts and the viewer install into `~/caesar3/hd/<sg2 name>/`. Restart the game after an install.

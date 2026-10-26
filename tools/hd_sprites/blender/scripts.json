@@ -1,0 +1,9 @@
+{
+  "_comment": "Which script builds which sprite ids (inclusive ranges). 'terrain' = terrain_make.sh, else make.sh <script>. Terrain installs only to the central climate (c3). Read by attempt.py and viewer/server.",
+  "scripts": [
+    {"from": 2779, "to": 2782, "script": "tent.py"},
+    {"from": 306, "to": 363, "script": "terrain"},
+    {"from": 476, "to": 533, "script": "terrain"},
+    {"from": 364, "to": 443, "script": "terrain"}
+  ]
+}

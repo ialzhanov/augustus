@@ -102,6 +102,19 @@ table.checks td:first-child { width: 22px; } table.checks td:nth-child(2) { widt
 .ov h3 { margin: 0 0 6px; font-size: 13px; } .ov .bar { width: 100%; margin: 6px 0; }
 .ov .legend { color: var(--dim); font-size: 11px; display: flex; gap: 10px; flex-wrap: wrap; }
 .dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+.actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+button.primary { background: #3a3020; border-color: var(--accent); }
+button:disabled { opacity: .5; cursor: default; }
+.atts { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+.att { flex: none; width: 132px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px; cursor: pointer; font-size: 11px; }
+.att.on { border-color: var(--accent); background: #3a3020; }
+.att img { display: block; width: 116px; margin: 0 auto 4px; }
+.jobs { color: var(--warn); display: flex; align-items: center; gap: 6px; }
+.spin { width: 10px; height: 10px; border: 2px solid var(--warn); border-right-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+#toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); background: var(--panel2); border: 1px solid var(--ok);
+         color: var(--text); padding: 10px 16px; border-radius: 8px; opacity: 0; transition: all .2s; z-index: 20; max-width: 80vw; pointer-events: none; }
+#toast.show { opacity: 1; transform: translate(-50%, 0); } #toast.bad { border-color: var(--fail); }
 @media (max-width: 800px) { body { grid-template-columns: 1fr; grid-template-areas: "top" "main"; } aside { display: none; } }
 </style>
 </head>
@@ -109,6 +122,7 @@ table.checks td:first-child { width: 22px; } table.checks td:nth-child(2) { widt
 <header>
   <h1>Caesar III — HD sprites <small id="built"></small></h1>
   <div class="stats" id="stats"></div>
+  <div class="jobs" id="jobs" title="render jobs"></div>
   <div class="controls">
     <input type="search" id="q" placeholder="Search id or group (e.g. 2780, tent)">
     <div class="chips" id="chips"></div>
@@ -120,10 +134,13 @@ table.checks td:first-child { width: 22px; } table.checks td:nth-child(2) { widt
 <main id="main"></main>
 <div id="shade"></div>
 <section id="detail" aria-hidden="true"></section>
+<div id="toast"></div>
 <script src="data.js"></script>
 <script>
-const D = window.C3DATA;
-const groups = new Map(D.groups.map(g => [g.id, g]));
+// served by viewer/server: live data and actions; opened from disk: data.js, read-only
+const LIVE = location.protocol.startsWith('http');
+let D = window.C3DATA || { built: '-', groups: [], sprites: [] };
+let groups = new Map();
 const STATUS = [
   ['installed', 'Installed'], ['pass', 'Passing'], ['fail', 'Failing'], ['none', 'Not started']];
 const st = load();
@@ -131,12 +148,22 @@ function load() { try { return Object.assign({ status: 'all', group: 'overview',
 function save() { try { localStorage.setItem('c3viewer', JSON.stringify(st)); } catch (e) {} }
 
 function status(s) {
-  if (!s.hd) return 'none';
+  if (!s.hd && !s.attempts) return 'none';
+  const inst = s.installed_attempt && (s.attempts || []).find(a => a.stamp === s.installed_attempt);
+  if (inst) return inst.ok ? 'installed' : 'fail';
   const fails = s.checks ? Object.entries(s.checks).filter(([, v]) => !v[0]).map(([k]) => k) : [];
   if (s.installed && s.installed_current && !fails.length) return 'installed';
   return fails.length ? 'fail' : 'pass';
 }
-D.sprites.forEach(s => { s.status = status(s); s.fails = s.checks ? Object.entries(s.checks).filter(([, v]) => !v[0]).map(([k]) => k) : []; });
+function prepare() {
+  groups = new Map(D.groups.map(g => [g.id, g]));
+  D.sprites.forEach(s => {
+    s.status = status(s);
+    const inst = s.installed_attempt && (s.attempts || []).find(a => a.stamp === s.installed_attempt);
+    s.fails = inst ? inst.fails : s.checks ? Object.entries(s.checks).filter(([, v]) => !v[0]).map(([k]) => k) : [];
+  });
+  document.getElementById('built').textContent = (LIVE ? 'live · ' : 'read-only (open via server for actions) · ') + 'data ' + D.built;
+}
 
 function counts(list) {
   const c = { installed: 0, pass: 0, fail: 0, none: 0 };
@@ -149,7 +176,6 @@ function barHTML(c, width) {
 }
 
 // header
-document.getElementById('built').textContent = 'data built ' + D.built;
 function renderStats() {
   const c = counts(D.sprites);
   document.getElementById('stats').innerHTML = barHTML(c) +
@@ -168,7 +194,7 @@ const bg = document.getElementById('bg'); bg.value = st.bg;
 bg.onchange = () => { st.bg = bg.value; save(); applyBg(); };
 function applyBg() { document.documentElement.style.setProperty('--tile-dark', st.bg === 'grass' ? '#4f6b22' : '#1b1c20');
   document.querySelectorAll('.card .thumb').forEach(t => t.style.background = st.bg === 'check' ? 'repeating-conic-gradient(#2c2e34 0 25%, #222428 0 50%) 0 0 / 12px 12px' : ''); }
-document.getElementById('reload').onclick = () => location.reload();
+document.getElementById('reload').onclick = () => LIVE ? refresh() : location.reload();
 
 // sidebar: overview + groups by category, groups with work first
 function renderSide() {
@@ -257,14 +283,38 @@ document.getElementById('main').addEventListener('scroll', e => {
 });
 
 // detail drawer
-let openId = null, zoom = 0, cut = 50, dbg = st.bg;   // zoom 0 = fit the stage
-function openDetail(id) {
+let openId = null, zoom = 0, cut = 50, dbg = st.bg, sel = null;   // zoom 0 = fit the stage; sel = selected attempt
+function attFile(s, a, suffix) {
+  return a && a.files.includes(`${s.id}${suffix}.png`) ? `../blender/out/attempts/${s.id}/${a.stamp}/${s.id}${suffix}.png` : null;
+}
+function openDetail(id, keepSel) {
+  if (openId !== id || !keepSel) sel = null;
   openId = id; const s = D.sprites.find(x => x.id === id); const g = groups.get(s.g);
   const det = document.getElementById('detail');
   const z = zoom || Math.max(1, Math.min(10, Math.floor(620 / s.w), Math.floor(420 / s.h)));
   const W = s.w * z, H = s.h * z;
-  const hdFile = s.hd ? `${s.hd}?${s.rendered}` : null;
-  const checks = s.checks ? Object.entries(s.checks).map(([k, [ok, msg]]) =>
+  const atts = s.attempts || [];
+  const a = atts.find(x => x.stamp === sel) || atts.find(x => x.stamp === s.installed_attempt) || atts[0] || null;
+  sel = a ? a.stamp : null;
+  const hdFile = a ? attFile(s, a, '') : s.hd ? `${s.hd}?${s.rendered}` : null;
+  const hd8 = a ? attFile(s, a, '_8') : s.hd8, hdtop = a ? attFile(s, a, '_top') : s.hdtop;
+  const ck = a ? a.checks : s.checks;
+  const busy = jobs.find(j => j.sprite === s.id && (j.status === 'queued' || j.status === 'running'));
+  const attemptsHTML = atts.length ? `<div class="panel"><h4>Attempts (${atts.length}) · click to compare</h4><div class="atts">${atts.map(x => `
+      <div class="att ${x.stamp === sel ? 'on' : ''}" data-stamp="${x.stamp}" title="seed ${x.seed}${x.fails.length ? ' · fails: ' + x.fails.join(', ') : ''}">
+        <img src="${attFile(s, x, '')}" style="${footClip(s, 1)}">
+        <div><b class="${x.ok ? 'ok' : 'bad'}">${x.ok ? '✔' : '✖'}</b> ${x.stamp.slice(4, 8).replace(/(..)(..)/, '$1-$2')} ${x.stamp.slice(9, 11)}:${x.stamp.slice(11, 13)}</div>
+        <div class="kbd">seed ${x.seed}${x.stamp === s.installed_attempt ? ' · <span class="ok">in game</span>' : ''}</div>
+      </div>`).join('')}</div></div>` : '';
+  const actionsHTML = LIVE ? `<div class="actions">
+      ${s.script ? `<button id="gen" ${busy ? 'disabled' : ''}>${busy ? (busy.status === 'running' ? 'Rendering…' : 'Queued…') : 'Generate new attempt'}</button>
+                    ${a ? `<button id="regen" ${busy ? 'disabled' : ''} title="render again with seed ${a.seed}">Re-render seed ${a.seed}</button>` : ''}`
+                 : '<span class="kbd">No script for this sprite yet (blender/scripts.json)</span>'}
+      ${a ? `<button id="inst" class="primary" ${a.stamp === s.installed_attempt ? 'disabled' : ''}>${a.stamp === s.installed_attempt ? 'Installed' : 'Install this attempt'}</button>
+             ${a.ok ? '' : '<label class="kbd"><input type="checkbox" id="force"> install although checks fail</label>'}` : ''}
+      ${s.installed ? '<button id="uninst">Uninstall (use original)</button>' : ''}
+    </div>` : '';
+  const checks = ck ? Object.entries(ck).map(([k, [ok, msg]]) =>
     `<tr><td class="${ok ? 'ok' : 'bad'}">${ok ? '✔' : '✖'}</td><td>${k}</td><td>${msg}</td></tr>`).join('') : '<tr><td></td><td colspan="2">No new version yet.</td></tr>';
   const isTile = s.w === 58 && s.h === 30;
   det.innerHTML = `
@@ -274,6 +324,7 @@ function openDetail(id) {
       <label class="kbd">Background <select id="dbg"><option value="dark">Dark</option><option value="grass">Grass</option><option value="check">Checker</option></select></label>
       <span class="kbd"><b>←</b> <b>→</b> next · <b>Esc</b> close</span><button id="dclose">Close</button></div>
     <div class="dbody">
+      ${actionsHTML}
       <div class="stage bg-${dbg}" id="stage">
         ${hdFile ? `<div class="wipe" id="wipe" style="--cut:${cut}%;width:${W}px;height:${H}px">
             <span class="lab" style="left:0">original</span><span class="lab" style="right:0">new</span>
@@ -287,12 +338,13 @@ function openDetail(id) {
           <figure><img src="../originals/${s.id}.png" width="${s.w * 2}" style="image-rendering:pixelated"><figcaption>original · 200%</figcaption></figure>
           ${hdFile ? `<figure><img src="${hdFile}" width="${s.w}" style="${footClip(s, 1)}"><figcaption>new · 100% (game)</figcaption></figure>
           <figure><img src="${hdFile}" width="${s.w * 2}" style="${footClip(s, 2)}"><figcaption>new · 200% (game max)</figcaption></figure>` : ''}
-          ${s.hd8 ? `<figure><img src="${s.hd8}?${s.rendered}" width="${Math.min(s.w * 6, 460)}"><figcaption>8× render</figcaption></figure>` : ''}
-          ${s.hdtop ? `<figure><img src="${s.hdtop}?${s.rendered}" width="${s.w * 2}"><figcaption>top part (_top.png)</figcaption></figure>` : ''}
+          ${hd8 ? `<figure><img src="${hd8}" width="${Math.min(s.w * 6, 460)}"><figcaption>8× render</figcaption></figure>` : ''}
+          ${hdtop ? `<figure><img src="${hdtop}" width="${s.w * 2}"><figcaption>top part (_top.png)</figcaption></figure>` : ''}
         </div></div>
         ${isTile ? `<div class="panel"><h4>Tiling 3×3 (seams)</h4>${tiling(s, hdFile)}</div>` : ''}
       </div>
-      <div class="panel"><h4>Checks</h4><table class="checks">${checks}</table></div>
+      ${attemptsHTML}
+      <div class="panel"><h4>Checks${a ? ` · attempt ${a.stamp}` : ''}</h4><table class="checks">${checks}</table></div>
       <div class="kbd">Files: <code>originals/${s.id}.png</code>${s.hd ? ` · <code>blender/out/${s.id}.png</code>` : ''}${s.installed ? ` · <code>~/caesar3/hd/c3/${s.id}.png</code>${s.installed_current ? '' : ' <span class="bad">(older than out/)</span>'}` : ''}</div>
     </div>`;
   det.classList.add('open'); document.getElementById('shade').classList.add('open');
@@ -300,6 +352,12 @@ function openDetail(id) {
   det.querySelector('#dclose').onclick = closeDetail;
   det.querySelector('#dz').onchange = e => { zoom = +e.target.value; openDetail(id); };
   det.querySelector('#dbg').onchange = e => { dbg = e.target.value; det.querySelector('#stage').className = 'stage bg-' + dbg; };
+  det.querySelectorAll('.att').forEach(el => el.onclick = () => { sel = el.dataset.stamp; openDetail(id, true); });
+  const on = (q, f) => { const el = det.querySelector(q); if (el) el.onclick = f; };
+  on('#gen', () => act('generate', { id }, `Rendering #${id} with a new seed`));
+  on('#regen', () => act('generate', { id, seed: a.seed }, `Rendering #${id} with seed ${a.seed}`));
+  on('#inst', () => act('install', { id, stamp: a.stamp, force: !!det.querySelector('#force')?.checked }, `Installed #${id} (${a.stamp}). Restart the game to see it.`));
+  on('#uninst', () => act('uninstall', { id }, `Removed the HD files of #${id}. The game uses the original.`));
   const r = det.querySelector('#cut'), w = det.querySelector('#wipe');
   if (r) {
     r.oninput = () => { cut = +r.value; w.style.setProperty('--cut', cut + '%'); };
@@ -329,14 +387,54 @@ document.getElementById('shade').onclick = closeDetail;
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT' && e.target.type === 'search') return;
   if (e.key === 'Escape') closeDetail();
-  if (e.key === 'r' || e.key === 'R') location.reload();
+  if (e.key === 'r' || e.key === 'R') LIVE ? refresh() : location.reload();
   if (openId !== null && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
     const i = current.findIndex(s => s.id === openId); const n = current[i + (e.key === 'ArrowRight' ? 1 : -1)];
     if (n) openDetail(n.id);
   }
 });
 
-renderStats(); renderChips(); renderSide(); renderMain();
+let jobs = [], polling = null;
+function toast(msg, bad) {
+  const t = document.getElementById('toast'); t.textContent = msg; t.className = 'show' + (bad ? ' bad' : '');
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.className = '', 4500);
+}
+async function act(kind, body, okMsg) {
+  try {
+    const r = await fetch('/api/' + kind, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const j = await r.json();
+    if (!r.ok) return toast(j.error || r.statusText, true);
+    toast(okMsg);
+    if (kind === 'generate') { await pollJobs(); } else { await refresh(); }
+  } catch (e) { toast(String(e), true); }
+}
+function renderJobs() {
+  const active = jobs.filter(j => j.status === 'queued' || j.status === 'running');
+  const el = document.getElementById('jobs');
+  el.innerHTML = active.length ? `<span class="spin"></span>${active.filter(j => j.status === 'running').length} rendering · ${active.filter(j => j.status === 'queued').length} queued` : '';
+  el.title = jobs.slice(0, 12).map(j => `#${j.sprite} seed ${j.seed}: ${j.status}`).join('\n');
+}
+async function pollJobs() {
+  if (!LIVE) return;
+  const before = new Map(jobs.map(j => [j.id, j.status]));
+  try { jobs = await (await fetch('/api/jobs')).json(); } catch (e) { return; }
+  renderJobs();
+  const finished = jobs.filter(j => (j.status === 'done' || j.status === 'failed') && before.get(j.id) && before.get(j.id) !== j.status);
+  for (const j of finished) toast(j.status === 'done' ? `#${j.sprite}: new attempt ready (seed ${j.seed})` : `#${j.sprite}: render failed — ${j.log.split('\n').slice(-3).join(' ')}`, j.status !== 'done');
+  if (finished.length) await refresh();
+  else if (openId !== null && jobs.some(j => j.sprite === openId && before.get(j.id) !== j.status)) openDetail(openId, true);
+  clearTimeout(polling);
+  if (jobs.some(j => j.status === 'queued' || j.status === 'running')) polling = setTimeout(pollJobs, 2000);
+}
+async function refresh() {
+  if (LIVE) {
+    try { const r = await fetch('/api/data'); if (r.ok) D = await r.json(); else toast((await r.json()).error, true); }
+    catch (e) { toast(String(e), true); }
+  }
+  prepare(); renderStats(); renderSide(); renderMain();
+  if (openId !== null) openDetail(openId, true);
+}
+(async () => { renderChips(); await refresh(); pollJobs(); })();
 </script>
 </body>
 </html>
