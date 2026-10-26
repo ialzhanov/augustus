@@ -1,7 +1,7 @@
 """Re-model Caesar III <GROUP NAME> (group <g>, images <ids>; W x H px, n tile(s)).
 
 usage: Blender -b -P <name>.py -- OUT.png SCALE [top] -- ID
-Copy to ~/Movies/caesar3-remaster/textures/blender/<name>.py. Positions are measured PIXELS of the original
+Copy to tools/hd_sprites/blender/<name>.py. Positions are measured PIXELS of the original
 (base of each object), converted with px(); colours are sampled sRGB from the original, converted with lin_gain().
 """
 import math, os, random, sys

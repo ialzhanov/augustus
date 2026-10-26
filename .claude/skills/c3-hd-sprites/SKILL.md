@@ -13,18 +13,18 @@ Remake an original Caesar III sprite as an HD (2x) image that the patched August
 |---|---|
 | Game (test install) | `~/caesar3` — `augustus.app` is the patched build; `augustus_pre_hd.app` is the unpatched backup |
 | HD files the game loads | `~/caesar3/hd/<sg2 name>/<id>.png` (+ `<id>_top.png`); `c3` = central climate, also `c3_north`, `c3_south` |
-| Engine source (user's fork) | `~/augustus` (`src/core/image_hd.c`, renderer `draw_texture_advanced`); build: `cmake --build build -j8` |
-| Pipeline | `~/Movies/caesar3-remaster/textures/` |
-| Decoder | `sg.py` — `SG(~/caesar3, 'C3').decode(id)`, `.groups[g]` = first id of group g |
+| Engine source (this repo) | repo root (`src/core/image_hd.c`, renderer `draw_texture_advanced`); build: `cmake --build build -j8` |
+| Pipeline (in this repo) | `tools/hd_sprites/` — setup: `python export_originals.py`, `./fetch_textures.sh` (see its README) |
+| Decoder (paths below: relative to `tools/hd_sprites/`) | `sg.py` — `SG(~/caesar3, 'C3').decode(id)`, `.groups[g]` = first id of group g |
 | Blender library | `blender/c3.py` — scene, camera, light, materials, props, grass, render, top pass |
 | Sprite scripts | `blender/tent.py`, `blender/casa.py` (old standalone), `blender/terrain.py` |
 | Build one sprite | `blender/make.sh SCRIPT ID [install]` — 8x render (+top), 2x file, sharpen, checks, viewer |
 | Build terrain | `blender/terrain_make.sh [install] ID...` (central climate only) |
 | Checks | `blender/check.py ORIG HD HAS_TOP [TOP]`; regression tests `blender/test_check.py` (run first by both build scripts) |
-| Originals (PNG) | `viewer/orig/<id>.png` (all 8,698) and `blender/orig/<id>.png` (used by make.sh) |
-| CC0 photo textures | `blender/tex/<ambientCG id>/` (Fabric061, Ground108, Ground054, Ground037, Grass004, Grass001, Planks037A, RoofingTiles006, Plaster007, Rock064, Gravel023) |
+| Originals (PNG) | `originals/<id>.png` (all 8,698; gitignored, made by `export_originals.py`) |
+| CC0 photo textures | `tex/<ambientCG id>/` (gitignored, `fetch_textures.sh`) (Fabric061, Ground108, Ground054, Ground037, Grass004, Grass001, Planks037A, RoofingTiles006, Plaster007, Rock064, Gravel023) |
 | Progress viewer | `viewer/index.html` (open from disk); `viewer/build_viewer.py` rebuilds `data.js` |
-| Group names | `~/augustus/src/core/image_group.h` (`GROUP_BUILDING_HOUSE_TENT = 26`, ...) |
+| Group names | `src/core/image_group.h` (repo root) (`GROUP_BUILDING_HOUSE_TENT = 26`, ...) |
 | Python with PIL/numpy | `~/.local/share/uv/tools/mflux/bin/python` (system python3 has no PIL) |
 | Blender | `/Applications/Blender.app/Contents/MacOS/Blender -b -P script.py -- OUT.png SCALE [top] -- ARGS` |
 
@@ -46,7 +46,7 @@ World: 1 tile = 1 x 1 units, tile centre at origin, +z up. Orthographic 2:1 came
 
 ## Workflow for one sprite
 
-1. **Look at the original** at 12x with a pixel grid (see `tents16.png` code in history: nearest upscale + grid every 5 px). List every object: position (pixel of its base), size in px, colour.
+1. **Look at the original** (`originals/<id>.png`) at 12x with a pixel grid (nearest upscale + a grid line every 5 px). List every object: position (pixel of its base), size in px, colour.
 2. **Measure, never guess**: positions via the formula above; heights from `35.5 px = 1 unit`; colours by sampling the original's pixels (sRGB) and converting with `c3.GAIN` (see `canvas()` in `tent.py`: `lin(srgb) * GAIN / photo_mean`, x0.7 for surfaces facing the sun).
 3. **Write the script** from `template_sprite.py` in this skill folder: ground (grass from tile 306 via `'grass'` material, plane **1.12** so the stepped outline has no gaps), the model, props from `c3` (amphora, bowl_pot, sack, basket, blanket_roll, stool, firepit, straw, rock, block, rubble), grass tufts `c3.grass(count, open_ground)`, `c3.render(W, H)`.
 4. **Orientation**: decide which way fronts/doors face from the original (screen lower-left = -y, lower-right = +x). The `mirror` check fails a mirrored layout.
