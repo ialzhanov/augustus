@@ -12,6 +12,9 @@
     {"from": 825, "to": 844, "script": "terrain.py"},
     {"from": 254, "to": 261, "script": "terrain.py"},
     {"from": 274, "to": 305, "script": "terrain.py"},
-    {"from": 262, "to": 273, "script": "terrain.py"}
+    {"from": 262, "to": 273, "script": "terrain.py"},
+    {"from": 201, "to": 244, "script": "terrain.py"},
+    {"from": 534, "to": 547, "script": "terrain.py"},
+    {"from": 3148, "to": 3154, "script": "terrain.py"}
   ]
 }

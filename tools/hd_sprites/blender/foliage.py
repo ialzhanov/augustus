@@ -38,8 +38,9 @@ def components(m):
     return out
 
 
-def diamond(H, W, tiles=1, grow=1.12):
-    """the tile diamond (with the 2 px steps of the outline at grow 1.12)"""
+def diamond(H, W, tiles=None, grow=1.12):
+    """the footprint diamond of n x n tiles (n from the width), with the 2 px steps of the outline at grow 1.12"""
+    tiles = tiles or max(1, round((W + 2) / 60))
     yy, xx = np.mgrid[0:H, 0:W]
     dd = np.abs(xx + 0.5 - W / 2) / (W / 2) + np.abs(yy + 0.5 - (H - 15 * tiles)) / (15 * tiles)
     return dd <= grow, dd

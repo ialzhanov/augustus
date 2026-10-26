@@ -26,6 +26,8 @@ def setup(seed=29, orig=None):
     random.seed(int(os.environ.get('C3_SEED', seed)))   # C3_SEED: a new variation (viewer 'Generate')
     bpy.ops.wm.read_factory_settings(use_empty=True)
     sc = bpy.context.scene
+    global ROCK_MESH
+    ROCK_MESH = None
     M.update({k: material(k, f) for k, f in MATERIALS.items()})
     global CLOUDS, CRACKLE
     CLOUDS = bpy.data.textures.new('clouds', 'CLOUDS'); CLOUDS.noise_scale = 0.35
@@ -295,9 +297,16 @@ def box(name, loc, size, m, bevel=0.0, rot=0.0):
     o.data.materials.append(M[m] if isinstance(m, str) else m); return o
 
 
+ROCK_MESH = None   # the icosphere of every rock, made once per scene (setup() clears it)
+
+
 def rock(loc, s, flat=0.65):
-    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=3, radius=1, location=loc)
-    o = bpy.context.object
+    """a rough stone; no bpy.ops: each op updates the whole scene (6000 pebbles of a 3x3 rock tile took > 30 min)"""
+    global ROCK_MESH
+    if ROCK_MESH is None:
+        bm = bmesh.new(); bmesh.ops.create_icosphere(bm, subdivisions=3, radius=1.0)
+        ROCK_MESH = bpy.data.meshes.new('rock'); bm.to_mesh(ROCK_MESH); bm.free()
+    o = bpy.data.objects.new('rock', ROCK_MESH.copy()); sc.collection.objects.link(o); o.location = loc
     o.scale = (s * random.uniform(0.8, 1.6), s * random.uniform(0.7, 1.2), s * flat * random.uniform(0.8, 1.2))
     o.rotation_euler = (random.uniform(-.2, .2), random.uniform(-.2, .2), random.uniform(0, math.pi))
     d = o.modifiers.new('d', 'DISPLACE'); d.texture = CLOUDS; d.strength = 0.35

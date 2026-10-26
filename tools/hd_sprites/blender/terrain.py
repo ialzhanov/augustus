@@ -22,6 +22,7 @@ if sys.argv[-2] == '--':   # make.sh gives only the id (sprites with a top part)
 else:
     ID, SRC = int(sys.argv[-2]), sys.argv[-1]
 TERRAIN_CAL = [float(v) for v in os.environ.get('C3_TERRAIN_CAL', '2.756,2.575,2.208').split(',')]   # terrain render vs its original (edge grass, with the tuft density compensation)
+ROCK_CAL = [float(v) for v in os.environ.get('C3_ROCK_CAL', '1,1,1').split(',')]   # x GAIN for rock outcrops
 LEAF_CAL = [float(v) for v in os.environ.get('C3_LEAF_CAL', '1.3,1.28,1.0').split(',')]   # x GAIN: leaf clusters shade each other (edge, 274-286; 1.4 made 274 too light)
 WATER_CAL = [float(v) for v in os.environ.get('C3_WATER_CAL', '0.519,0.540,0.590').split(',')]   # x TERRAIN_CAL: water colour unchanged by the terrain recalibration
 GAIN = tuple(c3.GAIN[i] * TERRAIN_CAL[i] for i in range(3))
@@ -44,6 +45,8 @@ WALLS = {833: (0.2, [(0.147, -0.001, 0.97, 0.22, 90)]),   # fit 0.396 thick (sha
 TREE = 254 <= ID <= 261 or 274 <= ID <= 305   # shrubs (cypresses) and trees: crowns of leaf clusters (foliage.py)
 OPEN_GROUND = set(range(254, 262)) | {276, 278, 280}   # single trees on grass: no undergrowth (the colour rule takes their
                                                        # shadow for foliage; lit clusters there gave 1.7 x the contrast)
+ROCK = 201 <= ID <= 244 or 534 <= ID <= 547   # rock outcrops (1x1 to 3x3): rough rocks on the crown circles of foliage.py
+GARDEN = 3148 <= ID <= 3154   # gardens: gravel path and curbs flat, hedges and beds as leaf clusters, a cypress crown
 MEADOW = 262 <= ID <= 273   # tall dry grass stalks (light yellow vertical runs) on grass, some above the tile
 CRACK = 444 <= ID <= 475   # earthquake chasms: the original's dark pixels sink into the ground (3D walls)
 CRACK_DEPTH = float(os.environ.get('C3_CRACK_DEPTH', '0.15'))   # chasm floor below the ground (units; 35.5 game px = 1)
@@ -116,8 +119,11 @@ def shore_models():
 known = alpha > 0
 if SHORE:   # the ground under the walls and rocks continues the water and grass around them
     known = known & ~shore_models()
-if TREE:   # tree tiles: the ground is undergrowth in the original's colours (no fill under the canopy)
+if TREE or ROCK or GARDEN:   # tree tiles: the ground is undergrowth in the original's colours (no fill under the canopy)
     CANOPY, CROWNS = foliage.crowns(rgb, alpha)
+    if GARDEN:   # the colour rule measures from the edge (a hedge here): only the parts above the diamond are crowns
+        dia_c, _ = foliage.diamond(H, W, grow=1.0)
+        CROWNS = [cr for cr in CROWNS if not dia_c[int(cr[1]), int(cr[0])]]
     TRUNK = (alpha > 0) & (rgb[..., 0] >= rgb[..., 1] - 0.01) & (foliage.foliage_diff(rgb, alpha) > foliage.T)   # brown or grey, not grass
     print(f'tree {ID}: {len(CROWNS)} crowns')
 fill = rgb * known[..., None]
@@ -133,6 +139,10 @@ grassy = (g > r + 0.02) & (g > b + 0.08) & ~water
 dirt = ~water & ~grassy
 if TREE:   # all ground under trees is vegetation: dark foliage pixels are not dirt (sand photo, pebbles, half the light)
     grassy, dirt = ~water, np.zeros_like(dirt)
+if GARDEN:   # pink gravel path and light stone curbs are ground, the rest is vegetation (hedges, beds, flowers)
+    lum_g = rgb @ np.array([0.299, 0.587, 0.114])
+    PATH = (alpha > 0) & (((rgb[..., 0] > rgb[..., 1] + 0.04) & (lum_g > 0.42)) | (lum_g > 0.62))
+    grassy, dirt = ~PATH & ~water, PATH & ~water
 if MOSAIC:   # the blue and green mosaic stones are not water or grass
     water, grassy, dirt = np.zeros_like(water), np.zeros_like(grassy), np.ones_like(dirt)
 inside = alpha > 0
@@ -143,13 +153,13 @@ if CRACK:   # chasm = the darkest pixels; 474 and 475 have only grey cracks, so 
     DEPTH_FIELD = box_blur(dark * (0.5 + 0.5 * np.clip((limit - lum) / 0.12, 0, 1)))   # darker = deeper
     grassy, dirt = grassy & ~dark, dirt | dark   # no grass tufts over the chasm, soil on its floor
     print(f'crack {ID}: {int((dark & inside).sum())} chasm px')
-if TREE or MEADOW:   # leaf colours: the original with its canopy (LAYOUT has grass there), corners grown from the nearby colours
+if TREE or MEADOW or ROCK or GARDEN:   # leaf colours: the original with its canopy (LAYOUT has grass there), corners grown from the nearby colours
     full = rgb * (alpha[..., None] > 0); k = alpha > 0
     while not k.all():
         wk = box_blur(k.astype(float))
         gr = np.stack([box_blur(full[..., j] * k) for j in range(3)], -1) / np.maximum(wk, 1e-6)[..., None]
         nw = ~k & (wk > 0); full[nw] = gr[nw]; k = k | nw
-    FOLIAGE = save_image('foliage', np.stack([box_blur(full[..., j], 1) for j in range(3)], -1), True)
+    FOLIAGE = save_image('foliage', np.stack([box_blur(full[..., j], 0 if GARDEN else 1) for j in range(3)], -1), True)   # garden: purple flowers blurred into the hedge green (edge)
 # paved roads: the sharp layout (a blur mixes the light stones into the 1 px green verges)
 LAYOUT = save_image('layout', np.stack([box_blur(fill[..., k], 0 if PAVED else 2) for k in range(3)], -1), True)
 # distance from the shore (sprite pixels, up to 4) for depth, foam and the wet band
@@ -279,14 +289,19 @@ def m_terrain():
     N.nodes.remove(N.nodes['Principled BSDF'])
 
 
-def m_mapped(tip=1.25):
-    """tufts, flowers' stems and pebbles: the broad original colour at their position"""
+def m_mapped(tip=1.25, merged=False):
+    """tufts, flowers' stems and bark: the broad original colour at their position. merged: one mesh of many tufts,
+    the height along the blade and the random value per tuft come from the attributes 'tz' and 'rnd'"""
     def f():
         lay = window_tex(LAYOUT)
-        sep = c3.N.nodes.new('ShaderNodeSeparateXYZ'); c3.link(c3.coord(), sep.inputs['Vector'])
-        root = c3.ramp(sep.outputs['Z'], (0.0, (0.45, 0.48, 0.42)), (1.0, (tip, tip, tip * 0.9)))
-        info = c3.N.nodes.new('ShaderNodeObjectInfo')
-        rnd = c3.ramp(info.outputs['Random'], (0.0, (0.7, 0.72, 0.6)), (1.0, (1.25, 1.2, 1.0)))
+        if merged:
+            tz = c3.N.nodes.new('ShaderNodeAttribute'); tz.attribute_name = 'tz'; height = tz.outputs['Fac']
+            rn = c3.N.nodes.new('ShaderNodeAttribute'); rn.attribute_name = 'rnd'; random_value = rn.outputs['Fac']
+        else:
+            sep = c3.N.nodes.new('ShaderNodeSeparateXYZ'); c3.link(c3.coord(), sep.inputs['Vector']); height = sep.outputs['Z']
+            random_value = c3.N.nodes.new('ShaderNodeObjectInfo').outputs['Random']
+        root = c3.ramp(height, (0.0, (0.45, 0.48, 0.42)), (1.0, (tip, tip, tip * 0.9)))
+        rnd = c3.ramp(random_value, (0.0, (0.7, 0.72, 0.6)), (1.0, (1.25, 1.2, 1.0)))
         col = c3.mix(c3.mix(c3.mix(lay.outputs['Color'], GAIN, 1.0, 'MULTIPLY'), root, 1.0, 'MULTIPLY'), rnd, 1.0, 'MULTIPLY')
         return col, None, 0.85
     return f
@@ -304,7 +319,7 @@ def material(name, fn):
     return m
 
 
-TERRAIN, MAPPED = material('terrain', m_terrain), material('mapped', m_mapped())
+TERRAIN, MAPPED = material('terrain', m_terrain), material('mapped', m_mapped(merged=True))
 if not CRACK:   # crack tiles: a height-field mesh (crack_ground), the same size
     c3.box('ground', (0, 0, -0.001), (NT + 0.12, NT + 0.12, 0.002), TERRAIN)   # larger than the tile (the 2 px steps of the tile shape stick out ~2 px)
 
@@ -334,13 +349,43 @@ for me in tufts:
     me.materials[0] = MAPPED
 
 
+TUFTS = []   # (tuft mesh, x, y, size, height factor, turn): built as one mesh (one object each: a 3x3 took > 30 min)
+
+
 def tuft(x, y):
-    o = bpy.data.objects.new('grass', random.choice(tufts)); c3.sc.collection.objects.link(o)
+    k = random.randrange(len(tufts))   # the random calls of the old one-object-per-tuft code, in the same order
     sz = random.uniform(0.014, 0.03)
-    o.location = (x, y, 0); o.scale = (sz, sz, sz * random.uniform(0.9, 1.5)); o.rotation_euler.z = random.uniform(0, 6.3)
+    TUFTS.append((k, x, y, sz, random.uniform(0.9, 1.5), random.uniform(0, 6.3)))
+
+
+def build_tufts():
+    """all tufts in one mesh; attributes 'tz' (height along the blade, 0..1) and 'rnd' (one value per tuft)"""
+    if not TUFTS:
+        return
+    t = np.array([row[1:] for row in TUFTS]); ks = np.array([row[0] for row in TUFTS])
+    rnd = np.random.default_rng(ID).uniform(0, 1, len(t))
+    verts, faces, tz, rv, off = [], [], [], [], 0
+    for k, me in enumerate(tufts):
+        sel = np.nonzero(ks == k)[0]
+        if not len(sel): continue
+        v = np.array([p.co[:] for p in me.vertices]); f = [list(p.vertices) for p in me.polygons]
+        x, y, sz, zf, rot = t[sel].T
+        c, s_ = np.cos(rot)[:, None], np.sin(rot)[:, None]
+        vx, vy, vz = v[None, :, 0] * sz[:, None], v[None, :, 1] * sz[:, None], v[None, :, 2] * (sz * zf)[:, None]
+        verts.append(np.stack([vx * c - vy * s_ + x[:, None], vx * s_ + vy * c + y[:, None], vz], -1).reshape(-1, 3))
+        for j in range(len(sel)):
+            faces += [[i + off + j * len(v) for i in fc] for fc in f]
+        tz.append(np.tile(v[:, 2], len(sel))); rv.append(np.repeat(rnd[sel], len(v)))
+        off += len(sel) * len(v)
+    me = bpy.data.meshes.new('tufts'); me.from_pydata(np.concatenate(verts).tolist(), [], faces)
+    for name, vals in (('tz', tz), ('rnd', rv)):
+        a = me.attributes.new(name, 'FLOAT', 'POINT'); a.data.foreach_set('value', np.concatenate(vals).astype(np.float32))
+    me.materials.append(MAPPED)
+    o = bpy.data.objects.new('grass', me); c3.sc.collection.objects.link(o)
 
 
 scatter(grassy, TUFT_DENSITY, tuft)
+build_tufts()
 # small flowers and clover on grass
 FLOWERS = [c3.material(f'flower{k}', (lambda col: lambda: (col, None, 0.5))(col))
            for k, col in enumerate([(0.9, 0.8, 0.15), (0.95, 0.95, 0.9), (0.55, 0.3, 0.75), (0.9, 0.45, 0.1)])]
@@ -500,7 +545,7 @@ elif MOSAIC:   # tesserae about 1 game px, set in straight rows, smooth tops, th
     paving(step=0.026, res=0.0025, height=0.004, square=True, jitter=0.06, wear=0.08, joint_w=0.05, tilt_sd=0.03)
 else:
     PEBBLE = material('pebble', lambda: m_cobble(per_object=True))
-    scatter(dirt & inside, 0.9, pebble)
+    scatter(dirt & inside, 0.3 if GARDEN else 0.9, pebble)   # one object each: a 2x2 garden path took > 10 min
 
 
 
@@ -544,7 +589,7 @@ def shore():
             x, y = world_of(xs[k] + random.uniform(-0.5, 0.5), ys[k] + random.uniform(-0.5, 0.5))   # rock body over the blob
             o = c3.rock((x, y, -0.2 * s), s, flat=random.uniform(0.7, 1.0))
             sub = o.modifiers.new('sub', 'SUBSURF'); sub.levels = 2
-            while o.modifiers[0] != sub: bpy.ops.object.modifier_move_up(modifier='sub')   # displace the finer mesh
+            o.modifiers.move(len(o.modifiers) - 1, 0)   # displace the finer mesh
             for f in o.data.polygons: f.use_smooth = True
             o.data.materials[0] = PEBBLE
             o.color = (*(lin(rgb[ys, xs]).mean(0) * np.array(c3.GAIN) * random.uniform(1.2, 1.5)), 1)
@@ -609,6 +654,8 @@ def trees():
     leaves, core, bark = material('leaves', m_leaves()), material('core', m_leaves(0.65)), material('bark', m_mapped(1.0))
     cs, ss = [], []
     score = np.clip((foliage.foliage_diff(rgb, alpha) - 4) / 14, 0, 1)   # 0 = edge grass, 1 = clearly foliage
+    if GARDEN:   # hedges and beds: the vegetation pixels (a blurred mask put clusters on the path)
+        score = ((alpha > 0) & ~PATH).astype(float)
     for x, y, r, z, g_row in CROWNS:
         R = r / foliage.PX_PER_UNIT
         gx, gy = world_of(x, g_row)
@@ -645,11 +692,12 @@ def trees():
     gx, gy = world_of(xs + rng.uniform(-0.5, 0.5, len(xs)), ys + rng.uniform(-0.5, 0.5, len(ys)))
     keep = (np.abs(gx) < LIMIT) & (np.abs(gy) < LIMIT)
     hgt = rng.uniform(0, 1, len(xs)) * (0.008 + 0.07 * sc)
-    instances('leaves', np.concatenate(cs), np.concatenate(ss), leaves, rng)
+    if cs:   # a garden without a part above the diamond has no crowns
+        instances('leaves', np.concatenate(cs), np.concatenate(ss), leaves, rng)
     keep &= ID not in OPEN_GROUND
     if keep.any():   # lighter only where dense (LEAF_CAL on single clusters on open grass: ground contrast 1.65 x on 254)
         instances('undergrowth', np.stack([gx, gy, hgt], 1)[keep], rng.uniform(0.009, 0.018, len(xs))[keep] * (0.7 + 0.5 * sc[keep]),
-                  material('undergrowth', m_leaves(spread=0.6, cal=(1, 1, 1))), rng, boost=1 + 0.4 * sc[keep])
+                  material('undergrowth', m_leaves(spread=0.6, cal=(1, 1, 1))), rng, boost=1 + (0.15 if GARDEN else 0.4) * sc[keep])
 
 
 def meadow():
@@ -678,10 +726,68 @@ def meadow():
     print(f'meadow {ID}: {len(cs)} blades')
 
 
+def m_rock():
+    """rock: the original's colour at the screen position x the brightness of the Rock064 photo, its normal map"""
+    def f():
+        N = c3.N
+        lay = window_tex(FOLIAGE)
+        mp = N.nodes.new('ShaderNodeMapping'); mp.inputs['Scale'].default_value = (6, 6, 6); c3.link(c3.coord(), mp.inputs['Vector'])
+        def img(kind, colour):
+            t = N.nodes.new('ShaderNodeTexImage'); t.projection = 'BOX'; t.projection_blend = 0.3
+            t.image = bpy.data.images.load(os.path.join(c3.TEX, 'Rock064', f'Rock064_1K-JPG_{kind}.jpg'), check_existing=True)
+            if not colour: t.image.colorspace_settings.name = 'Non-Color'
+            c3.link(mp.outputs['Vector'], t.inputs['Vector']); return t.outputs['Color']
+        bw = N.nodes.new('ShaderNodeRGBToBW'); c3.link(img('Color', True), bw.inputs['Color'])
+        det = c3.node('ShaderNodeMath'); det.operation = 'DIVIDE'; c3.link(bw.outputs['Val'], det.inputs[0]); det.inputs[1].default_value = 0.162
+        col = c3.mix(c3.mix(lay.outputs['Color'], tuple(GAIN[i] * ROCK_CAL[i] for i in range(3)), 1.0, 'MULTIPLY'), det.outputs['Value'], 1.0, 'MULTIPLY')
+        nm = N.nodes.new('ShaderNodeNormalMap'); nm.inputs['Strength'].default_value = 1.0; c3.link(img('NormalGL', False), nm.inputs['Color'])
+        return col, nm.outputs['Normal'], 0.85
+    return f
+
+
+BOULDER = None
+
+
+def boulder(loc, scale, mat):
+    """an angular boulder without bpy.ops (each op updates the whole scene: 400 boulders took > 30 min): one shared
+    coarse icosphere, turned at random on all axes, displaced by Voronoi cells, flat shaded: broken rock faces
+    (a subdivided smooth one made a soft lumpy mound)"""
+    global BOULDER
+    if BOULDER is None:
+        import bmesh
+        bm = bmesh.new(); bmesh.ops.create_icosphere(bm, subdivisions=3, radius=1.0)
+        BOULDER = bpy.data.meshes.new('boulder'); bm.to_mesh(BOULDER); bm.free()
+        BOULDER.materials.append(mat)
+    o = bpy.data.objects.new('boulder', BOULDER); c3.sc.collection.objects.link(o)
+    o.location, o.scale = loc, scale
+    o.rotation_euler = (random.uniform(0, 6.3), random.uniform(0, 6.3), random.uniform(0, 6.3))
+    for tex, strength in ((c3.CLOUDS, 0.25), (c3.CRACKLE, 0.25)):
+        d = o.modifiers.new('d', 'DISPLACE'); d.texture = tex; d.strength = strength
+    return o
+
+
+def rocks():
+    """a rough boulder on each crown circle, and a pile of larger ones under it down to the ground (one tall ellipsoid
+    per circle made stretched spikes)"""
+    c3.GROUND.update(bpy.data.objects.keys())
+    mat = material('rock', m_rock())
+    for x, y, r, z, g_row in CROWNS:
+        R = (r - 0.25) / foliage.PX_PER_UNIT
+        gx, gy = world_of(x, g_row)
+        n = max(1, math.ceil((z - 0.3 * R) / (1.2 * R)) + 1)   # a pile: the circle's boulder and more down to the ground
+        for k in range(n):
+            zk = max(z - k * 1.2 * R, 0.3 * R); Rk = R * (1 + 0.15 * k)
+            boulder((gx + random.uniform(-0.2, 0.2) * Rk, gy + random.uniform(-0.2, 0.2) * Rk, zk),
+                    (Rk * random.uniform(0.85, 1.05), Rk * random.uniform(0.85, 1.05), Rk * random.uniform(0.7, 0.9)), mat)
+    print(f'rock {ID}: {len(CROWNS)} rocks')
+
+
 if SHORE:
     shore()
-if TREE:
+if TREE or GARDEN:
     trees()
+if ROCK:
+    rocks()
 if MEADOW:
     meadow()
 c3.render(W, H, tiles=NT, samples=64, edge_fade=ID in WALLS)   # rocks: short shadows (edge_fade lit the edge band: rim)
