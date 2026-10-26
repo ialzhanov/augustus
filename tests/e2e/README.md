@@ -40,6 +40,26 @@ MallocPreScribble=1 MallocScribble=1 build-e2e/augustus.app/Contents/MacOS/augus
 
 The exit code is 0 when all checks pass, 1 when a check fails and 2 when the test file or the setup has an error. A crash gives another exit code, and no message box opens. At the first failed check, the test also writes `state_failure.json` and `state_failure.svx`. `run.sh` sets `MallocPreScribble` and `MallocScribble`: some save functions do not write all bytes of their buffers, and these variables make the bytes the same in each run.
 
+## Tests of the tool
+
+The tool has its own tests. Run them after a change to `src/game/e2e*.c`, to a test hook in the engine or to `run.sh`.
+
+```sh
+build-e2e/e2e_logic_test        # unit tests of src/game/e2e_logic.c (about 1 second)
+tests/e2e/selftest.sh           # the unit tests, run.sh and the binary (about 20 seconds)
+tests/e2e/selftest.sh --slow    # also builds the seam bug of 2b6e0ca02 and expects the seam case to fail
+```
+
+| Part | What it protects |
+|---|---|
+| `tests/e2e/unit/e2e_logic_test.c` | The parser, the ops, `mark`, the `{zoom}` replacement, the image compare and its tolerance, the seam finder (synthetic images with dark and light seams of a known depth), the HD group range |
+| Cases that must fail (`check_continues`, `image_mismatch`, `hd_missing_meadow`, the `error_*` cases) | A failed check does not stop the test; the image check, the HD check and each error message |
+| `selftest.sh`, fake binary | `run.sh`: the exit codes, `expect-log`, `expect-file`, the time limit, `--twice`, the `--update-images` guard |
+| `selftest.sh`, real binary | Relative paths, the seed, a bad data folder, the software renderer, a crash with no message box, `--update-images`, no HD folder, the user options not written, no test code in the normal build |
+| `selftest.sh --slow` | The seam case finds the real seam bug |
+
+`selftest.sh` cannot check that the window stays hidden. Look at the screen once after a change to the window code.
+
 ## Results
 
 ```text
@@ -57,6 +77,8 @@ build-e2e/e2e-results/summary.txt
 ## Test file format
 
 A test file is plain text with one command on each line. `#` starts a comment. The first line is `# expect: pass`, `# expect: fail` or `# expect: error`. `run.sh` compares it with the exit code 0, 1 or 2.
+
+A case can also have `# expect-log: <text>` lines and `# expect-file: <name>` lines. Each text must be in `log.txt`, and each file must be in the results folder. Use them in each case that expects a failure or an error, so that the case does not pass for a different reason.
 
 Names of buildings, house levels and resources are the names of the scenario event XML files (`src/scenario/event/parameter_data.c` and `src/game/resource.c`), for example `vacant_lot`, `granary`, `small_shack` and `wheat`. Tile coordinates are map coordinates from 0.
 
@@ -82,7 +104,7 @@ Notes:
 - `run month_end` runs until the month changes, then 1 more tick.
 - A capture is at most the size of the city viewport (1118 x 776 in the 1280 x 800 window). A capture that is partly outside the map, or a zoom outside 50 to the maximum, is an error.
 - `check hd` without a group fails when no image was drawn with an HD texture. With a group, it also fails when an image of the group was drawn without an HD texture. The group names are in `GROUP_NAMES` in `src/game/e2e_image.c`.
-- `check seams` compares each tile edge line (slope +1/2 or -1/2) with the parallel lines 1.5 to 3 pixels away. The limit is 16 (on a luminance scale of 0 to 255). On flat HD grass the worst line differs by at most 10.5 now, and by 26 to 35 at most zooms without the fix in `2b6e0ca02`.
+- `check seams` (the code is in `src/game/e2e_logic.c`) compares each tile edge line (slope +1/2 or -1/2) with the parallel lines 1.5 to 3 pixels away. The limit is 16 (on a luminance scale of 0 to 255). On flat HD grass the worst line differs by at most 10.5 now, and by 26 to 35 at most zooms without the fix in `2b6e0ca02`.
 
 ## Base savegames
 
