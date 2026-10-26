@@ -1,0 +1,7 @@
+# expect: pass
+# A scenario map loads, and the run advances the tick counter.
+load_map Caesarea
+check money > 0
+run ticks 50
+check tick < 50                  # a day has 50 ticks (0 to 49)
+check day == 1

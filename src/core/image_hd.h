@@ -18,4 +18,12 @@
  */
 void image_hd_load(image *images, int num_images, const char *sg2_filename);
 
+#ifdef E2E_TESTS
+/**
+ * Sets the folder of the HD sprites in place of "hd" in the data folder.
+ * The end-to-end tests use a pinned copy in the repository.
+ */
+void image_hd_set_base_dir(const char *dir);
+#endif
+
 #endif // CORE_IMAGE_HD_H

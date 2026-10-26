@@ -1,0 +1,15 @@
+# expect: pass
+# Goods use of a house (src/building/house_evolution.c, consume_resources()):
+# at tick 39 of day 0 a 1x1 house uses model_house_uses_inventory(level, pottery)
+# of its pottery. A 2x2 house also uses it on day 7. small_casa has pottery 0
+# and large_casa has pottery 1 (src/building/properties.c), so the case uses large_casa.
+load small_city.svx
+seed 1
+date 0 1 0                       # day 0 of the second month, tick 0
+set house 1 level large_casa
+set house 1 population 19        # max_people of large_casa, so no migrants come
+set house 1 pottery 100
+mark
+run ticks 40                     # tick 39 runs the evolve and the goods use
+check house 1 level == large_casa    # the house devolves only after 2 days (DEVOLVE_DELAY)
+check house 1 pottery == mark - 1

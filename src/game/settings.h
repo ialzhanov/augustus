@@ -24,6 +24,14 @@ typedef struct {
 
 void settings_load(void);
 
+#ifdef E2E_TESTS
+/**
+ * Sets all settings to the built-in default values, with no monthly autosave.
+ * The end-to-end test mode uses this in place of the user settings.
+ */
+void settings_load_defaults(void);
+#endif
+
 void settings_save(void);
 
 int setting_fullscreen(void);

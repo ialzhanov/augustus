@@ -332,16 +332,12 @@ static void initialize_saved_game(void)
     weather_reset();
 }
 
-static int start_scenario(const uint8_t *scenario_name, const char *scenario_file)
+static int start_scenario_from_file(const uint8_t *scenario_name, const char *full_scenario_file)
 {
     int mission = scenario_campaign_mission();
     int rank = scenario_campaign_rank();
     map_bookmarks_clear();
     int is_save_game = 0;
-    const char *full_scenario_file = dir_get_file_at_location(scenario_file, PATH_LOCATION_SCENARIO);
-    if (!full_scenario_file) {
-        return 0;
-    }
     if (!load_custom_scenario(scenario_name, full_scenario_file)) {
         uint8_t scenario_mapx_name[FILE_NAME_MAX];
         string_copy(scenario_name, scenario_mapx_name, FILE_NAME_MAX);
@@ -370,6 +366,22 @@ static int start_scenario(const uint8_t *scenario_name, const char *scenario_fil
 
     return 1;
 }
+
+static int start_scenario(const uint8_t *scenario_name, const char *scenario_file)
+{
+    const char *full_scenario_file = dir_get_file_at_location(scenario_file, PATH_LOCATION_SCENARIO);
+    if (!full_scenario_file) {
+        return 0;
+    }
+    return start_scenario_from_file(scenario_name, full_scenario_file);
+}
+
+#ifdef E2E_TESTS
+int game_file_start_scenario_from_path(const uint8_t *scenario_name, const char *path)
+{
+    return start_scenario_from_file(scenario_name, path);
+}
+#endif
 
 static const char *get_scenario_filename(const uint8_t *scenario_name, const char *extension, int decomposed)
 {

@@ -1,0 +1,9 @@
+# expect: pass
+# An imported event with a money condition runs and adds 1000 to the treasury.
+load small_city.svx
+events money_bonus.xml
+set money 6000
+mark
+run months 1
+check event 0 executions == 1
+check money == mark + 1000       # small_city has no workers and no tax

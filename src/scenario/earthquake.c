@@ -35,6 +35,7 @@ static struct {
         int y;
     } expand[4];
     int next_delay;
+    int custom_delay;
 } data;
 
 void scenario_earthquake_init(void)
@@ -214,7 +215,6 @@ void scenario_earthquake_process(void)
     }
     // --- Custom earthquake ---
     if (scenario.earthquake.severity == EARTHQUAKE_CUSTOM) {
-        static int custom_delay = 0; // Delay counter in ticks
         if (data.state == EVENT_NOT_STARTED) { // Start event
             if (game_time_year() == data.game_year && game_time_month() == data.month) {
                 data.state = EVENT_IN_PROGRESS;
@@ -223,9 +223,9 @@ void scenario_earthquake_process(void)
                     map_grid_offset(coords.x, coords.y));
             }
         } else if (data.state == EVENT_IN_PROGRESS) {
-            custom_delay++;
-            if (custom_delay >= data.next_delay) {
-                custom_delay = 0;
+            data.custom_delay++; // Delay counter in ticks
+            if (data.custom_delay >= data.next_delay) {
+                data.custom_delay = 0;
                 // Generate new random delay for next tile
                 data.next_delay = 10 + (random_byte() % (scenario.earthquake.pattern == EARTHQUAKE_PATTERN_RIGHT_LEFT ? 15 : 90) + 1); // 10 to 25 or 100 ticks
                 
@@ -319,4 +319,8 @@ void scenario_earthquake_load_state(buffer *buf)
         data.expand[i].x = buffer_read_i32(buf);
         data.expand[i].y = buffer_read_i32(buf);
     }
+    // The savegame does not store the custom earthquake delays. Start them again,
+    // so that the result does not depend on the game that ran before the load.
+    data.custom_delay = 0;
+    data.next_delay = 0;
 }

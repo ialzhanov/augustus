@@ -20,6 +20,13 @@
  */
 void game_time_init(int year);
 
+#ifdef E2E_TESTS
+/**
+ * Sets the date and sets the tick to 0. The end-to-end tests use this.
+ */
+void game_time_set_date(int year, int month, int day);
+#endif
+
 /**
  * The current game year
  *

@@ -1,0 +1,7 @@
+# expect: fail
+# expect-log: check hd meadow terrain_meadow: 0 draws with HD
+# The meadow images have no HD sprites, so the HD check of the meadow group fails.
+load flat_grass.svx
+terrain meadow 30 30 50 50
+capture meadow camera 40 40 zoom 100 size 320 240
+check hd meadow terrain_meadow

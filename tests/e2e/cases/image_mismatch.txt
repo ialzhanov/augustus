@@ -1,0 +1,13 @@
+# expect: fail
+# expect-log: pixels differ by more than 0 (allowed: 0), in the box
+# expect-log: pixels differ by more than 0 (allowed: 307200)
+# expect-log: ok   check image grass: 0 pixels differ by more than 255
+# expect-file: grass.diff.png
+# A capture with the camera 7 3 pixels away differs from the approved image of image_flat_grass.
+# The tolerance arguments make the same check pass.
+load flat_grass.svx
+seed 1
+capture grass camera 40 40 zoom 100 offset 7 3 size 640 480
+check image grass
+check image grass 0 307200
+check image grass 255

@@ -1,0 +1,5 @@
+# expect: pass
+# The grass tiles are drawn with the pinned HD sprites in tests/e2e/hd/.
+load flat_grass.svx
+capture grass camera 40 40 zoom 100 size 640 480
+check hd grass terrain_grass_1

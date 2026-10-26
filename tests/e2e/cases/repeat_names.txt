@@ -1,0 +1,11 @@
+# expect: pass
+# expect-log: capture r_50_0_0: 64 x 64 at camera 40 40, zoom 50, offset 0 0
+# expect-log: capture r_50_2_1: 64 x 64 at camera 40 40, zoom 50, offset 2 1
+# expect-log: capture r_60_0_0: 64 x 64 at camera 40 40, zoom 60, offset 0 0
+# expect-log: capture r_60_2_1: 64 x 64 at camera 40 40, zoom 60, offset 2 1
+# expect-file: r_60_2_1.png
+# A repeat block runs its lines for each zoom and each offset, with the names replaced.
+load flat_grass.svx
+repeat zoom 50 60 10 offsets 0,0 2,1
+capture r_{zoom}_{dx}_{dy} camera 40 40 zoom {zoom} offset {dx} {dy} size 64 64
+end

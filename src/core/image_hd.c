@@ -181,13 +181,26 @@ static int load_image_parts(image *img, int image_id, const char *dir, hd_part *
     return added;
 }
 
+#ifdef E2E_TESTS
+static char base_dir[FILE_NAME_MAX] = HD_BASE_DIR;
+
+void image_hd_set_base_dir(const char *dir)
+{
+    snprintf(base_dir, FILE_NAME_MAX, "%s", dir);
+}
+#else
+static const char *base_dir = HD_BASE_DIR;
+#endif
+
 static void build_dir_name(char *dir, const char *sg2_filename)
 {
-    snprintf(dir, FILE_NAME_MAX, "%s/%s", HD_BASE_DIR, file_remove_path(sg2_filename));
-    file_remove_extension(dir);
-    for (char *c = dir; *c; c++) {
+    char name[FILE_NAME_MAX];
+    snprintf(name, FILE_NAME_MAX, "%s", file_remove_path(sg2_filename));
+    file_remove_extension(name);
+    for (char *c = name; *c; c++) {
         *c = (char) tolower((unsigned char) *c);
     }
+    snprintf(dir, FILE_NAME_MAX, "%s/%s", base_dir, name);
 }
 
 void image_hd_load(image *images, int num_images, const char *sg2_filename)

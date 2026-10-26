@@ -1,6 +1,7 @@
 #include "game/system.h"
 
 #include "core/log.h"
+#include "game/e2e.h"
 #include "platform/platform.h"
 
 #if (defined(__GNUC__) && !defined(__MINGW32__) && !defined(__OpenBSD__) && \
@@ -84,7 +85,12 @@ static void crash_handler(int sig)
     log_error("Signal ", fetch_signal_name(sig), sig);
     backtrace_print();
     display_crash_message();
+#ifdef E2E_TESTS
+    // Exit code 1 is a failed check in the test mode
+    exit_with_status(e2e_is_active() ? E2E_CRASHED : 1);
+#else
     exit_with_status(1);
+#endif
 }
 
 void system_setup_crash_handler(void)

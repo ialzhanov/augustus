@@ -4,6 +4,7 @@
 #include "core/calc.h"
 #include "core/config.h"
 #include "core/image.h"
+#include "game/e2e.h"
 #include "game/settings.h"
 #include "game/system.h"
 #include "graphics/graphics.h"
@@ -161,6 +162,11 @@ int platform_screen_create(const char *title, int display_scale_percentage, int 
     if (fullscreen) {
         flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
+#ifdef E2E_TESTS
+    if (e2e_is_active()) {
+        flags |= SDL_WINDOW_HIDDEN;
+    }
+#endif
 
     SDL.window = SDL_CreateWindow(title,
         SDL_WINDOWPOS_CENTERED_DISPLAY(display_id), SDL_WINDOWPOS_CENTERED_DISPLAY(display_id),
@@ -361,6 +367,13 @@ void platform_screen_recreate_texture(void)
 
 void system_show_error_message_box(const char *title, const char *message)
 {
+#ifdef E2E_TESTS
+    if (e2e_is_active()) {
+        // A message box waits for a person
+        SDL_Log("%s: %s", title, message);
+        return;
+    }
+#endif
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, SDL.window);
 }
 

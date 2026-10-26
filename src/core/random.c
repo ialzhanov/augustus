@@ -17,6 +17,9 @@ static struct {
     int pool_index;
     int32_t pool[MAX_RANDOM];
     time_t last_seed;
+#ifdef E2E_TESTS
+    int has_test_seed;
+#endif
 } data;
 
 void random_init(void)
@@ -96,7 +99,29 @@ void random_save_state(buffer *buf)
     buffer_write_u32(buf, data.iv2);
 }
 
+#ifdef E2E_TESTS
+void random_set_test_seed(uint32_t seed)
+{
+    srand(seed);
+    data.has_test_seed = 1;
+    // The generator shifts 31 bits and must not start from 0
+    data.iv1 = (0x54657687 ^ seed) & 0x7fffffff;
+    data.iv2 = (0x72641663 ^ (seed * 2654435761u)) & 0x7fffffff;
+    if (!data.iv1) {
+        data.iv1 = 1;
+    }
+    if (!data.iv2) {
+        data.iv2 = 1;
+    }
+}
+#endif
+
 int random_from_stdlib(void) {
+#ifdef E2E_TESTS
+    if (data.has_test_seed) {
+        return rand();
+    }
+#endif
     time_t t;
     t = time(&t);
     if (data.last_seed != t) {

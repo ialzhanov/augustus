@@ -14,6 +14,10 @@
 
 #include "SDL.h"
 
+#ifdef E2E_TESTS
+#include "core/image.h"
+#endif
+
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -121,6 +125,33 @@ static struct {
     int should_correct_texture_offset;
     int disable_linear_filter;
 } data;
+
+#ifdef E2E_TESTS
+static int e2e_draw_counts[IMAGE_MAIN_ENTRIES][2];
+
+int platform_renderer_is_software(void)
+{
+    return data.is_software_renderer;
+}
+
+void platform_renderer_e2e_reset_counts(void)
+{
+    memset(e2e_draw_counts, 0, sizeof(e2e_draw_counts));
+}
+
+int platform_renderer_e2e_count(int image_id, int is_hd)
+{
+    return image_id >= 0 && image_id < IMAGE_MAIN_ENTRIES ? e2e_draw_counts[image_id][is_hd ? 1 : 0] : 0;
+}
+
+static void e2e_count_draw(const image *img)
+{
+    const image *main_images = image_get(0);
+    if (img >= main_images && img < main_images + IMAGE_MAIN_ENTRIES) {
+        e2e_draw_counts[img - main_images][img->hd.density ? 1 : 0]++;
+    }
+}
+#endif
 
 static int save_screen_buffer(color_t *pixels, int x, int y, int width, int height, int row_width)
 {
@@ -522,6 +553,9 @@ static void draw_texture_advanced(const image *img, float x, float y, color_t co
         return;
     }
 
+#ifdef E2E_TESTS
+    e2e_count_draw(img);
+#endif
     int density = img->hd.density;
     SDL_Texture *texture = density ? get_hd_texture(img->hd.atlas_id) : get_texture(img->atlas.id);
 

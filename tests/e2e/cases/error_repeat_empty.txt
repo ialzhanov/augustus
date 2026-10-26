@@ -1,0 +1,6 @@
+# expect: error
+# expect-log: repeat needs
+# A repeat block with no zoom value runs no lines. That is an error, not a pass.
+repeat zoom 200 50 5 offsets 0,0
+check money == -1
+end

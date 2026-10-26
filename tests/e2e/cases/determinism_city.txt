@@ -1,0 +1,6 @@
+# expect: pass
+# The same test gives the same state in each run (run.sh --twice compares the dumps).
+load_map Caesarea
+seed 1234
+run ticks 5000
+dump end

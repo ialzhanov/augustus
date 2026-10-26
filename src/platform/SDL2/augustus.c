@@ -6,6 +6,7 @@
 #include "core/lang.h"
 #include "core/log.h"
 #include "core/time.h"
+#include "game/e2e.h"
 #include "game/game.h"
 #include "game/settings.h"
 #include "game/system.h"
@@ -38,6 +39,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef E2E_TESTS
+#include <unistd.h>
+#endif
 
 #ifdef _MSC_VER
 #include <windows.h>
@@ -526,6 +531,16 @@ static const char *ask_for_data_dir(int again)
 
 static int pre_init(const char *custom_data_dir)
 {
+#ifdef E2E_TESTS
+    if (e2e_is_active()) {
+        // No message box and no folder dialog: they wait for a person
+        if (!custom_data_dir || !platform_file_manager_set_base_path(custom_data_dir)) {
+            SDL_Log("The test mode needs the Caesar 3 data folder as the last argument");
+            return 0;
+        }
+        return game_pre_init();
+    }
+#endif
     if (custom_data_dir) {
         SDL_Log("Loading game from %s", custom_data_dir);
         if (!platform_file_manager_set_base_path(custom_data_dir)) {
@@ -601,6 +616,39 @@ static int pre_init(const char *custom_data_dir)
     return 0;
 }
 
+#ifdef E2E_TESTS
+#define E2E_WINDOW_WIDTH 1280
+#define E2E_WINDOW_HEIGHT 800
+
+// Test mode does not use the user options. Each test starts from the built-in defaults.
+static void use_test_defaults(void)
+{
+    for (int key = 0; key < CONFIG_MAX_ENTRIES; key++) {
+        config_set(key, config_get_default_value(key));
+    }
+    settings_load_defaults();
+    setting_set_display(0, E2E_WINDOW_WIDTH, E2E_WINDOW_HEIGHT);
+}
+
+static int setup_error_status(int status)
+{
+    return e2e_is_active() ? E2E_ERROR : status;
+}
+
+// setup() changes the working folder to the data folder, so the test paths must be absolute
+static const char *make_absolute(const char *path, char *result)
+{
+    char folder[FILE_NAME_MAX];
+    if (path[0] == '/' || !getcwd(folder, FILE_NAME_MAX)) {
+        return path;
+    }
+    snprintf(result, FILE_NAME_MAX, "%s/%s", folder, path);
+    return result;
+}
+#else
+#define setup_error_status(status) (status)
+#endif
+
 static void setup(const augustus_args *args)
 {
     system_setup_crash_handler();
@@ -609,9 +657,18 @@ static void setup(const augustus_args *args)
     SDL_Log("Augustus version %s, %s build", system_version(), system_architecture());
     SDL_Log("Running on: %s", system_OS());
 
+#ifdef E2E_TESTS
+    if (args->test_file) {
+        e2e_set_active(args->test_file);
+        // No sound in test mode
+        SDL_setenv("SDL_AUDIODRIVER", "dummy", 1);
+        SDL_setenv("SDL_AUDIO_DRIVER", "dummy", 1);
+    }
+#endif
+
     if (!init_sdl(args->enable_joysticks)) {
         SDL_Log("Exiting: SDL init failed");
-        exit_with_status(-1);
+        exit_with_status(setup_error_status(-1));
     }
 
 #ifdef __vita__
@@ -622,8 +679,14 @@ static void setup(const augustus_args *args)
 
     if (!pre_init(base_dir)) {
         SDL_Log("Exiting: game pre-init failed");
-        exit_with_status(1);
+        exit_with_status(setup_error_status(1));
     }
+
+#ifdef E2E_TESTS
+    if (e2e_is_active()) {
+        use_test_defaults();
+    }
+#endif
 
     // If starting the log file failed (because, for example, the executable path isn't writable)
     // try again, placing the log file on the C3 path
@@ -654,7 +717,7 @@ static void setup(const augustus_args *args)
     encoding_to_utf8(lang_get_string(9, 0), title, 100, 0);
     if (!platform_screen_create(title, config_get(CONFIG_SCREEN_DISPLAY_SCALE), args->display_id)) {
         SDL_Log("Exiting: SDL create window failed");
-        exit_with_status(-2);
+        exit_with_status(setup_error_status(-2));
     }
 
 #ifdef PLATFORM_ENABLE_INIT_CALLBACK
@@ -687,7 +750,7 @@ static void setup(const augustus_args *args)
 
     if (!result) {
         SDL_Log("Exiting: game init failed");
-        exit_with_status(2);
+        exit_with_status(setup_error_status(2));
     }
 
     data.quit = 0;
@@ -698,15 +761,34 @@ int main(int argc, char **argv)
 {
     augustus_args args;
     if (!platform_parse_arguments(argc, argv, &args)) {
+#ifdef E2E_TESTS
+        if (args.test_file) {
+            exit_with_status(E2E_ERROR);
+        }
+#endif
 #if !defined(_WIN32) && !defined(__vita__) && !defined(__SWITCH__) && !defined(__ANDROID__) && !defined(__APPLE__)
         // Only exit on Linux platforms where we know the system will not throw any weird arguments our way
         exit_with_status(1);
 #endif
     }
 
+#ifdef E2E_TESTS
+    static char test_file[FILE_NAME_MAX];
+    static char test_out_dir[FILE_NAME_MAX];
+    if (args.test_file) {
+        args.test_file = make_absolute(args.test_file, test_file);
+        args.test_out_dir = make_absolute(args.test_out_dir ? args.test_out_dir : "e2e-results", test_out_dir);
+    }
+#endif
+
     setup(&args);
 
-
+#ifdef E2E_TESTS
+    if (args.test_file) {
+        // Exit here and do not call game_exit(): it saves the test defaults over the user options.
+        exit_with_status(e2e_run(args.test_file, args.test_out_dir, args.test_update_images));
+    }
+#endif
 
     mouse_set_inside_window(1);
     mouse_set_window_focus(1);

@@ -1,0 +1,6 @@
+# expect: fail
+# expect-log: FAIL line 6: check money == -1: actual
+# expect-file: state_failure.json
+# A check that cannot pass gives exit code 1 and the actual value.
+load_map Caesarea
+check money == -1

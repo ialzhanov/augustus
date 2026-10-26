@@ -5,6 +5,13 @@
 
 int platform_renderer_init(void *window);
 
+#ifdef E2E_TESTS
+int platform_renderer_is_software(void);
+void platform_renderer_e2e_reset_counts(void);
+// The number of draws of a main image since the reset, with (is_hd 1) or without (is_hd 0) an HD texture
+int platform_renderer_e2e_count(int image_id, int is_hd);
+#endif
+
 int platform_renderer_create_render_texture(int width, int height);
 
 int platform_renderer_lost_render_texture(void);

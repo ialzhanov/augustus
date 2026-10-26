@@ -1,0 +1,9 @@
+# expect: pass
+# The same event does not run when its condition is false.
+load small_city.svx
+events money_bonus.xml
+set money 100
+mark
+run months 1
+check event 0 executions == 0
+check money == mark

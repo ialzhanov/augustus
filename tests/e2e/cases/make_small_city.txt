@@ -1,0 +1,23 @@
+# expect: pass
+# Makes saves/small_city.svx: one house next to a well, a market, a granary and
+# a warehouse. A road connects the house to the entry point at 0 30: a house
+# with no road to the entry is removed after some days (src/building/maintenance.c).
+# The house has building id 1. Run this recipe again after a save version change.
+new_map 60
+set money 10000
+place vacant_lot at 20 20
+place well at 21 21
+place market at 24 20
+place granary at 28 20
+place warehouse at 33 20
+place road at 0 30 to 0 22
+place road at 0 22 to 20 22
+run days 1                       # a tick changes the new buildings from "created" to "in use"
+check building 1 type == vacant_lot
+check building 1 state == 1      # BUILDING_STATE_IN_USE
+check building 5 state == 1
+check building_count well == 1
+check building_count market == 1
+check building_count granary == 1
+check building_count warehouse == 1
+save small_city.svx

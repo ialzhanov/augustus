@@ -74,4 +74,13 @@ int random_between_from_stdlib(int min, int max);
 
 double random_fractional_from_stdlib(void);
 
+#ifdef E2E_TESTS
+/**
+ * Sets a fixed seed for the end-to-end test mode. random_from_stdlib() then
+ * does not read the clock, and the random state takes a value from the seed.
+ * @param seed The seed
+ */
+void random_set_test_seed(uint32_t seed);
+#endif
+
 #endif // CORE_RANDOM_H

@@ -1,0 +1,6 @@
+# expect: pass
+# A capture of flat grass is the same as the approved image.
+load flat_grass.svx
+seed 1
+capture grass camera 40 40 zoom 100 size 640 480
+check image grass

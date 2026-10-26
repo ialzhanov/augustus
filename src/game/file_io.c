@@ -1984,6 +1984,27 @@ int game_file_io_write_saved_game(const char *filename)
     return 1;
 }
 
+#ifdef E2E_TESTS
+int game_file_io_hash_saved_game(uint32_t *hashes, int max_hashes)
+{
+    resource_set_mapping(RESOURCE_CURRENT_VERSION);
+    init_savegame_data(SAVE_GAME_CURRENT_VERSION);
+    savegame_save_to_state(&savegame_data.state);
+    int num_pieces = savegame_data.num_pieces < max_hashes ? savegame_data.num_pieces : max_hashes;
+    for (int i = 0; i < num_pieces; i++) {
+        const buffer *buf = &savegame_data.pieces[i].buf;
+        // FNV-1a over the written bytes of the piece
+        uint32_t hash = 2166136261u;
+        for (int j = 0; j < (int) buf->size; j++) {
+            hash = (hash ^ buf->data[j]) * 16777619u;
+        }
+        hashes[i] = hash;
+    }
+    clear_savegame_pieces();
+    return num_pieces;
+}
+#endif
+
 int game_file_io_delete_saved_game(const char *filename)
 {
     log_info("Deleting game", filename, 0);

@@ -1,0 +1,25 @@
+# expect: pass
+# The state commands and queries that the other cases do not use.
+load small_city.svx
+set stock 4 wheat 300            # building 4 is the granary
+check stock 4 wheat == 300
+set stock 5 pottery 20           # building 5 is the warehouse; the unit is a cart load (4 in each of 8 spaces)
+check stock 5 pottery == 20
+set stock 5 pottery 10
+check stock 5 pottery == 10
+check city_stock pottery == 10
+set favor 60
+check favor == 60
+config gameplay_buyers_dont_distribute 1
+mark
+cheat addmoney 500
+check money == mark + 500
+date 0 3 2
+mark
+run days 2
+check day == 4
+run until 1 0
+check year == mark + 1
+check month == 0
+clear 24 20 25 21                # the market
+check building_count market == 0
