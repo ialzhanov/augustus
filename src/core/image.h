@@ -66,6 +66,12 @@ typedef struct image {
         int x_offset;
         int y_offset;
     } atlas;
+    struct {
+        int density; /**< 0 = no high-resolution version; N = N times the original resolution */
+        int atlas_id; /**< Texture index inside the ATLAS_HD atlas */
+        int x_offset; /**< Position of the uncropped image in the high-resolution atlas */
+        int y_offset;
+    } hd;
 } image;
 
 /**

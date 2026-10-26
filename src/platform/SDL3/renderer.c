@@ -416,8 +416,10 @@ static const image_atlas_data *get_texture_atlas(atlas_type type)
 
 static void free_all_textures(void)
 {
-    for (atlas_type i = ATLAS_FIRST; i < ATLAS_MAX - 1; i++) {
-        free_texture_atlas_and_data(i);
+    for (atlas_type i = ATLAS_FIRST; i < ATLAS_MAX; i++) {
+        if (i != ATLAS_EXTERNAL) {
+            free_texture_atlas_and_data(i);
+        }
     }
     for (int i = 0; i < CUSTOM_IMAGE_MAX; i++) {
         if (data.custom_textures[i].texture) {
@@ -472,6 +474,14 @@ static SDL_Texture *get_texture(int texture_id)
     return data.texture_lists[type][texture_id & IMAGE_ATLAS_BIT_MASK];
 }
 
+static SDL_Texture *get_hd_texture(int index)
+{
+    if (!data.texture_lists[ATLAS_HD] || index < 0 || index >= data.atlas_data[ATLAS_HD].num_images) {
+        return 0;
+    }
+    return data.texture_lists[ATLAS_HD][index];
+}
+
 static void set_texture_color_and_scale_mode(SDL_Texture *texture, color_t color, float scale)
 {
     if (!color) {
@@ -505,7 +515,8 @@ static void draw_texture_advanced(const image *img, float x, float y, color_t co
         return;
     }
 
-    SDL_Texture *texture = get_texture(img->atlas.id);
+    int density = img->hd.density;
+    SDL_Texture *texture = density ? get_hd_texture(img->hd.atlas_id) : get_texture(img->atlas.id);
 
     if (!texture) {
         return;
@@ -513,7 +524,8 @@ static void draw_texture_advanced(const image *img, float x, float y, color_t co
 
     float scale = scale_x == scale_y ? scale_x : 0.0f;
 
-    set_texture_color_and_scale_mode(texture, color, scale);
+    // High-resolution images are always drawn smaller than their texture, so they always use linear filtering
+    set_texture_color_and_scale_mode(texture, color, density ? 0.0f : scale);
 
     x += img->x_offset;
     y += img->y_offset;
@@ -522,6 +534,13 @@ static void draw_texture_advanced(const image *img, float x, float y, color_t co
 
     SDL_FRect src_coords = { img->atlas.x_offset + src_correction, img->atlas.y_offset + src_correction,
         img->width - src_correction, img->height - src_correction };
+    if (density) {
+        src_coords = (SDL_FRect) {
+            img->hd.x_offset + (img->x_offset + src_correction) * density,
+            img->hd.y_offset + (img->y_offset + src_correction) * density,
+            (img->width - src_correction) * density, (img->height - src_correction) * density
+        };
+    }
 
     // When zooming out, instead of drawing the grid image, we reduce the isometric textures' size,
     // which ends up simulating a grid without any performance penalty
