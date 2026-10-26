@@ -364,8 +364,10 @@ LIGHT = dict(el=35, az=-50, sun=4.2, fill=0.5, amb=0.02)   # hard light: origina
 LIGHT.update({k: float(v) for k, v in (kv.split('=') for kv in os.environ.get('C3_LIGHT', '').split(',') if kv)})
 
 
-def render(W, H, tiles=1, samples=128):
-    """W x H sprite of an n x n building; writes OUT (or the top part when TOP)"""
+def render(W, H, tiles=1, samples=128, edge_fade=False):
+    """W x H sprite of an n x n building; writes OUT (or the top part when TOP).
+    edge_fade: shadows of the building fade out toward the front tile edges (a second render without them is blended
+    in), so a long shadow does not stop at the tile edge where the engine cuts the sprite (the next tile is lit)."""
     if TOP:
         for name in GROUND:
             bpy.data.objects[name].is_holdout = True
@@ -403,6 +405,24 @@ def render(W, H, tiles=1, samples=128):
         sc.render.border_min_y, sc.render.border_max_y = foot_h / H, 1.0   # rows 0 .. H - foot_h (top part)
     sc.render.filepath = OUT
     bpy.ops.render.render(write_still=True)
+    if edge_fade and not TOP:
+        import numpy as np
+        for o in sc.objects:
+            if o.name not in GROUND and o.type == 'MESH':
+                o.visible_shadow = False
+        sc.render.filepath = OUT.replace('.png', '_noshadow.png')
+        bpy.ops.render.render(write_still=True)
+        a, b = (bpy.data.images.load(f) for f in (OUT, sc.render.filepath))
+        w, h = a.size
+        pa = np.array(a.pixels[:]).reshape(h, w, 4); pb = np.array(b.pixels[:]).reshape(h, w, 4)   # bottom row first
+        yy, xx = np.mgrid[0:h, 0:w] / SCALE
+        cy = foot_h                                      # tile centre, rows from the bottom
+        dist = np.abs(xx - W / 2) / (W / 2) + np.abs(yy - cy) / (15 * tiles)
+        f = np.clip((dist - 0.6) / 0.25, 0, 1) * np.clip((cy + 3 - yy) / 6, 0, 1)    # front half: no building there
+        f = (f * f * (3 - 2 * f))[..., None]
+        out = pa + (np.maximum(pb, pa) - pa) * f         # only lighten: remove shadow, keep everything else
+        a.pixels.foreach_set(out.astype(np.float32).ravel()); a.filepath_raw = OUT; a.file_format = 'PNG'; a.save()
+        os.remove(sc.render.filepath)
 
 
 # ---------- props (shared by all sprites) ----------
