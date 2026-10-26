@@ -20,8 +20,10 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -68,6 +70,8 @@ type job struct {
 	Started time.Time `json:"started,omitzero"`
 	Ended   time.Time `json:"ended,omitzero"`
 	Log     string    `json:"log"`
+	// External: a Blender render that the server did not start (a batch from the command line). ID is -pid.
+	External bool `json:"external,omitempty"`
 }
 
 func main() {
@@ -293,10 +297,51 @@ func (s *server) handleJobs(w http.ResponseWriter, r *http.Request) {
 	s.jobsMu.Lock()
 	defer s.jobsMu.Unlock()
 	out := make([]job, 0, len(s.jobs))
+	busy := map[string]bool{}
 	for i := len(s.jobs) - 1; i >= 0 && len(out) < 50; i-- {
 		out = append(out, *s.jobs[i])
+		if j := s.jobs[i]; j.Status == "running" {
+			busy[fmt.Sprintf("%s:%d", j.Climate, j.Sprite)] = true
+		}
+	}
+	if ps, err := exec.Command("ps", "-axo", "pid=,args=").Output(); err == nil {
+		for _, j := range externalRenders(string(ps)) {
+			if !busy[fmt.Sprintf("%s:%d", j.Climate, j.Sprite)] {
+				out = append(out, j)
+			}
+		}
 	}
 	writeJSON(w, http.StatusOK, out)
+}
+
+// renderArgs matches a pipeline Blender render: -P <script> -- .../blender/out/[./|<climate>/]<id>_8[top].png
+var renderArgs = regexp.MustCompile(`^\s*(\d+) \S*Blender -b -P (\S+) -- \S*/out/(?:\./)?(?:(c3_north|c3_south)/)?(\d+)_8(?:top)?\.png`)
+
+// externalRenders lists the Blender renders in `ps -axo pid=,args=` output as running jobs, one per sprite.
+func externalRenders(ps string) []job {
+	var out []job
+	seen := map[string]bool{}
+	for _, line := range strings.Split(ps, "\n") {
+		m := renderArgs.FindStringSubmatch(line)
+		if m == nil {
+			continue
+		}
+		pid, _ := strconv.Atoi(m[1])
+		id, _ := strconv.Atoi(m[4])
+		climate := m[3]
+		if climate == "" {
+			climate = "c3"
+		}
+		script := filepath.Base(m[2])
+		if script == "terrain.py" {
+			script = "terrain"
+		}
+		if key := fmt.Sprintf("%s:%d", climate, id); !seen[key] {
+			seen[key] = true
+			out = append(out, job{ID: -pid, Sprite: id, Climate: climate, Script: script, Status: "running", External: true})
+		}
+	}
+	return out
 }
 
 func (s *server) worker() {

@@ -193,3 +193,21 @@ func TestGenerateNeedsScriptAndOneJobPerSprite(t *testing.T) {
 		t.Fatalf("second job for the same sprite queued: %d", rec.Code)
 	}
 }
+
+func TestExternalRenders(t *testing.T) {
+	ps := `  58936 /Applications/Blender.app/Contents/MacOS/Blender -b -P terrain.py -- /x/blender/out/./334_8.png 8 -- 334 /x/originals/334.png
+  58937 /Applications/Blender.app/Contents/MacOS/Blender -b -P tent.py -- /x/blender/out/c3_north/2781_8top.png 8 top -- 2781
+  58938 /Applications/Blender.app/Contents/MacOS/Blender -b -P tent.py -- /x/blender/out/c3_north/2781_8.png 8 -- 2781
+  58939 /Applications/Blender.app/Contents/MacOS/Blender -b -P calibrate.py -- /tmp/white.png 8
+  58940 grep Blender`
+	got := externalRenders(ps)
+	if len(got) != 2 {
+		t.Fatalf("want 2 renders (one per sprite), got %+v", got)
+	}
+	if j := got[0]; j.ID != -58936 || j.Sprite != 334 || j.Climate != "c3" || j.Script != "terrain" || j.Status != "running" || !j.External {
+		t.Errorf("terrain render: %+v", j)
+	}
+	if j := got[1]; j.Sprite != 2781 || j.Climate != "c3_north" || j.Script != "tent.py" {
+		t.Errorf("tent render: %+v", j)
+	}
+}
