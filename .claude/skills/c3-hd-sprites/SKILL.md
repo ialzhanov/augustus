@@ -95,6 +95,9 @@ Add a test to `test_check.py` for every new fault class, then a check. Never loo
 - `edge_fade` removes the shadows near the tile edge, so the edge band gets lighter: rocks failed `rim` with it.
 - `rim` once measured the two images on different pixels: a top part stays opaque at the tile edge, the footprint does not. The original itself measured 1.09. It now uses the same pixels in both (test in `test_check.py`).
 - `make.sh` keeps the Blender log of each pass in `out/<id>_blender*.log`: some renders fail with no "rror:" line.
+- - Trees and shrubs (254-261, 274-305) use `terrain.py` tree mode: `foliage.py` splits the canopy into circles (a sphere of radius R shows as a circle of 41 R px); each becomes a crown of leaf clusters in the original's screen-space colours, with a trunk or a leaf column to the ground. Dense tiles get undergrowth clusters; tiles with single trees on grass (`OPEN_GROUND`) do not: the colour rule takes the tree shadow for foliage, and lit clusters there doubled the contrast. Leaf clusters shade each other: `LEAF_CAL` 1.3.
+- Meadow (262-273): tall blades at the foot of each light yellow vertical run of pixels.
+- Sprites higher than wide: Blender fits `ortho_scale` to the larger side. `c3.render` corrects it; `test_camera.py` (run in Blender) checks a half-tile ground and a pole in three frame shapes. A full-tile ground did not show the fault (the frame cut it).
 - - zsh does not split an unquoted variable into words: `./terrain_make.sh $ids` gives one argument. Use `${=ids}`.
 
 ## Parallel work
