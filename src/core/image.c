@@ -6,6 +6,7 @@
 #include "building/image.h"
 #include "core/buffer.h"
 #include "core/file.h"
+#include "core/image_hd.h"
 #include "core/image_packer.h"
 #include "core/io.h"
 #include "core/log.h"
@@ -997,6 +998,8 @@ int image_load_climate(int climate_id, int is_editor, int force_reload, int keep
     if (is_editor) {
         image_load_main_aux_finalize();
     }
+
+    image_hd_load(data.main, IMAGE_MAIN_ENTRIES, filename_idx);
 
     // Update native huts alternative images after climate change.
     update_native_images(data.current_climate, climate_id);

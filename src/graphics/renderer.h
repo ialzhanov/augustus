@@ -13,8 +13,12 @@ typedef enum {
     ATLAS_CUSTOM,
     ATLAS_MAIN_AUX,
     ATLAS_EXTERNAL,
+    ATLAS_HD, // not encoded in image ids: images store only the texture index in image.hd.atlas_id
     ATLAS_MAX
 } atlas_type;
+
+// Image ids store the atlas type above IMAGE_ATLAS_BIT_OFFSET in a signed int: the type must stay below the sign bit
+_Static_assert(ATLAS_EXTERNAL < (1 << (31 - IMAGE_ATLAS_BIT_OFFSET)), "atlas type does not fit in an image id");
 
 typedef enum {
     CUSTOM_IMAGE_NONE,
