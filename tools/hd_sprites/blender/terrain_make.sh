@@ -13,8 +13,8 @@ SUB=$($P -c "import sys; sys.path.insert(0, '..'); from sg import sub; print(sub
 pass=0; fail=0; skip=0; SEED0=$C3_SEED
 for ID in "$@"; do
   ORIG=$($P -c "import sys; sys.path.insert(0, '..'); from sg import orig_path; print(orig_path('$C3_CLIMATE', $ID))")
-  H=$($P -c "from PIL import Image; print(Image.open('$ORIG').height)")
-  if [ "$H" != 30 ]; then echo "skip $ID (height $H: has a part above the tile)"; skip=$((skip+1)); continue; fi
+  read -r Wd H <<< "$($P -c "from PIL import Image; im=Image.open('$ORIG'); print(im.width, im.height)")"
+  if [ "$H" != $(( 30 * ((Wd + 2) / 60) )) ]; then echo "skip $ID (height $H: has a part above the tile)"; skip=$((skip+1)); continue; fi
   export C3_SEED=${SEED0:-$ID}
   rm -f $O/${ID}_8.png $O/${ID}.png   # a failed render must not leave an old image to check
   $B -b -P terrain.py -- $PWD/$O/${ID}_8.png 8 -- $ID $ORIG 2>&1 | grep -E "rror:" || true

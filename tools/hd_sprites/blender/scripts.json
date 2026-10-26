@@ -4,6 +4,9 @@
     {"from": 2779, "to": 2782, "script": "tent.py"},
     {"from": 306, "to": 363, "script": "terrain"},
     {"from": 476, "to": 533, "script": "terrain"},
-    {"from": 364, "to": 443, "script": "terrain"}
+    {"from": 364, "to": 443, "script": "terrain"},
+    {"from": 591, "to": 657, "script": "terrain"},
+    {"from": 246, "to": 253, "script": "terrain"},
+    {"from": 3140, "to": 3147, "script": "terrain"}
   ]
 }

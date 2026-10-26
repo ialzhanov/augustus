@@ -142,13 +142,15 @@ def checks(orig_path, hd_path, has_top=False, top_path=None):
         return (a[..., 1] > a[..., 0] + 5) & (a[..., 1] > a[..., 2] + 15)
     ring = oa & (a_hd > 0.5) & (dist > 0.78) & (dist < 0.97) & (yy > cy)        # front edges: never under a building
     ring_o, ring_g = ring & green(o), ring & green(g)                            # grass pixels only (no clutter)
-    if ring_g.sum() > 10:
-        new = lab(g[ring_g][:, :3]).mean(0)
-        de_ring = np.linalg.norm(TERRAIN_GRASS_LAB - new)
-        de_own = np.linalg.norm(lab(o[ring_o][:, :3]).mean(0) - new) if ring_o.sum() > 10 else 99
+    # own original: compare at the SAME pixels (where the original is green, else where ours is green), so a verge
+    # that turned pale or grey cannot pass by no longer being green; terrain grass: our green pixels, if any
+    at = ring_o if ring_o.sum() > 10 else ring_g
+    if at.sum() > 10:
+        de_own = np.linalg.norm(lab(o[at][:, :3]).mean(0) - lab(g[at][:, :3]).mean(0))
+        de_ring = np.linalg.norm(TERRAIN_GRASS_LAB - lab(g[ring_g][:, :3]).mean(0)) if ring_g.sum() > 10 else 99
     else:
-        de_ring = de_own = 0
-    res['edge'] = (min(de_ring, de_own) <= 6, f'edge grass dE {de_ring:.1f} vs terrain grass, {de_own:.1f} vs own original (max 6)')
+        de_ring = de_own = 0                                                     # no grass at the edge in either
+    res['edge'] = (min(de_ring, de_own) <= 6, f'edge grass dE {de_ring:.1f} vs terrain grass, {de_own:.1f} vs own original at {at.sum()} px (max 6)')
     de_all = np.linalg.norm(lab(o[both][:, :3]).mean(0) - lab(g[both][:, :3]).mean(0))
     res['colour'] = (de_all <= 10, f'mean colour dE {de_all:.1f} (max 10)')
 
