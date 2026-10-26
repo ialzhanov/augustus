@@ -1,0 +1,5 @@
+# expect: pass
+# A new map uses the HD sprites too (new_map must load the game graphics again after the editor).
+new_map 60
+capture grass camera 30 30 zoom 100 size 320 240
+check hd grass terrain_grass_1

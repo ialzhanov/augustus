@@ -1,0 +1,5 @@
+# expect: error
+# expect-log: the test mode does not allow the yearly autosave
+# The yearly autosave writes augustus.ini, so the test mode refuses it.
+load small_city.svx
+config gameplay_change_yearly_autosave 1

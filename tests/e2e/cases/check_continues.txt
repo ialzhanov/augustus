@@ -1,0 +1,11 @@
+# expect: fail
+# expect-log: FAIL line 9: check money == 1: actual 15000, expected 1
+# expect-log: ok   line 10: check money == 15000
+# expect-log: FAIL line 11: check money < mark - 1: actual 15000, expected 14999
+# A failed check does not stop the test: each failed check shows in the log.
+load_map Caesarea
+mark
+check money == 15000
+check money == 1
+check money == 15000
+check money < mark - 1
